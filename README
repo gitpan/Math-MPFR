@@ -3,9 +3,9 @@ It wraps the 'mpfr-2.1.0' (floating point) functions. You'll get errors
 if you try to build Math-MPFR-1.04 (or later) against an earlier 
 version of the mpfr library. If you have an earlier version of the 
 mpfr library, try Math-MPFR-1.03 (or earlier, if necessary). 
-See http://www.mpfr.org/mpfr-current/ for
+See http://www.mpfr.org/mpfr-current/ for MPFR source and
 instructions on how to build the library - or see below for how to
-obtain Win32 pre-compiled binaries.
+obtain Win32 pre-compiled Math::MPFR binaries.
 
 For GMP, see http://swox.com/gmp .
 
@@ -32,16 +32,14 @@ If those files are in a location where your compiler does not find
 them by default, then instead of running 'perl Makefile.PL', you'll
 need to run:
 
-perl Makefile.pl INC=/path/to/needed_includes LIBS=/path/to/needed_libs
+perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes" LIBS="-L/path/to/mpfr_lib -L/path/to/gmp_lib -lmpfr -lgmp"
 
 (Alternatively you could copy the requisite files to a location where
 the compiler *does* find them by default - which was the option I 
 chose on Win32.)
 
 If you have a dynamic build of GMP, then the GMP shared library file 
-('.dll' or '.so') needs to be accessible to the system. A MS windows
-version of the GMP dll (libgmp-3.dll) is available from:
-http://www.kalinabears.com.au/w32perl/math_gmp.html .
+('.dll' or '.so') needs to be accessible to the system.
 
 Win32 pre-compiled binaries (with installation instructions) of 
 this module can be found at:

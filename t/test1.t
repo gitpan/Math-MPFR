@@ -4,6 +4,8 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
+$| = 1;
+
 print "1..76\n";
 
 my $double = 12345.5;
@@ -21,6 +23,10 @@ if(!$@) {$have_mpf = 1}
 
 eval{require Math::GnuMPq};
 if(!$@) {$have_mpq = 1}
+
+# Load the GMP module - trap the
+# error if the module is not available
+eval{require GMP};
 
 eval{require GMP::Mpz};
 if(!$@) {$have_Gmpz = 1}

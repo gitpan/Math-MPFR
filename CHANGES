@@ -52,3 +52,9 @@
    Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
    Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
    Rmpfr_rint_ceil Rmpfr_rint_floor
+
+1.05
+ - Add some checks to Makefile.PL to ensure that anyone trying to
+   build this module has an up-to-date MPFR library. This is mainly
+   an attempt to stop cpan testers who don't have an up-to-date MPFR
+   from testing the module and subsequently reporting "FAIL" or "NA".

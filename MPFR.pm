@@ -92,7 +92,7 @@ Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max
 Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
 Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
 Rmpfr_rint_ceil Rmpfr_rint_floor);
-    $Math::MPFR::VERSION = '1.04';
+    $Math::MPFR::VERSION = '1.05';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 

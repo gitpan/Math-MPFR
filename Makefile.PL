@@ -1,7 +1,12 @@
+use 5.006;
 use ExtUtils::MakeMaker;
 use Config;
 
-### NOTE ###
+$| = 1;
+
+### NOTE FOR MSVC COMPILERS ###
+# (This may no longer be relevant, but it won't break anything
+# so I'll leave it as is.)
 # '-lgcc' is simply MinGW\lib\libgcc.a renamed (copied) to 
 # 'libgcc.lib' and placed where the MSVC compiler can find it.
 # '-lcoldname' is simply MinGW\lib\libcoldname.a renamed (copied) to
@@ -11,6 +16,149 @@ use Config;
 if($Config{'cc'} =~ /cl/) {$libs = '-lmpfr -lgmp -lgcc -lcoldname'}
 else {$libs = '-lmpfr -lgmp'}
 
+sub have_compiler {
+    if($^O =~ /mswin32/i) {
+      if(system("$Config{cc} -o comp.exe comp.c >NUL 2>&1") == 0) {return 1}
+      else {return 0}
+      }
+
+    else {
+      if(system("$Config{cc} -o comp.exe comp.c 2>/dev/null") == 0) {return 1}
+      else {return 0}
+      }
+}
+
+print "Checking for a C compiler ....";
+
+if(!have_compiler) {
+  die <<EOD;
+
+******************************************
+Could not find your $Config{cc} compiler.
+If you know this is not an issue then feel
+free to modify the Makefile.PL to exclude
+this test, and then re-run the Makefile.PL.
+
+If the author has made a mistake in the
+construction of this test, please let him
+know:
+sisyphus at cpan dot org
+******************************************
+EOD
+  }
+else {print ".. found\n"}
+
+sub have_libraries {
+    my $CC = $Config{cc};
+    my %args = map{split /\s*=\s*/} @ARGV;
+    my $LIBS = $args{LIBS} || $libs;
+    my $INC = $args{INC};
+
+    if($^O =~ /mswin32/i) {
+      if(system("$CC check.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
+      else {return 0}
+      }
+
+    else {
+      if(system("$CC check.c $INC $LIBS 2>/dev/null") == 0) {return 1}
+      else {return 0}
+      }
+}
+
+print "Looking for GMP and MPFR libraries ...";
+
+if(!have_libraries) {
+  die <<EOD;
+
+******************************************
+Couldn't find libgmp and/or libmpfr -
+both of which are required for Math::MPFR.
+
+To obtain GMP go to:
+http://swox.com/gmp/
+
+To obtain MPFR go to:
+http://www.mpfr.org/
+
+If you have these 2 libraries installed,
+then apparently one (or both) was not
+found. Check the README for instructions.
+If the instructions are incorrect, please
+notify the author:
+sisyphus at cpan dot org
+
+You can, of course, modify Makefile.PL so 
+that this test is not conducted - then
+re-run it.
+******************************************
+EOD
+}
+else {print "... libraries found\n"}
+
+print "Checking that your MPFR library is up to date ...";
+
+sub get_version{
+    my $CC = $Config{cc};
+    my %args = map{split /\s*=\s*/} @ARGV;
+    my $LIBS = $args{LIBS} || $libs;
+    my $INC = $args{INC};
+
+    if($^O =~ /mswin32/i) {
+      unless(system("$CC -o version.exe version.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
+      my $v = `version.exe`;
+      my @v = split /\./, $v;
+      if($v[0] >= 2 && $v[1] >= 1 && $v[2] >= 0) {return 2}
+      print "\nYou have MPFR version $v\n";
+      return 0;
+      }
+
+    else {
+      unless(system("$CC -o version.exe version.c $INC $LIBS 2>/dev/null") == 0) {return 1}
+      my $v = `./version.exe`;
+      my @v = split /\./, $v;
+      if($v[0] >= 2 && $v[1] >= 1 && $v[2] >= 0) {return 2}
+      print "\nYou have MPFR version $v\n";
+      return 0;
+      }
+}
+
+$v_ok = get_version;
+
+if($v_ok == 2) {print ".. ok - up to date\n"}
+
+if($v_ok == 1) {
+  die <<EOD;
+
+In attempting to determine your MPFR version, the
+executable did not compile. This would indicate that
+you don't have a sufficiently recent version of MPFR. 
+You need MPFR version 2.1.0 or higher. Get it from:
+
+http://www.mpfr.org/
+
+Alternatively, if you think there's an error in 
+this check procedure, then edit the Makefile.PL
+to exclude this check, re-run it, and please 
+inform the author:
+sisyphus at cpan dot org
+EOD
+}
+
+if($v_ok == 0) {
+  die <<EOD;
+
+You need MPFR version 2.1.0 or higher. Get it from:
+
+http://www.mpfr.org/
+
+Alternatively, if you think there's an error in 
+this check procedure, then edit the Makefile.PL
+to exclude this check, re-run it, and please 
+inform the author:
+sisyphus at cpan dot org
+EOD
+}
+
 my %options = %{       
 {
   NAME => 'Math::MPFR',
@@ -18,7 +166,7 @@ my %options = %{
   LIBS => [
     $libs
   ],
-  'VERSION' => '1.04',
+  'VERSION' => '1.05',
 }
 };
 WriteMakefile(%options);

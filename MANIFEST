@@ -6,6 +6,9 @@ INLINE.h
 README
 CHANGES
 mpfr.info
+check.c
+comp.c
+version.c
 t/test1.t
 t/test2.t
 t/test3.t
