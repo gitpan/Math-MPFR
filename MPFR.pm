@@ -84,8 +84,8 @@ Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove
 Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
-Rmpfr_urandomb Rmpfr_random2);
-    $Math::MPFR::VERSION = '1.01';
+Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump);
+    $Math::MPFR::VERSION = '1.02';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -132,7 +132,7 @@ Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove
 Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
-Rmpfr_urandomb Rmpfr_random2
+Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump
 )]);
 
 sub Rmpfr_get_str {
@@ -181,8 +181,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    use Math::MPFR qw(:mpfr);
 
-   my $str = '123542@2'; # mantissa = 123452
+   my $str = '.123542@2'; # mantissa = (.)123452
                          # exponent = 2
+   #Alternatively:
+   # my $str = '12.3542';
+
    my $base = 10;
    my $rnd = GMP_RNDZ; # Rounding mode - can be set to
              # one of GMP_RNDN, GMP_RNDZ, GMP_RNDU,
@@ -204,7 +207,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    # string value, or whether it is less than (or greater 
    # than) the string value. See 'COMBINED INITIALISATION AND
    # ASSIGNMENT', below.
-   my ($bn3, $cmp) = Rmpfr_init_set_str($str, $base, $rnd);
+   my ($bn3, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
 
    # Perform some operations ... see 'FUNCTIONS' below.
    # see 'OPERATOR OVERLOADING' below for docs re
@@ -218,8 +221,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    # print out the value held by $bn1 (in decimal):
    print Rmpfr_get_str($bn1, 10, 0, $rnd), "\n";
-   # or just use the overloaded "" :
-   print "$bn1\n";
+   # or just make use of overloading :
+   print $bn1, "\n";
 
    # print out the value held by $bn1 (in base 16) using the
    # 'Rmpfr_out_str' function. (No newline is printed.)
@@ -333,7 +336,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    Eg something like Rmpfr_add($r1, $r1, $r1),
    where $r1 *is* the same reference to the same mpfr structure,
    would add $r1 to itself and store the result in $r1. Alternatively,
-   you could (courtesy of operatore overloading) simply code it
+   you could (courtesy of operator overloading) simply code it
    as $r1 += $r1. Otoh, Rmpfr_add($r1, $r2, $r3), where each of the
    arguments is a different reference to a different mpfr structure
    would add $r2 to $r3 and store the result in $r1. Alternatively
@@ -521,11 +524,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_str($rop, $str, $base, $rnd);
     Set $rop to the value of $str in base $base (between 2 and
     36), rounded in direction $rnd to the precision of $rop. 
-    The exponent is read in decimal.  This function returns -1 if an
-    internal overflow occurred (for instance, because the exponent is
-    too large). Otherwise it returns 0 if the base is valid and if
-    the entire string is a valid number in base $base, and 1 if
-    the input is incorrect.
+    The exponent is read in decimal.  This function returns 0 if
+    the entire string is a valid number in base $base. otherwise
+    it returns -1.
 
    Rmpfr_set_str_binary($rop, $str);
     Set $rop to the value of the binary number in $str, which has to
@@ -579,7 +580,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If $rop < 1st arg, $si is negative.
 
    ($rop, $si) = Rmpfr_init_set_str($str, $base, $rnd);
-   ($rop, $si) = Rmpfr_init_set_str($str, $base, $rnd);
+   ($rop, $si) = Rmpfr_init_set_str_nobless($str, $base, $rnd);
      Initialize $rop and set its value from $str in base $base,
      rounded to direction $rnd.  See `Rmpfr_set_str'.
 
@@ -970,9 +971,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Output $op on stdout in raw binary format (the exponent is in
     decimal, yet).
 
+   Rmpfr_dump($op, $rnd);
+    Output "$op\n" on stdout in base 2, rounded in direction $rnd.
+    As with 'Rmpfr_print_binary' the exponent is in base 10.
+
    #############
 
    MISCELLANEOUS
+
+   $GMP_version = Math::MPFR::gmp_v();
+    Returns the version of the GMP library (eg. 4.1.3).
+    The function is not exportable.
 
    $si = Rmpfr_rint($rop, $op, $rnd);
    $si = Rmpfr_ceil($rop, $op);
@@ -1134,18 +1143,22 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    ####################
 
    OPERATOR OVERLOADING
-
+    
+    Overloading works with numbers, strings (base 10 only) and
+    Math::MPFR objects.
     Overloaded operations are performed using the current
-    "default rounding mode".
+    "default rounding mode" (which you can determine using the
+    'Rmpfr_get_default_rounding_mode' function, and change using
+    the 'Rmpfr_set_default_rounding_mode' function).
 
     The following operators are overloaded:
-     + - * /
-     += -= *= /= 
-     ** **= sqrt
+     + - * / ** sqrt (Return value has default precision)
+     += -= *= /= **= (Precision remains unchanged)
      < <= > >= == != <=>
-     ! not abs
-     atan2 cos sin log exp
-     int (on perl 5.8 only, NA on perl 5.6)
+     ! not
+     abs atan2 cos sin log exp (Return value has default precision)
+     int (On perl 5.8 only, NA on perl 5.6. The return value
+          has default precision)
      = ""
 
     Attempting to use the overloaded operators with objects that

@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..45\n";
+print "1..51\n";
 
 Rmpfr_set_default_prec(200);
 
@@ -703,6 +703,101 @@ if($@ =~ /Invalid argument/) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 45\n"}
 else {print "not ok 45\n"}
+
+$mbi = "this is a string";
+$ok = '';
+
+eval{$q = $p + $mbi;};
+if($@ =~ /Invalid string/) {$ok = 'a'}
+eval{$q = $p * $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'b'}
+eval{$q = $p - $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'c'}
+eval{$q = $p / $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'd'}
+eval{$q = $p ** $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'e'}
+eval{$p += $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'f'}
+eval{$p *= $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'g'}
+eval{$p -= $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'h'}
+eval{$p /= $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'i'}
+eval{$p **= $mbi;};
+if($@ =~ /Invalid string/) {$ok .= 'j'}
+eval{if($q >$mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'k'}
+eval{if($q <$mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'l'}
+eval{if($p >= $mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'm'}
+eval{if($p <= $mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'n'}
+eval{if($p <=> $mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'o'}
+eval{if($p == $mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'p'}
+eval{if($p != $mbi){};};
+if($@ =~ /Invalid string/) {$ok .= 'q'}
+
+if($ok eq 'abcdefghijklmnopq') {print "ok 46\n"}
+else {print "not ok 46\n"}
+
+$mbi = "-111111111111112.34567879";
+Rmpfr_set_si($p, 1234, GMP_RNDN);
+
+$q = $p + $mbi;
+$p = $q - $mbi;
+$q = $p * $mbi;
+$p = $q / $mbi;
+
+if($p == 1234
+   && get_refcnt($p) == 1
+   && get_refcnt($q) == 1) {print "ok 47\n"}
+else {print "not ok 47\n"}
+
+$p *= $mbi;
+$p /= $mbi;
+$p += $mbi;
+$p -= $mbi;
+
+if($p == 1234
+   && get_refcnt($p) == 1
+   && get_refcnt($q) == 1) {print "ok 48\n"}
+else {print "not ok 48\n"}
+
+$q = $mbi + $p;
+$p = $mbi - $q;
+
+if($p == -1234
+   && get_refcnt($p) == 1
+   && get_refcnt($q) == 1) {print "ok 49\n"}
+else {print "not ok 49\n"}
+
+$q = $mbi * $p;
+$p = $mbi / $q;
+
+if($p < -0.00081 && $p > -0.000811
+   && get_refcnt($p) == 1
+   && get_refcnt($q) == 1) {print "ok 50\n"}
+else {print "not ok 50\n"}
+
+Rmpfr_set_str($p, "1234567.123", 10, GMP_RNDN);
+
+if($p > $mbi &&
+   $p >= $mbi &&
+   $mbi < $p &&
+   $mbi <= $p &&
+   ($p <=> $mbi) > 0 &&
+   ($mbi <=> $p) < 0 &&
+   $p != $mbi &&
+   !($p == $mbi) &&
+   get_refcnt($p) == 1) {print "ok 51\n"}
+else {print "not ok 51\n"}
+
+
 
 sub adjust {
     if($_[0]) {

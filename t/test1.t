@@ -4,7 +4,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..77\n";
+print "1..81\n";
 
 my $double = 12345.5;
 my $ui = 4;
@@ -834,19 +834,36 @@ if(1) {
 
   Rgmp_randclear($state);
   }
-#else {print "ok 77 - skipped - no Math::GMP\n"}
 
-
-# Run the following to test Rmpfr_out_str,
-# Rmpfr_print_binary and Rmpfr_inp_str
-__END__
 Rmpfr_set_d($c, 1123.5, GMP_RNDN);
-Rmpfr_out_str($c, 10, 0, GMP_RNDN);
-print "\n";
-Rmpfr_print_binary($c);
+eval {Rmpfr_out_str($c, 10, 0, GMP_RNDN);
+      print "\n";};
+
+if($@) {print "not ok 78\n"}
+else {print "ok 78\n"}
+
+eval {Rmpfr_print_binary($c);
+      print "\n";};
+
+if($@) {print "not ok 79\n"}
+else {print "ok 79\n"} 
+
+eval {Rmpfr_dump($c, GMP_RNDN);};
+
+if($@) {print "not ok 80\n"}
+else {print "ok 80\n"} 
+
+eval{print "GMP Version: ", Math::MPFR::gmp_v(), "\n";};
+
+if($@) {print "not ok 81\n"}
+else {print "ok 81\n"}    
+
+# Run the following to test Rmpfr_inp_str
+# and Rmpfr_dump
+__END__
 print "\nEnter a number [eg .11235\@4]\n";
 Rmpfr_inp_str($check, 10, GMP_RNDN);
 print "\n";
-Rmpfr_out_str($check, 10, 0, GMP_RNDN);
+Rmpfr_dump($check, GMP_RNDN);
 print "\n";
 
