@@ -4,14 +4,14 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..81\n";
+print "1..76\n";
 
 my $double = 12345.5;
 my $ui = 4;
 my $si = -1369012;
 
-my($have_mpz, $have_mpf, $have_mpq, $have_gmp, $have_Gmpz,
-   $have_Gmpq, $have_Gmpf) = (0, 0, 0, 0, 0, 0, 0);
+my($have_mpz, $have_mpf, $have_mpq, $have_Gmpz,
+   $have_Gmpq, $have_Gmpf) = (0, 0, 0, 0, 0, 0);
 
 eval{require Math::GnuMPz};
 if(!$@) {$have_mpz = 1}
@@ -21,9 +21,6 @@ if(!$@) {$have_mpf = 1}
 
 eval{require Math::GnuMPq};
 if(!$@) {$have_mpq = 1}
-
-eval{require Math::GMP};
-if(!$@) {$have_gmp = 1}
 
 eval{require GMP::Mpz};
 if(!$@) {$have_Gmpz = 1}
@@ -448,8 +445,8 @@ if($have_mpz) {
    if(Rmpfr_inf_p($check)) {$ok .= 'd'}
 
    if($ok eq 'abcd' && !$flag
-     && get_refcnt($c) == 1
-     && get_refcnt($check) == 1){print "ok 47\n"}
+     && Math::MPFR::get_refcnt($c) == 1
+     && Math::MPFR::get_refcnt($check) == 1){print "ok 47\n"}
    else {print "not ok 47\n"}
    }
 else {print "ok 47 - skipped - no Math::GnuMPz\n"}
@@ -468,40 +465,20 @@ my $flag = Rmpfr_nanflag_p();
 
 $check = $check / $c;
 if(!$flag && Rmpfr_nanflag_p()
-   && get_refcnt($check) == 1
-   && get_refcnt($c) == 1) {print "ok 48\n"}
+   && Math::MPFR::get_refcnt($check) == 1
+   && Math::MPFR::get_refcnt($c) == 1) {print "ok 48\n"}
 else {print "not ok 48\n"}
 
 ########################
 
-if($have_gmp) {
-  $z = Math::GMP->new("1123");
-  Rmpfr_set_z($c, $z, GMP_RNDN);
-  if($c == 1123 && get_refcnt($z) == 1
-     && get_package_name($z) eq "Math::GMP") {print "ok 49\n"}
-  else {print "not ok 49\n"}
-  }
-else {print "ok 49 - skipped - no Math::GMP\n"}
-
 if($have_Gmpz) {
   $z = GMP::Mpz::mpz(11213);
   Rmpfr_set_z($c, $z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpz") {print "ok 50\n"}
-  else {print "not ok 50\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpz") {print "ok 49\n"}
+  else {print "not ok 49\n"}
   }
-else {print "ok 50 - skipped - no GMP::Mpz\n"}
-
-if($have_gmp) {
-  Rmpfr_set_prec($c, 53);
-  Rmpfr_set_ui($c, 2, GMP_RNDN);
-  $z = Math::GMP->new(0);
-  my $exp = Rmpfr_get_z_exp($z, $c);
-  if($exp == -51 && "$z" eq '4503599627370496'
-     && get_package_name($z) eq "Math::GMP") {print "ok 51\n"}
-  else {print "not ok 51\n"}
-  }
-else {print "ok 51 - skipped - no Math::GMP\n"}
+else {print "ok 49 - skipped - no GMP::Mpz\n"}
 
 if($have_Gmpz) {
   Rmpfr_set_prec($c, 53);
@@ -509,22 +486,10 @@ if($have_Gmpz) {
   Rmpfr_set_ui($c, 2, GMP_RNDN);
   my $exp = Rmpfr_get_z_exp($z, $c);
   if($exp == -51 && "$z" eq '4503599627370496'
-     && get_package_name($z) eq "GMP::Mpz") {print "ok 52\n"}
-  else {print "not ok 52\n"}
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpz") {print "ok 50\n"}
+  else {print "not ok 50\n"}
   }
-else {print "ok 52 - skipped - no GMP::Mpz\n"}
-
-if($have_gmp) {
-  $z = Math::GMP->new(11234);
-  Rmpfr_set_prec($c, 300);
-  Rmpfr_set_ui($c, 237, GMP_RNDN);
-  Rmpfr_div_z($check2, $c, $z, GMP_RNDN);
-  Rmpfr_mul_z($check2, $check2, $z, GMP_RNDN);
-  if(Rmpfr_eq($check2, $c, 280)
-     && get_package_name($z) eq "Math::GMP") {print "ok 53\n"}
-  else {print "not ok 53\n"}
-  }
-else {print "ok 53 - skipped - no Math::GMP\n"}
+else {print "ok 50 - skipped - no GMP::Mpz\n"}
 
 if($have_Gmpz) {
   $z = GMP::Mpz::mpz(11231);
@@ -533,10 +498,10 @@ if($have_Gmpz) {
   Rmpfr_div_z($check2, $c, $z, GMP_RNDN);
   Rmpfr_mul_z($check2, $check2, $z, GMP_RNDN);
   if($check2 >= 235.999999 && $check2 <= 236.000001
-     && get_package_name($z) eq "GMP::Mpz") {print "ok 54\n"}
-  else {print "not ok 54\n"}
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpz") {print "ok 51\n"}
+  else {print "not ok 51\n"}
   }
-else {print "ok 54 - skipped - no GMP::Mpz\n"}
+else {print "ok 51 - skipped - no GMP::Mpz\n"}
 
 if($have_Gmpq) {
   Rmpfr_set_prec($c, 300);
@@ -544,83 +509,74 @@ if($have_Gmpq) {
   $q = GMP::Mpq::mpq(11/7);
   Rmpfr_div_q($check2, $c, $q, GMP_RNDN);
   Rmpfr_mul_q($check2, $check2, $q, GMP_RNDN);
-  if(Rmpfr_eq($check2, $c, 280)
-     && get_package_name($q) eq "GMP::Mpq") {print "ok 55\n"}
-  else {print "not ok 55\n"}
+  if($check2 - $c > -0.000001 && $check2 - $c < 0.000001 &&
+     Math::MPFR::get_package_name($q) eq "GMP::Mpq") {print "ok 52\n"}
+  else {print "not ok 52\n"}
   }
-else {print "ok 55 - skipped - no GMP::Mpq\n"}
-
-if($have_gmp) {
-  $z = Math::GMP->new("1123");
-  my ($c, $cmp) = Rmpfr_init_set_z($z, GMP_RNDN);
-  if($c == 1123 && get_refcnt($z) == 1
-     && get_package_name($z) eq "Math::GMP") {print "ok 56\n"}
-  else {print "not ok 56\n"}
-  }
-else {print "ok 56 - skipped - no Math::GMP\n"}
+else {print "ok 52 - skipped - no GMP::Mpq\n"}
 
 if($have_Gmpz) {
   $z = GMP::Mpz::mpz(11213);
   my ($c, $cmp) = Rmpfr_init_set_z($z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpz") {print "ok 57\n"}
-  else {print "not ok 57\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpz") {print "ok 53\n"}
+  else {print "not ok 53\n"}
   }
-else {print "ok 57 - skipped - no GMP::Mpz\n"}
+else {print "ok 53 - skipped - no GMP::Mpz\n"}
 
 if($have_Gmpq) {
   $z = GMP::Mpq::mpq(11213);
   my ($c, $cmp) = Rmpfr_init_set_q($z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpq") {print "ok 58\n"}
-  else {print "not ok 58\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpq") {print "ok 54\n"}
+  else {print "not ok 54\n"}
   }
-else {print "ok 58 - skipped - no GMP::Mpq\n"}
+else {print "ok 54 - skipped - no GMP::Mpq\n"}
 
 if($have_Gmpf) {
   $z = GMP::Mpf::mpf(11213.0);
   my ($c, $cmp) = Rmpfr_init_set_f($z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpf") {print "ok 59\n"}
-  else {print "not ok 59\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpf") {print "ok 55\n"}
+  else {print "not ok 55\n"}
   }
-else {print "ok 59 - skipped - no GMP::Mpf\n"}
+else {print "ok 55 - skipped - no GMP::Mpf\n"}
 
 if($have_Gmpq) {
   $z = GMP::Mpq::mpq(11213);
   Rmpfr_set_q($c, $z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpq") {print "ok 60\n"}
-  else {print "not ok 60\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpq") {print "ok 56\n"}
+  else {print "not ok 56\n"}
   }
-else {print "ok 60 - skipped - no GMP::Mpq\n"}
+else {print "ok 56 - skipped - no GMP::Mpq\n"}
 
 if($have_Gmpf) {
   $z = GMP::Mpf::mpf(11213.0);
   Rmpfr_set_f($c, $z, GMP_RNDN);
-  if($c == 11213 && get_refcnt($z) == 1
-     && get_package_name($z) eq "GMP::Mpf") {print "ok 61\n"}
-  else {print "not ok 61\n"}
+  if($c == 11213 && Math::MPFR::get_refcnt($z) == 1
+     && Math::MPFR::get_package_name($z) eq "GMP::Mpf") {print "ok 57\n"}
+  else {print "not ok 57\n"}
   }
-else {print "ok 61 - skipped - no GMP::Mpf\n"}
+else {print "ok 57 - skipped - no GMP::Mpf\n"}
 
 my $inf = Rmpfr_init();
 Rmpfr_set_inf($inf, -1);
 
-if(Rmpfr_inf_p($inf)) {print "ok 62\n"}
-else {print "not ok 62\n"}
+if(Rmpfr_inf_p($inf)) {print "ok 58\n"}
+else {print "not ok 58\n"}
 
 my $nan = Rmpfr_init();
 Rmpfr_set_nan($nan);
 
-if(Rmpfr_nan_p($nan)) {print "ok 63\n"}
-else {print "not ok 63\n"}
+if(Rmpfr_nan_p($nan)) {print "ok 59\n"}
+else {print "not ok 59\n"}
 
 Rmpfr_set_si($inf, -27, GMP_RNDN);
 Rmpfr_cbrt($inf, $inf, GMP_RNDN);
 
-if($inf == -3 && Rmpfr_integer_p($inf)) {print "ok 64\n"}
-else {print "not ok 64\n"}
+if($inf == -3 && Rmpfr_integer_p($inf)) {print "ok 60\n"}
+else {print "not ok 60\n"}
 
 $ok = 1;
 my @r3 = ();
@@ -635,20 +591,8 @@ for(my $i = 0; $i < 100; $i++) {
       }
    } 
 
-if($ok) {print "ok 65\n"}
-else {print "not ok 65\n"}
-
-if($have_gmp) {
-  $z = Math::GMP->new(17);
-  Rmpfr_set($check, $c, GMP_RNDN);
-
-  Rmpfr_add_z($c, $c, $z, GMP_RNDN);
-  Rmpfr_sub_z($c, $c, $z, GMP_RNDN);
- 
-  if($c == $check) {print "ok 66\n"}
-  else {print "not ok 66\n"}
-  }
-else {print "ok 66 - skipped - no Math::GMP\n"}
+if($ok) {print "ok 61\n"}
+else {print "not ok 61\n"}
 
 if($have_Gmpz) {
   $z = GMP::Mpz::mpz(57);
@@ -657,16 +601,16 @@ if($have_Gmpz) {
   Rmpfr_add_z($c, $c, $z, GMP_RNDN);
   Rmpfr_sub_z($c, $c, $z, GMP_RNDN);
  
-  if($c == $check) {print "ok 67\n"}
-  else {print "not ok 67\n"}
+  if($c == $check) {print "ok 62\n"}
+  else {print "not ok 62\n"}
   }
-else {print "ok 67 - skipped - no GMP::Mpz\n"}
+else {print "ok 62 - skipped - no GMP::Mpz\n"}
 
 Rmpfr_set_si($c, -123, GMP_RNDN);
 Rmpfr_set_si($check, -7, GMP_RNDN);
 
-if(Rmpfr_cmpabs($c, $check) > 0 && !Rmpfr_unordered_p($c, $check)) {print "ok 68\n"}
-else {print "not ok 68\n"}
+if(Rmpfr_cmpabs($c, $check) > 0 && !Rmpfr_unordered_p($c, $check)) {print "ok 63\n"}
+else {print "not ok 63\n"}
 
 $ok = '';
 
@@ -676,20 +620,20 @@ if($check2 == $c) {$ok = 'a'}
 Rmpfr_max($check2, $check, $c, GMP_RNDN);
 if($check2 == $check) {$ok .= 'b'}
 
-if($ok eq 'ab') {print "ok 69\n"}
-else {print "not ok 69\n"}
+if($ok eq 'ab') {print "ok 64\n"}
+else {print "not ok 64\n"}
 
 Rmpfr_set_d($c, 1.003, GMP_RNDN);
 Rmpfr_gamma($c, $c, GMP_RNDN);
 
-if($c > 0.9982772 && $c < 0.9982773) {print "ok 70\n"}
-else {print "not ok 70\n"}
+if($c > 0.9982772 && $c < 0.9982773) {print "ok 65\n"}
+else {print "not ok 65\n"}
 
 Rmpfr_set_ui($c, 0, GMP_RNDN);
 Rmpfr_erf($check, $c, GMP_RNDN);
 
-if($check == 0) {print "ok 71\n"}
-else {print "not ok 71\n"}
+if($check == 0) {print "ok 66\n"}
+else {print "not ok 661\n"}
 
 Rmpfr_const_pi($check, GMP_RNDN);
 $check **= 4;
@@ -698,13 +642,13 @@ $check /= 90;
 Rmpfr_set_ui($c, 4, GMP_RNDN);
 Rmpfr_zeta($c, $c, GMP_RNDN);
 
-if($c > $check - 0.00001 && $c < $check + 0.00001) {print "ok 72\n"}
-else {print "not ok 72\n"}
+if($c > $check - 0.00001 && $c < $check + 0.00001) {print "ok 67\n"}
+else {print "not ok 67\n"}
 
 my $fail = Rmpfr_set_exp($c, -5);
 
-if(!$fail && Rmpfr_get_exp($c) == -5) {print "ok 73\n"}
-else {print "not ok 73\n"}
+if(!$fail && Rmpfr_get_exp($c) == -5) {print "ok 68\n"}
+else {print "not ok 68\n"}
 
 if($have_Gmpz) {
   my $str = '';
@@ -731,12 +675,12 @@ if($have_Gmpz) {
         }
      } 
 
-  if($ok) {print "ok 74\n"}
-  else {print "not ok 74\n"}
+  if($ok) {print "ok 69\n"}
+  else {print "not ok 69\n"}
 
   Rgmp_randclear($state);
   }
-else {print "ok 74 - skipped - no GMP::Mpz\n"}
+else {print "ok 69 - skipped - no GMP::Mpz\n"}
 
 if(1) {
   my $str = '';
@@ -762,12 +706,12 @@ if(1) {
         }
      } 
 
-  if($ok) {print "ok 75\n"}
-  else {print "not ok 75\n"}
+  if($ok) {print "ok 70\n"}
+  else {print "not ok 70\n"}
 
   Rgmp_randclear($state);
   }
-#else {print "ok 75 - skipped - no GMP::Mpz\n"}
+#else {print "ok 70 - skipped - no GMP::Mpz\n"}
 
 ##########################################
 
@@ -797,12 +741,12 @@ if($have_mpz) {
         }
      } 
 
-  if($ok) {print "ok 76\n"}
-  else {print "not ok 76\n"}
+  if($ok) {print "ok 71\n"}
+  else {print "not ok 71\n"}
 
   Rgmp_randclear($state);
   }
-else {print "ok 76 - skipped - no Math::GnuMPz\n"}
+else {print "ok 71 - skipped - no Math::GnuMPz\n"}
 
 #########################
 if(1) {
@@ -829,8 +773,8 @@ if(1) {
         }
      } 
 
-  if($ok) {print "ok 77\n"}
-  else {print "not ok 77\n"}
+  if($ok) {print "ok 72\n"}
+  else {print "not ok 72\n"}
 
   Rgmp_randclear($state);
   }
@@ -839,24 +783,24 @@ Rmpfr_set_d($c, 1123.5, GMP_RNDN);
 eval {Rmpfr_out_str($c, 10, 0, GMP_RNDN);
       print "\n";};
 
-if($@) {print "not ok 78\n"}
-else {print "ok 78\n"}
+if($@) {print "not ok 73\n"}
+else {print "ok 73\n"}
 
 eval {Rmpfr_print_binary($c);
       print "\n";};
 
-if($@) {print "not ok 79\n"}
-else {print "ok 79\n"} 
+if($@) {print "not ok 74\n"}
+else {print "ok 74\n"} 
 
 eval {Rmpfr_dump($c, GMP_RNDN);};
 
-if($@) {print "not ok 80\n"}
-else {print "ok 80\n"} 
+if($@) {print "not ok 75\n"}
+else {print "ok 75\n"} 
 
-eval{print "GMP Version: ", Math::MPFR::gmp_v(), "\n";};
+eval{$ok = Math::MPFR::gmp_v();};
 
-if($@) {print "not ok 81\n"}
-else {print "ok 81\n"}    
+if($@ || $ok =~ /[^0-9\.]/) {print "not ok 76\n"}
+else {print "ok 76\n"}    
 
 # Run the following to test Rmpfr_inp_str
 # and Rmpfr_dump

@@ -7,4 +7,5 @@ README
 CHANGES
 mpfr.info
 t/test1.t
+t/test2.t
 t/overload.t

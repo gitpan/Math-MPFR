@@ -44,7 +44,7 @@
     @Math::MPFR::ISA = qw(Exporter DynaLoader);
     @Math::MPFR::EXPORT_OK = qw(GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 Rmpfr_set_default_rounding_mode Rmpfr_prec_round Rmpfr_get_emin
-Rmpfr_get_default_rounding_mode get_refcnt get_package_name
+Rmpfr_get_default_rounding_mode 
 Rmpfr_get_emax Rmpfr_set_emin Rmpfr_set_emax Rmpfr_check_range
 Rmpfr_clear_underflow Rmpfr_clear_overflow Rmpfr_clear_nanflag
 Rmpfr_clear_inexflag Rmpfr_clear_flags Rmpfr_underflow_p
@@ -85,14 +85,14 @@ Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
 Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump);
-    $Math::MPFR::VERSION = '1.02';
+    $Math::MPFR::VERSION = '1.03';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 Rmpfr_set_default_rounding_mode Rmpfr_prec_round Rmpfr_get_emin
-Rmpfr_get_default_rounding_mode get_refcnt get_package_name
+Rmpfr_get_default_rounding_mode 
 Rmpfr_get_emax Rmpfr_set_emin Rmpfr_set_emax Rmpfr_check_range
 Rmpfr_clear_underflow Rmpfr_clear_overflow Rmpfr_clear_nanflag
 Rmpfr_clear_inexflag Rmpfr_clear_flags Rmpfr_underflow_p
@@ -1168,11 +1168,39 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     easily lead to user confusion and frustration, so I'll resist
     the temptation until someone convinces me that I should do
     otherwise.
-    The workaround is to use 'Rmpfr_init_set_z', 'Rmpfr_init_set_q', 
-    or 'Rmpfr_init_set_f' to first create a copy of the object - 
-    and to use that copy with the overloaded operator.
-    (Alternatively resort to making the appropriate function call
-    and don't use operator overloading under such circumstances.)
+    The workaround is to convert this "foreign" object to a
+    format that *will* work with the overloaded operator.
+
+    In those situations where the overload subroutine operates on 2
+    perl variables, then obviously one of those perl variables is
+    a Math::MPFR object. To determine the value of the other variable
+    the subroutine works through the following steps (in order),
+    using the first value it finds, or croaking if it gets
+    to step 6:
+
+    1. If the variable is an unsigned long then that value is used.
+       The variable is considered to be an unsigned long if 
+       (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV() 
+       returns true.
+
+    2. If the variable is a signed long int, then that value is used.
+       The variable is consdiered to be a signed long int if the
+       IOK flag is set.
+
+    3. If the variable is a double, then that value is used. The
+       variable is considered to be a double if the NOK flag is set.
+
+    4. If the variable is a string (ie the POK flag is set) then the
+       base 10 value of that string is used. If the POK flag is set,
+       but the string is not a valid base 10 number, the subroutine
+       croaks with an appropriate error message.
+
+    5. If the variable is a Math::MPFR object then the value of that
+       object is used.
+
+    6. If none of the above is true, then the second variable is
+       deemed to be of an invalid type. The subroutine croaks with
+       an appropriate error message.
 
    #####################
 

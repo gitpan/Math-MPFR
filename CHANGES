@@ -36,3 +36,7 @@
  - Make overloading work with strings.
  - Add 'Rmpfr_dump'.
  - Add 'Math::MPFR::gmp_v' (not exportable).
+
+1.03
+ - Replace 'SvROK()' with 'sv_isobject()' in the overload functions.
+ - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
