@@ -8,4 +8,5 @@ CHANGES
 mpfr.info
 t/test1.t
 t/test2.t
+t/test3.t
 t/overload.t

@@ -31,7 +31,7 @@ if(!$@) {$have_Gmpq = 1}
 eval{require GMP::Mpf};
 if(!$@) {$have_Gmpf = 1}
 
-my($z, $f, $q);
+my($z, $f, $q, $qq);
 
 if($have_mpz) {$z = Math::GnuMPz::Rmpz_init_set_str('aaaaaaaaaaaaaaaaaaaa', 36)}
 if($have_mpq) {
@@ -425,6 +425,9 @@ else {print "ok 46 - skipped - no Math::GnuMPf\n"}
 
 if($have_mpz) {
    # Check that a specific MPFR bug has been fixed
+
+   Rmpfr_clear_nanflag();
+
    Math::GnuMPz::Rmpz_set_ui($z, 0);
    Rmpfr_set($check, $c, GMP_RNDN);
 
@@ -447,7 +450,7 @@ if($have_mpz) {
    if($ok eq 'abcd' && !$flag
      && Math::MPFR::get_refcnt($c) == 1
      && Math::MPFR::get_refcnt($check) == 1){print "ok 47\n"}
-   else {print "not ok 47\n"}
+   else {print "not ok 47 \$ok: $ok   \$flag: $flag\n"}
    }
 else {print "ok 47 - skipped - no Math::GnuMPz\n"}
 
@@ -506,11 +509,11 @@ else {print "ok 51 - skipped - no GMP::Mpz\n"}
 if($have_Gmpq) {
   Rmpfr_set_prec($c, 300);
   Rmpfr_set_ui($c, 236, GMP_RNDN);
-  $q = GMP::Mpq::mpq(11/7);
-  Rmpfr_div_q($check2, $c, $q, GMP_RNDN);
-  Rmpfr_mul_q($check2, $check2, $q, GMP_RNDN);
+  $qq = GMP::Mpq::mpq(11, 7);
+  Rmpfr_div_q($check2, $c, $qq, GMP_RNDN);
+  Rmpfr_mul_q($check2, $check2, $qq, GMP_RNDN);
   if($check2 - $c > -0.000001 && $check2 - $c < 0.000001 &&
-     Math::MPFR::get_package_name($q) eq "GMP::Mpq") {print "ok 52\n"}
+     Math::MPFR::get_package_name($qq) eq "GMP::Mpq") {print "ok 52\n"}
   else {print "not ok 52\n"}
   }
 else {print "ok 52 - skipped - no GMP::Mpq\n"}
@@ -792,7 +795,7 @@ eval {Rmpfr_print_binary($c);
 if($@) {print "not ok 74\n"}
 else {print "ok 74\n"} 
 
-eval {Rmpfr_dump($c, GMP_RNDN);};
+eval {Rmpfr_dump($c);};
 
 if($@) {print "not ok 75\n"}
 else {print "ok 75\n"} 

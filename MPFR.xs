@@ -2192,12 +2192,114 @@ void Rgmp_randseed_ui(SV * state, SV * seed) {
      gmp_randseed_ui(*((gmp_randstate_t *) SvIV(SvRV(state))), SvUV(seed));     
 }
 
-void Rmpfr_dump(SV * a, SV * round) {
-     mpfr_dump(*((mpfr_t *) SvIV(SvRV(a))), SvUV(round));
+void Rmpfr_dump(SV * a) { /* Once took a 'round' argument */
+     mpfr_dump(*((mpfr_t *) SvIV(SvRV(a))));
 } 
 
 SV * gmp_v() {
      return newSVpv(gmp_version, 0);
+}
+
+/* NEW in MPFR-2.1.0 */
+
+SV * Rmpfr_set_ui_2exp(SV * a, SV * b, SV * c, SV * round) {
+     return newSViv(mpfr_set_ui_2exp(*((mpfr_t *) SvIV(SvRV(a))), (unsigned long)SvUV(b), (mp_exp_t)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_set_si_2exp(SV * a, SV * b, SV * c, SV * round) {
+     return newSViv(mpfr_set_si_2exp(*((mpfr_t *) SvIV(SvRV(a))), (int)SvIV(b), (mp_exp_t)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+void Rmpfr_get_z(SV * a, SV * b, SV * round) {
+     mpfr_get_z(*((mpz_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round));
+}
+
+SV * Rmpfr_si_sub(SV * a, SV * b, SV * c, SV * round) {
+     return newSViv(mpfr_si_sub(*((mpfr_t *) SvIV(SvRV(a))), (int)SvIV(b), *((mpfr_t *) SvIV(SvRV(c))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_sub_si(SV * a, SV * b, SV * c, SV * round){
+     return newSViv(mpfr_sub_si(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (int)SvIV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_mul_si(SV * a, SV * b, SV * c, SV * round){
+     return newSViv(mpfr_mul_si(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (int)SvIV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_si_div(SV * a, SV * b, SV * c, SV * round) {
+     return newSViv(mpfr_si_div(*((mpfr_t *) SvIV(SvRV(a))), (int)SvIV(b), *((mpfr_t *) SvIV(SvRV(c))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_div_si(SV * a, SV * b, SV * c, SV * round){
+     return newSViv(mpfr_div_si(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (int)SvIV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_sqr(SV * a, SV * b, SV * round) {
+     return newSViv(mpfr_sqr(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_cmp_z(SV * a, SV * b) {
+     return newSViv(mpfr_cmp_z(*((mpfr_t *) SvIV(SvRV(a))), *((mpz_t *) SvIV(SvRV(b)))));
+}
+
+SV * Rmpfr_cmp_q(SV * a, SV * b) {
+     return newSViv(mpfr_cmp_q(*((mpfr_t *) SvIV(SvRV(a))), *((mpq_t *) SvIV(SvRV(b)))));
+}
+
+SV * Rmpfr_cmp_f(SV * a, SV * b) {
+     return newSViv(mpfr_cmp_f(*((mpfr_t *) SvIV(SvRV(a))), *((mpf_t *) SvIV(SvRV(b)))));
+}
+
+SV * Rmpfr_zero_p(SV * a) {
+     return newSViv(mpfr_zero_p(*((mpfr_t *) SvIV(SvRV(a)))));
+}
+
+void Rmpfr_free_cache() {
+     mpfr_free_cache();
+}
+
+SV * Rmpfr_get_version() {
+     return newSVpv(mpfr_get_version(), 0);
+}
+
+SV * Rmpfr_get_emin_min() {
+     return newSViv(mpfr_get_emin_min());
+}
+
+SV * Rmpfr_get_emin_max() {
+     return newSViv(mpfr_get_emin_max());
+}
+
+SV * Rmpfr_get_emax_min() {
+     return newSViv(mpfr_get_emax_min());
+}
+
+SV * Rmpfr_get_emax_max() {
+     return newSViv(mpfr_get_emax_max());
+}
+
+void Rmpfr_clear_erangeflag() {
+     mpfr_clear_erangeflag();
+}
+
+SV * Rmpfr_erangeflag_p() {
+     return newSViv(mpfr_erangeflag_p());
+}
+
+SV * Rmpfr_rint_round(SV * a, SV * b, SV * round) {
+     return newSViv(mpfr_rint_round(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_rint_trunc(SV * a, SV * b, SV * round) {
+     return newSViv(mpfr_rint_trunc(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_rint_ceil(SV * a, SV * b, SV * round) {
+     return newSViv(mpfr_rint_ceil(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_rint_floor(SV * a, SV * b, SV * round) {
+     return newSViv(mpfr_rint_floor(*((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), (mp_rnd_t)SvUV(round)));
 }
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
@@ -3840,14 +3942,13 @@ Rgmp_randseed_ui (state, seed)
 	return; /* assume stack size is correct */
 
 void
-Rmpfr_dump (a, round)
+Rmpfr_dump (a)
 	SV *	a
-	SV *	round
 	PREINIT:
 	I32* temp;
 	PPCODE:
 	temp = PL_markstack_ptr++;
-	Rmpfr_dump(a, round);
+	Rmpfr_dump(a);
 	if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
 	  PL_markstack_ptr = temp;
@@ -3858,4 +3959,168 @@ Rmpfr_dump (a, round)
 
 SV *
 gmp_v ()
+
+SV *
+Rmpfr_set_ui_2exp (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_set_si_2exp (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+void
+Rmpfr_get_z (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_get_z(a, b, round);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_si_sub (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_sub_si (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_mul_si (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_si_div (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_div_si (a, b, c, round)
+	SV *	a
+	SV *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_sqr (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
+
+SV *
+Rmpfr_cmp_z (a, b)
+	SV *	a
+	SV *	b
+
+SV *
+Rmpfr_cmp_q (a, b)
+	SV *	a
+	SV *	b
+
+SV *
+Rmpfr_cmp_f (a, b)
+	SV *	a
+	SV *	b
+
+SV *
+Rmpfr_zero_p (a)
+	SV *	a
+
+void
+Rmpfr_free_cache ()
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_free_cache();
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_get_version ()
+
+SV *
+Rmpfr_get_emin_min ()
+
+SV *
+Rmpfr_get_emin_max ()
+
+SV *
+Rmpfr_get_emax_min ()
+
+SV *
+Rmpfr_get_emax_max ()
+
+void
+Rmpfr_clear_erangeflag ()
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_clear_erangeflag();
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_erangeflag_p ()
+
+SV *
+Rmpfr_rint_round (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
+
+SV *
+Rmpfr_rint_trunc (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
+
+SV *
+Rmpfr_rint_ceil (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
+
+SV *
+Rmpfr_rint_floor (a, b, round)
+	SV *	a
+	SV *	b
+	SV *	round
 

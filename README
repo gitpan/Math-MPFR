@@ -1,6 +1,9 @@
 This module requires that MPFR (and hence GMP) has been installed.
-It wraps the 'mpfr-2.0.3' (floating point) functions.
-See http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html for
+It wraps the 'mpfr-2.1.0' (floating point) functions. You'll get errors
+if you try to build Math-MPFR-1.04 (or later) against an earlier 
+version of the mpfr library. If you have an earlier version of the 
+mpfr library, try Math-MPFR-1.03 (or earlier, if necessary). 
+See http://www.mpfr.org/mpfr-current/ for
 instructions on how to build the library - or see below for how to
 obtain Win32 pre-compiled binaries.
 

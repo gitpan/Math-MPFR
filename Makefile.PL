@@ -18,7 +18,7 @@ my %options = %{
   LIBS => [
     $libs
   ],
-  'VERSION' => '1.03',
+  'VERSION' => '1.04',
 }
 };
 WriteMakefile(%options);

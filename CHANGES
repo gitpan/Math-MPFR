@@ -40,3 +40,15 @@
 1.03
  - Replace 'SvROK()' with 'sv_isobject()' in the overload functions.
  - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
+
+1.04
+ - Built against MPFR-2.1.0.
+ - Added the following functions, not available with versions earlier
+   than 2.1.0 :
+   Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
+   Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
+   Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
+   Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
+   Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
+   Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
+   Rmpfr_rint_ceil Rmpfr_rint_floor
