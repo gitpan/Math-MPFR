@@ -1,0 +1,47 @@
+This module requires that MPFR (and hence GMP) has been installed.
+It wraps the 'mpfr-2.0.3' (floating point) functions.
+See http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html for
+instructions on how to build the library - or see below for how to
+obtain Win32 pre-compiled binaries.
+
+For GMP, see http://swox.com/gmp .
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will 
+not compile with perl versions prior to 5.6.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the following files from the GMP and MPFR
+libraries will need to be accessible:
+
+ gmp.h
+ mpfr.h
+ the static library files libgmp and libmpfr ('.a' or '.lib')
+
+If those files are in a location where your compiler does not find 
+them by default, then instead of running 'perl Makefile.PL', you'll
+need to run:
+
+perl Makefile.pl INC=/path/to/needed_includes LIBS=/path/to/needed_libs
+
+(Alternatively you could copy the requisite files to a location where
+the compiler *does* find them by default - which was the option I 
+chose on Win32.)
+
+If you have a dynamic build of GMP, then the GMP shared library file 
+('.dll' or '.so') needs to be accessible to the system. A MS windows
+version of the GMP dll (libgmp-3.dll) is available from:
+http://www.kalinabears.com.au/w32perl/math_gmp.html .
+
+Win32 pre-compiled binaries (with installation instructions) of 
+this module can be found at:
+http://www.kalinabears.com.au/w32perl/math_gnump.html . 
+Using the pre-compiled perl binaries is the best option for MSVC built
+perl (including ActiveState perl).

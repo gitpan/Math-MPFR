@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+MPFR.pm
+MPFR.xs
+INLINE.h
+README
+CHANGES
+mpfr.info
+t/test1.t
+t/overload.t

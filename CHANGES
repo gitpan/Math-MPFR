@@ -1,0 +1,28 @@
+0.05
+ - Requires mpfr-2.0.3
+ - Add 'Rmpfr_out_str()'
+ - Add 'Rmpfr_get_default_rounding_mode()'
+ - Rename 'Rmpfr_set_str_raw()' to 'Rmpfr_set_str_binary()'
+   in keeping with changes to the MPFR library.
+ - Alter 'Rmpfr_check_range()' in keeping with change to 
+   'mpfr_check_range()' in the MPFR library.
+ - Introduce operator overloading.
+
+0.06
+ - Add 'Rmpfr_gamma()', 'Rmpfr_zeta()', and 'Rmpfr_erf()'.
+ - Add overloading for 'atan2', 'cos', 'sin', 'log', 'exp', and 'int'.
+
+0.07
+ - Replace 'Rmpfr_round_prec' with 'Rmpfr_prec_round' in keeping 
+   with changes to the MPFR library.
+ - Remove 'Rmpfr_random' (deprecated).
+ - Add 'Rmpfr_cbrt', 'Rmpfr_cmpabs', ', 'Rmpfr_greater_p',
+   'Rmpfr_greaterequal_p', 'Rmpfr_less_p', 'Rmpfr_lessequal_p',
+   'Rmpfr_lessgreater_p', 'Rmpfr_equal_p', 'Rmpfr_unordered_p',
+   'Rmpfr_inp_str', 'Rmpfr_frac', 'Rmpfr_integer_p',
+   'Rmpfr_nexttoward', 'Rmpfr_nextabove', 'Rmpfr_next_below',
+   'Rmpfr_min', 'Rmpfr_max', 'Rmpfr_get_exp', 'Rmpfr_set_exp'
+   'Rgmp_randinit_default', 'Rgmp_randinit_lc_2exp',
+   'Rgmp_randinit_lc_2exp_size', 'Rgmp_randseed', 'Rgmp_randseed_ui',
+   'Rgmp_randclear'.
+ - Change module name from 'Math::GnuMPfr' to 'Math::MPFR'
