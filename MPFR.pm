@@ -81,7 +81,7 @@ Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_const_euler
 Rmpfr_print_binary Rmpfr_rint Rmpfr_ceil Rmpfr_floor Rmpfr_round
 Rmpfr_trunc Rmpfr_add_one_ulp Rmpfr_sub_one_ulp Rmpfr_can_round
 Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove 
-Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
+Rmpfr_nextbelow Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
 Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump
@@ -91,8 +91,9 @@ Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
 Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
 Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
 Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
-Rmpfr_rint_ceil Rmpfr_rint_floor);
-    $Math::MPFR::VERSION = '1.05';
+Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
+Rmpfr_fits_ulong_p Rmpfr_fits_slong_p);
+    $Math::MPFR::VERSION = '1.06';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -136,7 +137,7 @@ Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_const_euler
 Rmpfr_print_binary Rmpfr_rint Rmpfr_ceil Rmpfr_floor Rmpfr_round
 Rmpfr_trunc Rmpfr_add_one_ulp Rmpfr_sub_one_ulp Rmpfr_can_round
 Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove 
-Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
+Rmpfr_nextbelow Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
 Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump
@@ -146,7 +147,8 @@ Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
 Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
 Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
 Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
-Rmpfr_rint_ceil Rmpfr_rint_floor
+Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
+Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
 )]);
 
 sub Rmpfr_get_str {
@@ -161,9 +163,9 @@ sub Rmpfr_get_str {
       }
     if(substr($ret[0], 0, 1) eq '-') {
        substr($ret[0], 0, 1, '');
-       return "-." . $ret[0] . '@' . $ret[1];
+       return '-.' . $ret[0] . '@' . $ret[1];
        }
-    return "." . $ret[0] . '@' . $ret[1];
+    return '.' . $ret[0] . '@' . $ret[1];
 }
 
 sub overload_string {
@@ -184,7 +186,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    A bigfloat module utilising the MPFR library. Basically
    this module simply wraps the 'mpfr' floating point functions
    provided by that library. See:
-   http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
+   http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html or the
+   file mpfr.info (which is included with this distribution).
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpfr
    documentation.
@@ -195,6 +198,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    use Math::MPFR qw(:mpfr);
 
+   # use single quotes for string assignment, not double quotes
    my $str = '.123542@2'; # mantissa = (.)123452
                          # exponent = 2
    #Alternatively:
@@ -210,18 +214,20 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    # of 100 bits and an initial value of NaN.
    my $bn1 = Rmpfr_init2(100);
 
+   # Assign the value -2314.451 to $bn1.
+   Rmpfr_set_d($bn1, -2314.451, GMP_RNDN);
+
    # Create another Math::MPFR object that holds
    # an initial value of NaN and has the default precision.
    my $bn2 = Rmpfr_init();
 
    # Create another Math::MPFR object that holds an initial
    # value of $str (in base $base) and has the default
-   # precision. $bn3 is the number. The value of $cmp 
-   # tells us whether $bn3 is an exact representation of the
-   # string value, or whether it is less than (or greater 
-   # than) the string value. See 'COMBINED INITIALISATION AND
-   # ASSIGNMENT', below.
-   my ($bn3, $cmp) = Rmpfr_init_set_str($str, $base, $rnd);
+   # precision. $bn3 is the number. $nok will either be 0 
+   # indicating that the string was a valid number string, or
+   # -1, indicating that the string was not a valid number. 
+   # See 'COMBINED INITIALISATION AND ASSIGNMENT', below.
+   my ($bn3, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
 
    # Perform some operations ... see 'FUNCTIONS' below.
    # see 'OPERATOR OVERLOADING' below for docs re
@@ -309,6 +315,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    1) Math::GMP from CPAN. (This module provides access to mpz
       objects only - NOT mpf and mpq objects.)
+      Win32 binaries of it are available from
+      http://www.kalinabears.com.au/w32perl/math_gmp.html
 
    AND/OR
 
@@ -371,14 +379,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    the only interest is whether it evaluates as false or true.
 
    "$str" simply means a string of symbols that represent a number,
-   eg "1234567890987654321234567@7" which might be a base 10 number,
-   or "zsa34760sdfgq123r5@11" which would have to represent a base 36
+   eg '1234567890987654321234567@7' which might be a base 10 number,
+   or 'zsa34760sdfgq123r5@11' which would have to represent a base 36
    number (because "z" is a valid digit only in base 36). Valid
    bases for MPFR numbers are 2 to 36 (inclusive).
  
-   $rnd is simply one of the 4 rounding mode values (discussed above).
+   "$rnd" is simply one of the 4 rounding mode values (discussed above).
 
-   $p is the (unsigned long) value for precision.
+   "$p" is the (unsigned long) value for precision.
 
    ##############
 
@@ -502,7 +510,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Initialize $rop, set its precision to be *exactly* $p bits,
     and set its value to NaN.  To change the precision of a
     variable which has already been initialized,
-    use `Rmpfr_set_prec' instead.  The precision PREC can be
+    use `Rmpfr_set_prec' instead.  The precision $p can be
     any integer between Rmpfr_min_prec() andRmpfr_max_prec().
 
    Rmpfr_set_prec($op, $p);
@@ -559,7 +567,28 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     36), rounded in direction $rnd to the precision of $rop. 
     The exponent is read in decimal.  This function returns 0 if
     the entire string is a valid number in base $base. otherwise
-    it returns -1.
+    it returns -1. If $base is zero, the base is set according to 
+    the following rules:
+     if the string starts with '0b' or '0B' the base is set to 2;
+     if the string starts with '0x' or '0X' the base is set to 16;
+     otherwise the base is set to 10.
+    The following exponent symbols can be used:
+     '@' - can be used for any base;
+     'e' or 'E' - can be used only with bases <= 10;
+     'p' or 'P' - can be used to introduce binary exponents with
+                  hexadecimal or binary strings.
+    See the MPFR library documentation for more details. See also
+    'Rmpfr_inp_str' (below). 
+    Because of the special significance of the '@' symbol in perl,
+    make sure you assign to strings using single quotes, not
+    double quotes, when using '@' as the exponent marker. If you 
+    must use double quotes (which is hard to believe) then you
+    need to escape the '@'. ie the following two assignments are
+    equivalent:
+     Rmpfr_set_str($rop, '.1234@-5', 10, GMP_RNDN);
+     Rmpfr_set_str($rop, ".1234\@-5", 10, GMP_RNDN);
+    But the following assignment won't do what you want:
+     Rmpfr_set_str($rop, ".1234@-5", 10, GMP_RNDN); 
 
    Rmpfr_set_str_binary($rop, $str);
     Set $rop to the value of the binary number in $str, which has to
@@ -615,7 +644,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    ($rop, $si) = Rmpfr_init_set_str($str, $base, $rnd);
    ($rop, $si) = Rmpfr_init_set_str_nobless($str, $base, $rnd);
      Initialize $rop and set its value from $str in base $base,
-     rounded to direction $rnd.  See `Rmpfr_set_str'.
+     rounded to direction $rnd. If $str was a valid number, then
+     $si will be set to 0. Else it will be set to -1.
+     See `Rmpfr_set_str' (above) and 'Rmpfr_inp_str' (below).
 
    ##########
   
@@ -630,6 +661,20 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     more digits than can be accurately represented by OP are
     ever generated.  If $digits is 0 then that accurate
     maximum number of digits are generated.
+
+   $bool = Rmpfr_fits_ulong_p($op, $rnd); # fits in unsigned long
+   $bool = Rmpfr_fits_slong_p($op, $rnd); # fits in signed long
+    Return non-zero if $op would fit in the respective C data
+    type, when rounded to an integer in the direction $rnd.
+
+   $ui = Rmpfr_get_ui($op, $rnd);
+   $si = Rmpfr_get_si($op, $rnd);
+    Convert $op to a 'signed long' or an `unsigned long'
+    after rounding it with respect to $rnd.
+    If $op is NaN, the result is undefined. If $op is too big
+    for the return type, it returns the maximum or the minimum
+    of the corresponding C type, depending on the direction of
+    the overflow. The flag erange is then also set.
 
    $double = Rmpfr_get_d($op, $rnd);
     Convert $op to a double, using the rounding mode $rnd.
@@ -1199,11 +1244,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     in which case the `Rmpfr_sub_one_ulp' function behaves like a
     conventional subtraction.
 
-   $bool = Rmpfr_can_round($op, $ui, $rnd1, $rnd2, $prec);
+   $bool = Rmpfr_can_round($op, $ui, $rnd1, $rnd2, $p);
     Assuming $op is an approximation of an unknown number X in direction
     $rnd1 with error at most two to the power E(b)-$ui where E(b) is
-    the exponent of B, returns 1 if one is able to round exactly X
-    to precision $prec with direction $rnd2, and 0 otherwise. This
+    the exponent of $op, returns 1 if one is able to round exactly X
+    to precision $p with direction $rnd2, and 0 otherwise. This
     function *does not modify* its arguments.
 
    $si = Rmpfr_get_exp($op);
@@ -1219,20 +1264,25 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    OPERATOR OVERLOADING
     
-    Overloading works with numbers, strings (base 10 only) and
-    Math::MPFR objects.
+    Overloading works with numbers, strings (bases 2, 10, and 16
+    only - see step '4.' below) and Math::MPFR objects.
     Overloaded operations are performed using the current
     "default rounding mode" (which you can determine using the
     'Rmpfr_get_default_rounding_mode' function, and change using
     the 'Rmpfr_set_default_rounding_mode' function).
 
+    Be aware that when you use overloading with a string operand,
+    the overload subroutine converts that string operand to a
+    Math::MPFR object with *current default precision*, and using
+    the *current default rounding mode*.
+
     The following operators are overloaded:
-     + - * / ** sqrt (Return value has default precision)
+     + - * / ** sqrt (Return object has default precision)
      += -= *= /= **= (Precision remains unchanged)
      < <= > >= == != <=>
      ! not
-     abs atan2 cos sin log exp (Return value has default precision)
-     int (On perl 5.8 only, NA on perl 5.6. The return value
+     abs atan2 cos sin log exp (Return object has default precision)
+     int (On perl 5.8 only, NA on perl 5.6. The return object
           has default precision)
      = ""
 
@@ -1259,16 +1309,19 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
        returns true.
 
     2. If the variable is a signed long int, then that value is used.
-       The variable is consdiered to be a signed long int if the
+       The variable is considered to be a signed long int if the
        IOK flag is set.
 
     3. If the variable is a double, then that value is used. The
        variable is considered to be a double if the NOK flag is set.
 
     4. If the variable is a string (ie the POK flag is set) then the
-       base 10 value of that string is used. If the POK flag is set,
-       but the string is not a valid base 10 number, the subroutine
-       croaks with an appropriate error message.
+       value of that string is used. If the POK flag is set, but the
+       string is not a valid number, the subroutine croaks with an 
+       appropriate error message. If the string starts with '0b' or
+       '0B' it is regarded as a base 2 number. If it starts with '0x'
+       or '0X' it is regarded as a base 16 number. Otherwise it is
+       regarded as a base 10 number.
 
     5. If the variable is a Math::MPFR object then the value of that
        object is used.

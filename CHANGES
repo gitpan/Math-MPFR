@@ -58,3 +58,15 @@
    build this module has an up-to-date MPFR library. This is mainly
    an attempt to stop cpan testers who don't have an up-to-date MPFR
    from testing the module and subsequently reporting "FAIL" or "NA".
+
+1.06
+ - Modify the Makefile.PL checks added in version 1.05 to cater for
+   those building with a Microsoft compiler
+ - Alter Rmpfr_set_str and Rmpfr_init_set_str so that a base of 0
+   can be specified - in which case the base is determined from the
+   input string
+ - Added the following functions:
+   Rmpfr_get_ui Rmpfr_get_si Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
+ - Fix a bug in 'Rmpfr_deref2()' - used by 'overload_print()'
+ - Provide more complete testing with 4 new test files - namely
+   test4.t, trig.t, set_str.t and exceptions.t.

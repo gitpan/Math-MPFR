@@ -196,7 +196,7 @@ if(!$@ && $v) {print "ok 19\n"}
 else {print "not ok 19: $@\n"}
 
 if((Rmpfr_get_emin_min() <= Rmpfr_get_emin_max()) &&
-   (Rmpfr_get_emax_min() <= Rmpfr_get_emax_min())) {print "ok 20\n"}
+   (Rmpfr_get_emax_min() <= Rmpfr_get_emax_max())) {print "ok 20\n"}
 else {print "not ok 20\n"}
 
 Rmpfr_set_d($mpfr1, $double, $rnd);

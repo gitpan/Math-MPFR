@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..52\n";
+print "1..53\n";
 
 Rmpfr_set_default_prec(200);
 
@@ -823,6 +823,11 @@ if($@ =~ /Invalid argument/) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 52\n"}
 else {print "not ok 52\n"}
+
+my $p_copy = $p;
+$p_copy += 1;
+if($p_copy - $p == 1) {print "ok 53\n"}
+else {print "not ok 53\n"}
 
 
 sub adjust {

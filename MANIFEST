@@ -12,4 +12,8 @@ version.c
 t/test1.t
 t/test2.t
 t/test3.t
+t/test4.t
 t/overload.t
+t/exceptions.t
+t/trig.t
+t/set_str.t

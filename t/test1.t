@@ -24,9 +24,8 @@ if(!$@) {$have_mpf = 1}
 eval{require Math::GnuMPq};
 if(!$@) {$have_mpq = 1}
 
-# Load the GMP module - trap the
-# error if the module is not available
-eval{require GMP};
+# No need to load GMP.pm
+#eval{require GMP};
 
 eval{require GMP::Mpz};
 if(!$@) {$have_Gmpz = 1}
@@ -63,6 +62,7 @@ my $e = Rmpfr_init2(300);
 my $check = Rmpfr_init2(300);
 my $check2 = Rmpfr_init2(300);
 my $check3 = Rmpfr_init2(300);
+#my $check4 = Rmpfr_init2(300);
 my $angle = Rmpfr_init2(300);
 my $unity = Rmpfr_init2(300);
 my $s = Rmpfr_init2(300);
@@ -76,24 +76,24 @@ if(Rmpfr_get_prec($c) >= 101 && Rmpfr_get_prec($c) < 300 && Rmpfr_get_prec($d) >
 else {print "not ok 4\n"}
 
 Rmpfr_set_prec($c, 300);
-if(Rmpfr_get_prec($c) >= 300) {print "ok 5\n"}
+if(Rmpfr_get_prec($c) == 300) {print "ok 5\n"}
 else {print "not ok 5\n"}
 
 Rmpfr_set_str($c, 'afsder.dgk1111111111111111111116', 36, GMP_RNDZ);
 
-my $s3 = Rmpfr_get_str($c, 16, 0, GMP_RNDU);
-my $s4 = Rmpfr_get_str($c, 16, 0, GMP_RNDD);
+my $s3 = Rmpfr_get_str($c, 16, 75, GMP_RNDU);
+my $s4 = Rmpfr_get_str($c, 16, 75, GMP_RNDD);
 
 if($s3 ne $s4) {print "ok 6\n"}
-else {print "not ok 6\n"}
+else {print "not ok 6 $s3 $s4\n"}
 
 Rmpfr_set($d, $c, GMP_RNDD);
 
-$s3 = Rmpfr_get_str($d, 16, 0, GMP_RNDU);
-$s4 = Rmpfr_get_str($d, 16, 0, GMP_RNDD);
+$s3 = Rmpfr_get_str($d, 16, 75, GMP_RNDU);
+$s4 = Rmpfr_get_str($d, 16, 75, GMP_RNDD);
 
 if($s3 ne $s4) {print "ok 7\n"}
-else {print "not ok 7\n"}
+else {print "not ok 7 $s3 $s4\n"}
 
 Rmpfr_set_d($c, $double, GMP_RNDN);
 
@@ -817,6 +817,6 @@ __END__
 print "\nEnter a number [eg .11235\@4]\n";
 Rmpfr_inp_str($check, 10, GMP_RNDN);
 print "\n";
-Rmpfr_dump($check, GMP_RNDN);
+Rmpfr_dump($check);
 print "\n";
 

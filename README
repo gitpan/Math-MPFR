@@ -4,8 +4,9 @@ if you try to build Math-MPFR-1.04 (or later) against an earlier
 version of the mpfr library. If you have an earlier version of the 
 mpfr library, try Math-MPFR-1.03 (or earlier, if necessary). 
 See http://www.mpfr.org/mpfr-current/ for MPFR source and
-instructions on how to build the library - or see below for how to
-obtain Win32 pre-compiled Math::MPFR binaries.
+instructions on how to build the library - or visit
+http://www.kalinabears.com.au/w32perl/math_gnump.html to
+obtain pre-compiled Math::MPFR binaries for Win32.
 
 For GMP, see http://swox.com/gmp .
 
@@ -32,7 +33,7 @@ If those files are in a location where your compiler does not find
 them by default, then instead of running 'perl Makefile.PL', you'll
 need to run:
 
-perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes" LIBS="-L/path/to/mpfr_lib -L/path/to/gmp_lib -lmpfr -lgmp"
+perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes" LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
 
 (Alternatively you could copy the requisite files to a location where
 the compiler *does* find them by default - which was the option I 
