@@ -228,14 +228,11 @@ else {print "not ok 27\n"}
 
 my $d2;
 
-if($Config{make} !~ /nmake/i) {
   Rmpfr_const_pi($c, GMP_RNDN);
   $d2 = Rmpfr_get_d($c, GMP_RNDN);
 
   if($d2 > 3.14159265 && $d2 < 3.14159266) {print "ok 28\n"}
   else {print "not ok 28\n"}
-  }
-else {print "ok 28 - skipped - msvc-built perl likes to segfault here\n"}
 
 Rmpfr_const_euler($c, GMP_RNDN);
 $d2 = Rmpfr_get_d($c, GMP_RNDN);
@@ -500,7 +497,7 @@ if($have_gmp) {
   Rmpfr_set_ui($c, 2, GMP_RNDN);
   $z = Math::GMP->new(0);
   my $exp = Rmpfr_get_z_exp($z, $c);
-  if($exp == -51 && Math::GnuMPz::Rmpz_get_str($z, 10) eq '4503599627370496'
+  if($exp == -51 && "$z" eq '4503599627370496'
      && get_package_name($z) eq "Math::GMP") {print "ok 51\n"}
   else {print "not ok 51\n"}
   }
@@ -511,7 +508,7 @@ if($have_Gmpz) {
   $z = GMP::Mpz::mpz(0);
   Rmpfr_set_ui($c, 2, GMP_RNDN);
   my $exp = Rmpfr_get_z_exp($z, $c);
-  if($exp == -51 && Math::GnuMPz::Rmpz_get_str($z, 10) eq '4503599627370496'
+  if($exp == -51 && "$z" eq '4503599627370496'
      && get_package_name($z) eq "GMP::Mpz") {print "ok 52\n"}
   else {print "not ok 52\n"}
   }
@@ -841,7 +838,7 @@ if(1) {
 
 
 # Run the following to test Rmpfr_out_str,
-# Rmpfr_print _binary and Rmpfr_inp_str
+# Rmpfr_print_binary and Rmpfr_inp_str
 __END__
 Rmpfr_set_d($c, 1123.5, GMP_RNDN);
 Rmpfr_out_str($c, 10, 0, GMP_RNDN);
@@ -851,4 +848,5 @@ print "\nEnter a number [eg .11235\@4]\n";
 Rmpfr_inp_str($check, 10, GMP_RNDN);
 print "\n";
 Rmpfr_out_str($check, 10, 0, GMP_RNDN);
+print "\n";
 

@@ -7,7 +7,7 @@
     use constant GMP_RNDU => 2;
     use constant GMP_RNDD => 3;
 
-use overload
+    use overload
     '+'    => \&overload_add,
     '-'    => \&overload_sub,
     '*'    => \&overload_mul,
@@ -85,7 +85,7 @@ Rmpfr_next_below Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
 Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
 Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
 Rmpfr_urandomb Rmpfr_random2);
-    $Math::MPFR::VERSION = '0.07';
+    $Math::MPFR::VERSION = '1.01';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -346,7 +346,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    which for most of us means that it will be greater than
    -(2**31) and less than 2**31.
 
-   "$double" is a C 'double.
+   "$double" is a C double.
 
    "$bool" means a value (usually a 'signed long int') in which
    the only interest is whether it evaluates as false or true.
@@ -513,7 +513,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     is less than the machine word width.  The return value is zero
     when $rop=2nd arg, positive when $rop>2nd arg, and negative when 
     $rop<2nd arg.  For `mpfr_set_d', be careful that the input
-    number OP may not be exactly representable as a double-precision
+    number $double may not be exactly representable as a double-precision
     number (this happens for 0.1 for instance), in which case it is
     first rounded by the C compiler to a double-precision number,
     and then only to a mpfr floating-point number.
@@ -634,7 +634,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_mul($rop, $op1, $op2, $rnd);
    $si = Rmpfr_mul_ui($rop, $op, $ui, $rnd);
    $si = Rmpfr_mul_z($rop, $op, $z, $rnd); # $z is a mpz object.
-   $si = Rmpfr_mul_q($rop, $op, $q, $rnd); # $q is a Math::Gn$rnd.
+   $si = Rmpfr_mul_q($rop, $op, $q, $rnd); # $q is a mpq object.
+    Set $rop to 2nd arg * 3rd arg rounded in the direction $rnd.
     Return 0 if the result is exact, a positive value if $rop is 
     greater than 2nd arg times 3rd arg, a negative value otherwise.
 
@@ -841,7 +842,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $bool = Rmpfr_sinh($rop, $op, $rnd);
    $bool = Rmpfr_tanh($rop, $op, $rnd);
     Set $rop to the hyperbolic cosine/hyperbolic sine/hyperbolic
-    tangent respectively of $op, rounded to the direction$rnd
+    tangent respectively of $op, rounded to the direction $rnd
     with the precision of $rop.  Return 0 iff the result is exact
     (this occurs in fact only when OP is 0 i.e. the result is 1).
 
@@ -1149,7 +1150,16 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     Attempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::MPFR'
-    will not (currently) work.
+    will not (currently) work. It would be fun (and is tempting)
+    to implement cross-class overloading - but it could also
+    easily lead to user confusion and frustration, so I'll resist
+    the temptation until someone convinces me that I should do
+    otherwise.
+    The workaround is to use 'Rmpfr_init_set_z', 'Rmpfr_init_set_q', 
+    or 'Rmpfr_init_set_f' to first create a copy of the object - 
+    and to use that copy with the overloaded operator.
+    (Alternatively resort to making the appropriate function call
+    and don't use operator overloading under such circumstances.)
 
    #####################
 

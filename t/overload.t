@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
+use Math::BigInt; # for some error tests
 
-print "1..44\n";
+print "1..45\n";
 
 Rmpfr_set_default_prec(200);
 
@@ -675,6 +676,33 @@ if($p == 6
    && get_refcnt($p) == 1
    && get_refcnt($q) == 1) {print "ok 44\n"}
 else {print "not ok 44\n"}
+
+my $mbi = Math::BigInt->new(112345);
+$ok = '';
+
+eval{$q = $p + $mbi;};
+if($@ =~ /Invalid argument/) {$ok = 'a'}
+eval{$q = $p * $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'b'}
+eval{$q = $p - $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'c'}
+eval{$q = $p / $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'd'}
+eval{$q = $p ** $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'e'}
+eval{$p += $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'f'}
+eval{$p *= $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'g'}
+eval{$p -= $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'h'}
+eval{$p /= $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'i'}
+eval{$p **= $mbi;};
+if($@ =~ /Invalid argument/) {$ok .= 'j'}
+
+if($ok eq 'abcdefghij') {print "ok 45\n"}
+else {print "not ok 45\n"}
 
 sub adjust {
     if($_[0]) {

@@ -26,3 +26,8 @@
    'Rgmp_randinit_lc_2exp_size', 'Rgmp_randseed', 'Rgmp_randseed_ui',
    'Rgmp_randclear'.
  - Change module name from 'Math::GnuMPfr' to 'Math::MPFR'
+
+1.01
+ - Eradicate segfault that was occurring when 'overload_add',
+   'overload_sub', 'overload_mul', 'overload_div' and 'overload_pow'
+   croaked due to invalid argument(s).

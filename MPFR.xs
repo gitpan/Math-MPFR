@@ -1060,41 +1060,33 @@ SV * overload_mul(SV * a, SV * b, SV * third) {
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
+     sv_setiv(obj, (IV)mpfr_t_obj);
+     SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
        mpfr_mul_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          mpfr_mul_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        mpfr_mul_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvIV(b) * -1, __gmpfr_default_rounding_mode);
        mpfr_neg(*mpfr_t_obj, *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvNOK(b)) {
        mpfr_set_d(*mpfr_t_obj, SvNV(b), __gmpfr_default_rounding_mode);
        mpfr_mul(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvROK(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          mpfr_mul(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
@@ -1149,40 +1141,32 @@ SV * overload_add(SV * a, SV * b, SV * third) {
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
+     sv_setiv(obj, (IV)mpfr_t_obj);
+     SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
        mpfr_add_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvIOK(b)) {
        if(SvIV(b) >= 0) {
          mpfr_add_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        mpfr_sub_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvIV(b) * -1, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvNOK(b)) {
        mpfr_set_d(*mpfr_t_obj, SvNV(b), __gmpfr_default_rounding_mode);
        mpfr_add(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvROK(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          mpfr_add(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
@@ -1236,12 +1220,12 @@ SV * overload_sub(SV * a, SV * b, SV * third) {
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
+     sv_setiv(obj, (IV)mpfr_t_obj);
+     SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
        if(third == &PL_sv_yes) mpfr_ui_sub(*mpfr_t_obj, SvUV(b), *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
        else mpfr_sub_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
@@ -1249,14 +1233,10 @@ SV * overload_sub(SV * a, SV * b, SV * third) {
        if(SvIV(b) >= 0) {
          if(third == &PL_sv_yes) mpfr_ui_sub(*mpfr_t_obj, SvUV(b), *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
          else mpfr_sub_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        mpfr_add_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvIV(b) * -1, __gmpfr_default_rounding_mode);
        if(third == &PL_sv_yes) mpfr_neg(*mpfr_t_obj, *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
@@ -1264,16 +1244,12 @@ SV * overload_sub(SV * a, SV * b, SV * third) {
        mpfr_set_d(*mpfr_t_obj, SvNV(b), __gmpfr_default_rounding_mode);
        if(third == &PL_sv_yes) mpfr_sub(*mpfr_t_obj, *mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
        else mpfr_sub(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvROK(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          mpfr_sub(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
@@ -1329,12 +1305,12 @@ SV * overload_div(SV * a, SV * b, SV * third) {
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
+     sv_setiv(obj, (IV)mpfr_t_obj);
+     SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
        if(third == &PL_sv_yes) mpfr_ui_div(*mpfr_t_obj, SvUV(b), *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
        else mpfr_div_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
@@ -1342,15 +1318,11 @@ SV * overload_div(SV * a, SV * b, SV * third) {
        if(SvIV(b) >= 0) {
          if(third == &PL_sv_yes) mpfr_ui_div(*mpfr_t_obj, SvUV(b), *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
          else mpfr_div_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvUV(b), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        if(third == &PL_sv_yes) mpfr_ui_div(*mpfr_t_obj, SvIV(b) * -1, *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
        else mpfr_div_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), SvIV(b) * -1, __gmpfr_default_rounding_mode);
        mpfr_neg(*mpfr_t_obj, *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
@@ -1358,21 +1330,16 @@ SV * overload_div(SV * a, SV * b, SV * third) {
        mpfr_set_d(*mpfr_t_obj, SvNV(b), __gmpfr_default_rounding_mode);
        if(third == &PL_sv_yes) mpfr_div(*mpfr_t_obj, *mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), __gmpfr_default_rounding_mode);
        else mpfr_div(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvROK(b)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          mpfr_div(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(a))), *((mpfr_t *) SvIV(SvRV(b))), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
 
-     mpfr_clear(*mpfr_t_obj);
      croak("Invalid argument supplied to overload_div function");
 
 }
@@ -1731,16 +1698,16 @@ SV * overload_pow(SV * p, SV * second, SV * third) {
      SV * obj_ref, * obj;
 
      New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
-     if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sqrt function");
+     if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_pow function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
+     sv_setiv(obj, (IV)mpfr_t_obj);
+     SvREADONLY_on(obj);
 
      if(SvUOK(second)) {
        if(third == &PL_sv_yes) mpfr_ui_pow(*mpfr_t_obj, SvUV(second), *((mpfr_t *) SvIV(SvRV(p))), __gmpfr_default_rounding_mode);
        else mpfr_pow_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), SvUV(second), __gmpfr_default_rounding_mode);
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
@@ -1748,14 +1715,10 @@ SV * overload_pow(SV * p, SV * second, SV * third) {
        if(SvIV(second) >= 0) {
          if(third == &PL_sv_yes) mpfr_ui_pow(*mpfr_t_obj, SvUV(second), *((mpfr_t *) SvIV(SvRV(p))), __gmpfr_default_rounding_mode);
          else mpfr_pow_ui(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), SvUV(second), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        if(third != &PL_sv_yes) {
          mpfr_pow_si(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), SvIV(second), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
@@ -1764,21 +1727,17 @@ SV * overload_pow(SV * p, SV * second, SV * third) {
        mpfr_set_d(*mpfr_t_obj, SvNV(second), __gmpfr_default_rounding_mode);
        if(third == &PL_sv_yes) mpfr_pow(*mpfr_t_obj, *mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), __gmpfr_default_rounding_mode);
        else mpfr_pow(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), *mpfr_t_obj, __gmpfr_default_rounding_mode); 
-       sv_setiv(obj, (IV)mpfr_t_obj);
-       SvREADONLY_on(obj);
        return obj_ref;
        }
 
      if(SvROK(second)) {
        if(strEQ(HvNAME(SvSTASH(SvRV(second))), "Math::MPFR")) {
          mpfr_pow(*mpfr_t_obj, *((mpfr_t *) SvIV(SvRV(p))), *((mpfr_t *) SvIV(SvRV(second))), __gmpfr_default_rounding_mode);
-         sv_setiv(obj, (IV)mpfr_t_obj);
-         SvREADONLY_on(obj);
          return obj_ref;
          }
        }
 
-     croak("Inappropriate argument supplied to overload_pow.");
+     croak("Invalid argument supplied to overload_pow.");
 }
 
 SV * overload_pow_eq(SV * p, SV * second, SV * third) {
@@ -1815,7 +1774,7 @@ SV * overload_pow_eq(SV * p, SV * second, SV * third) {
        }
 
      SvREFCNT_dec(p);
-     croak("Inappropriate argument supplied to overload_pow_eq.");
+     croak("Invalid argument supplied to overload_pow_eq.");
 }
 
 SV * overload_log(SV * p, SV * second, SV * third) {
