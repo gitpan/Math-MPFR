@@ -1,3 +1,6 @@
+/*
+* Check that the MPFR library is sufficiently recent
+*/
 #include <stdio.h>
 #include <gmp.h>
 #include <mpfr.h>

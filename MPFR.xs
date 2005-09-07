@@ -44,7 +44,7 @@ SV * Rmpfr_init() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -59,7 +59,7 @@ SV * Rmpfr_init2(SV * prec) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2 function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -74,7 +74,7 @@ SV * Rmpfr_init_nobless() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -89,7 +89,7 @@ SV * Rmpfr_init2_nobless(SV * prec) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -108,7 +108,7 @@ void Rmpfr_init_set(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -130,7 +130,7 @@ void Rmpfr_init_set_ui(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -152,7 +152,7 @@ void Rmpfr_init_set_si(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -174,7 +174,7 @@ void Rmpfr_init_set_d(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -196,7 +196,7 @@ void Rmpfr_init_set_f(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -218,7 +218,7 @@ void Rmpfr_init_set_z(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -240,7 +240,7 @@ void Rmpfr_init_set_q(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -264,7 +264,7 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpf_init_set str is out of allowable range");
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -286,7 +286,7 @@ void Rmpfr_init_set_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -308,7 +308,7 @@ void Rmpfr_init_set_ui_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -330,7 +330,7 @@ void Rmpfr_init_set_si_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -352,7 +352,7 @@ void Rmpfr_init_set_d_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -374,7 +374,7 @@ void Rmpfr_init_set_f_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -396,7 +396,7 @@ void Rmpfr_init_set_z_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -418,7 +418,7 @@ void Rmpfr_init_set_q_nobless(SV * q, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -442,7 +442,7 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
 
      Inline_Stack_Reset;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str_nobless function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -1063,7 +1063,7 @@ SV * overload_mul(SV * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_mul function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1161,7 +1161,7 @@ SV * overload_add(SV * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_add function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1257,7 +1257,7 @@ SV * overload_sub(SV * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sub function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1360,7 +1360,7 @@ SV * overload_div(SV * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_div function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1465,7 +1465,7 @@ SV * overload_copy(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_copy function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1480,7 +1480,7 @@ SV * overload_abs(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_abs function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1821,7 +1821,7 @@ SV * overload_sqrt(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sqrt function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1838,7 +1838,7 @@ SV * overload_pow(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_pow function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1940,7 +1940,7 @@ SV * overload_log(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_log function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1956,7 +1956,7 @@ SV * overload_exp(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_exp function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1972,7 +1972,7 @@ SV * overload_sin(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sin function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -1988,7 +1988,7 @@ SV * overload_cos(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_cos function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2004,7 +2004,7 @@ SV * overload_int(SV * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_int function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2020,7 +2020,7 @@ SV * overload_atan2(SV * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, sizeof(mpfr_t), mpfr_t);
+     New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_atan2 function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2096,7 +2096,7 @@ SV * Rgmp_randinit_default() {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
-     New(1, state, sizeof(gmp_randstate_t), gmp_randstate_t);
+     New(1, state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_default function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -2112,7 +2112,7 @@ SV * Rgmp_randinit_lc_2exp(SV * a, SV * c, SV * m2exp ) {
      mpz_t aa;
      SV * obj_ref, * obj;
 
-     New(1, state, sizeof(gmp_randstate_t), gmp_randstate_t);
+     New(1, state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -2143,7 +2143,7 @@ SV * Rgmp_randinit_lc_2exp_size(SV * size) {
 
      if(SvUV(size) > 128) croak("The argument supplied to Rgmp_randinit_lc_2exp_size function (%u) needs to be in the range [1..128]", SvUV(size));
 
-     New(1, state, sizeof(gmp_randstate_t), gmp_randstate_t);
+     New(1, state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp_size function");
      obj_ref = newSViv(0);
      obj = newSVrv(obj_ref, NULL);
@@ -2311,6 +2311,15 @@ SV * Rmpfr_fits_ulong_p(SV * a, SV * round) {
 SV * Rmpfr_fits_slong_p(SV * a, SV * round) {
      return newSVuv(mpfr_fits_slong_p(*((mpfr_t *) SvIV(SvRV(a))), (mp_rnd_t)SvUV(round)));
 }
+
+SV * Rmpfr_strtofr(SV * a, SV * str, SV * base, SV * round) {
+     int b = (int)SvIV(base);
+     //char ** endptr;
+     if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
+     return newSViv(mpfr_strtofr(*((mpfr_t *) SvIV(SvRV(a))), SvPV_nolen(str), NULL, b, (mp_rnd_t)SvUV(round)));
+}
+
+
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
 
@@ -4152,5 +4161,12 @@ Rmpfr_fits_ulong_p (a, round)
 SV *
 Rmpfr_fits_slong_p (a, round)
 	SV *	a
+	SV *	round
+
+SV *
+Rmpfr_strtofr (a, str, base, round)
+	SV *	a
+	SV *	str
+	SV *	base
 	SV *	round
 

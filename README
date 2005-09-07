@@ -1,18 +1,36 @@
-This module requires that MPFR (and hence GMP) has been installed.
-It wraps the 'mpfr-2.1.0' (floating point) functions. You'll get errors
-if you try to build Math-MPFR-1.04 (or later) against an earlier 
-version of the mpfr library. If you have an earlier version of the 
-mpfr library, try Math-MPFR-1.03 (or earlier, if necessary). 
-See http://www.mpfr.org/mpfr-current/ for MPFR source and
-instructions on how to build the library - or visit
-http://www.kalinabears.com.au/w32perl/math_gnump.html to
-obtain pre-compiled Math::MPFR binaries for Win32.
+This module wraps the MPFR library functions.
 
-For GMP, see http://swox.com/gmp .
+The MPFR library is a C library for multiple-precision floating-point
+computations with exact rounding (also called correct rounding). It
+is based on the GMP multiple-precision C library.
+
+The main goal of MPFR is to provide a library for multiple-precision
+floating-point computation which is both efficient and has a 
+well-defined semantics. It copies the good ideas from the
+ANSI/IEEE-754 standard for double-precision floating-point
+arithmetic (53-bit mantissa).
+
+MPFR, like GMP, is free. It is distributed under the
+GNU Lesser General Public License (GNU Lesser GPL).
+
+Because this module wraps the MPFR functions, it requires that both
+the GMP C library and the MPFR C library have been installed.
+
+For the GMP library see:
+http://swox.com/gmp
+
+For the MPFR library see:
+http://www.mpfr.org
+Do not use the (outdated) MPFR library source that ships with the
+GMP source.
+
+As of version 1.04 of this module, MPFR-2.1.0 is required - and you'll
+get errors if you try to build against an earlier version of the MPFR
+library.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but
-it's definite that the XS code relating to operator overloading will 
+it's definite that the XS code relating to operator overloading will
 not compile with perl versions prior to 5.6.
 
 Build in the usual way:
@@ -29,21 +47,22 @@ libraries will need to be accessible:
  mpfr.h
  the static library files libgmp and libmpfr ('.a' or '.lib')
 
-If those files are in a location where your compiler does not find 
+If those files are in a location where your compiler does not find
 them by default, then instead of running 'perl Makefile.PL', you'll
 need to run:
 
-perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes" LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes"
+ LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
 
 (Alternatively you could copy the requisite files to a location where
-the compiler *does* find them by default - which was the option I 
+the compiler *does* find them by default - which was the option I
 chose on Win32.)
 
-If you have a dynamic build of GMP, then the GMP shared library file 
+If you have a dynamic build of GMP, then the GMP shared library file
 ('.dll' or '.so') needs to be accessible to the system.
 
-Win32 pre-compiled binaries (with installation instructions) of 
+Win32 pre-compiled binaries (with installation instructions) of
 this module can be found at:
-http://www.kalinabears.com.au/w32perl/math_gnump.html . 
-Using the pre-compiled perl binaries is the best option for MSVC built
-perl (including ActiveState perl).
+http://www.kalinabears.com.au/w32perl/math_gnump.html .
+Using the pre-compiled perl binaries is probably the best option for
+Win32 perl (including ActiveState perl and IndigoPerl).

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
 
-print "1..14\n";
+print "1..15\n";
 
 my $hex = '0xabcde';
 my $dec = 703710;
@@ -130,4 +130,32 @@ Rmpfr_set_str($z, $bigstr, 0, GMP_RNDN);
 if($z == $bigstr) {print "ok 14\n"}
 else {print "not ok 14\n"}
 
+$ok = '';
+
+my $ret = Rmpfr_strtofr($z, '11111111111.11111111111111', 0, GMP_RNDD);
+if($ret == -1) {$ok = 'a'}
+
+$ret = Rmpfr_strtofr($z, '11111111111.11111111111111', 0, GMP_RNDU);
+if($ret == 1) {$ok .= 'b'}
+
+$ret = Rmpfr_strtofr($z, '-11111111111.11111111111111', 0, GMP_RNDZ);
+if($ret == 1) {$ok .= 'c'}
+
+$ret = Rmpfr_strtofr($z, '11111111111.11111111111111', 0, GMP_RNDZ);
+if($ret == -1) {$ok .= 'd'}
+
+$ret = Rmpfr_strtofr($z, '-11111111111.5s11111111111111', 0, GMP_RNDD);
+if(!$ret) {$ok .= 'e'}
+
+$ret = Rmpfr_strtofr($z, '-11111111111.5s11111111111111', 0, GMP_RNDU);
+if(!$ret) {$ok .= 'f'}
+
+$ret = Rmpfr_strtofr($z, 'm11111111111.5s11111111111111', 0, GMP_RNDD);
+if(!$z) {$ok .= 'g'}
+
+$ret = Rmpfr_strtofr($z, 'm11111111111.5s11111111111111', 0, GMP_RNDU);
+if(!$z) {$ok .= 'h'}
+
+if($ok eq 'abcdefgh') {print "ok 15\n"}
+else {print "not ok 15 $ok\n"}
 

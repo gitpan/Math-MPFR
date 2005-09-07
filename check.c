@@ -1,3 +1,8 @@
+/*
+* Check that gmp.h, mpfr.h, and mpf2mpfr.h
+* can be found by the compiler
+*/
+
 #include <stdio.h>
 #include <gmp.h>
 #include <mpfr.h>

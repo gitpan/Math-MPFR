@@ -92,8 +92,8 @@ Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max
 Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
 Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
 Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
-Rmpfr_fits_ulong_p Rmpfr_fits_slong_p);
-    $Math::MPFR::VERSION = '1.06';
+Rmpfr_fits_ulong_p Rmpfr_fits_slong_p Rmpfr_strtofr);
+    $Math::MPFR::VERSION = '1.07';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -148,7 +148,7 @@ Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max
 Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
 Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
 Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
-Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
+Rmpfr_fits_ulong_p Rmpfr_fits_slong_p Rmpfr_strtofr
 )]);
 
 sub Rmpfr_get_str {
@@ -589,6 +589,40 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      Rmpfr_set_str($rop, ".1234\@-5", 10, GMP_RNDN);
     But the following assignment won't do what you want:
      Rmpfr_set_str($rop, ".1234@-5", 10, GMP_RNDN); 
+
+   Rmpfr_strtofr($rop, $str, $base, $rnd);
+    Read a floating point number from a string $str in base $base,
+    rounded in the direction $rnd. If successful, the result is
+    stored in $rop. If $str doesn't start with a valid number then
+    $rop is set to zero.
+    Parsing follows the standard C `strtod' function.  This means
+    optional leading whitespace, an optional `+' or `-', mantissa
+    digits, and an  optional exponent consisting of an `e' or `E'
+    (if $base <= 10) or `@', an optional sign, and digits.   A hex
+    mantissa can be given with a leading `0x' or `0X', in which case
+    `p' or `P' may introduce an optional binary exponent. A binary
+    mantissa can be given with a leading `0b' or `0B', in which case
+    `e', `E', `p', `P' or `@' may introduce the  binary exponent.
+    In addition `infinity', `inf' (if BASE <= 10)  or `@inf@' with an
+    optional sign, or `nan',  `nan(n-char-sequence)' (if $base <= 10),
+    `@nan@'  or `@nan@(n-char-sequence)' all non case significant, can
+    be given. A `n-char-sequence' is a string containing only digits
+    (0, 1, 2, ..., 9)  and non-digits (_, a, b, ..., z, A, B, ..., Z).
+    There must be at least one digit in the mantissa for the number to
+    be valid. If an exponent has no digits it's ignored and parsing
+    stops after the mantissa.  If an `0x', `0X', `0b' or  `0B' is not
+    followed by hexadecimal/binary digits, parsing stops after the
+    first `0'.
+    Note that in the hex format the exponent `P' represents a power of
+    2,  whereas `@' represents a power of the base (i.e. 16).
+    If the argument $base is different from 0, it must be in the range
+    2 to 36. Case is ignored; upper-case and lower-case letters have
+    the same value.
+    If `base' is 0, then it tries to identify the used base: if the
+    mantissa begins with the `0x' prefix, it assumes that BASE is 16.
+    If it begins with `0b', it assumes that BASE is 2. Otherwise, it
+    assumes it is 10.
+    It returns a usual ternary value.
 
    Rmpfr_set_str_binary($rop, $str);
     Set $rop to the value of the binary number in $str, which has to

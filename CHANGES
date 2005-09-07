@@ -70,3 +70,8 @@
  - Fix a bug in 'Rmpfr_deref2()' - used by 'overload_print()'
  - Provide more complete testing with 4 new test files - namely
    test4.t, trig.t, set_str.t and exceptions.t.
+
+1.07
+ - New() was allocating more memory than necessary in many instances.
+   Rewrote the code (in those instances) to fix that.
+ - Add Rmpfr_strtofr

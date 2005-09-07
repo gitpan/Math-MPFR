@@ -57,7 +57,7 @@ if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($z) == 1
    && Math::MPFR::get_refcnt($p) == 1
    && Math::MPFR::get_refcnt($q) == 1) {print "ok 1\n"}
-else {print "not ok 1\n"}
+else {print "not ok 1 $ok\n"}
 
 $ok = '';
 
@@ -101,7 +101,7 @@ Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 2\n"}
-else {print "not ok 2\n"}
+else {print "not ok 2 $ok\n"}
 
 $ok = '';
 
@@ -139,7 +139,7 @@ if($z == 2472) {$ok .= 'g'}
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($p) == 1
    && Math::MPFR::get_refcnt($z) == 1) {print "ok 3\n"}
-else {print "not ok 3\n"}
+else {print "not ok 3 $ok\n"}
 
 $ok = '';
 
@@ -183,7 +183,7 @@ Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 4\n"}
-else {print "not ok 4\n"}
+else {print "not ok 4 $ok\n"}
 
 $ok = '';
 
@@ -232,7 +232,7 @@ if($z > 0.999 && $z < 1.001) {$ok .= '7'}
 if($ok eq 'a1b2c3d4e5f6g7'
    && Math::MPFR::get_refcnt($p) == 1
    && Math::MPFR::get_refcnt($z) == 1) {print "ok 5\n"}
-else {print "not ok 5\n"}
+else {print "not ok 5 $ok\n"}
 
 $ok = '';
 
@@ -266,7 +266,7 @@ if($p < 1234.0001 && $p > 1233.9999) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 6\n"}
-else {print "not ok 6\n"}
+else {print "not ok 6 $ok\n"}
 
 my $c = $p;
 if("$c" eq '.1234@4'
@@ -388,7 +388,7 @@ if($z == $p) {$ok .= 'g'}
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($z) == 1
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 24\n"}
-else {print "not ok 24\n"}
+else {print "not ok 24 $ok\n"}
 
 $ok = '';
 
@@ -423,7 +423,7 @@ if($z == $p) {$ok .= 'g'}
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($z) == 1
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 25\n"}
-else {print "not ok 25\n"}
+else {print "not ok 25 $ok\n"}
 
 $ok = '';
 
@@ -458,7 +458,7 @@ if($z == -$p) {$ok .= 'g'}
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($z) == 1
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 26\n"}
-else {print "not ok 26\n"}
+else {print "not ok 26 $ok\n"}
 
 $ok = '';
 
@@ -493,7 +493,7 @@ if($z == $p) {$ok .= 'g'}
 if($ok eq 'abcdefg'
    && Math::MPFR::get_refcnt($z) == 1
    && Math::MPFR::get_refcnt($p) == 1) {print "ok 27\n"}
-else {print "not ok 27\n"}
+else {print "not ok 27 $ok\n"}
 
 $ok = ($posi!=$p).($posi==$p).($posi>$p).($posi>=$p).($posi<$p).($posi<=$p).($posi<=>$p);
 if($ok eq '1011001'
@@ -655,7 +655,7 @@ if($ok eq 'abcdefghijklm'
   && Math::MPFR::get_refcnt($s) == 1
   && Math::MPFR::get_refcnt($c) == 1
   && Math::MPFR::get_refcnt($p) == 1) {print "ok 41\n"}
-else {print "not ok 41\n"}
+else {print "not ok 41 $ok\n"}
 
 Rmpfr_set_d($p, 81, GMP_RNDN);
 $q = $p ** 0.5;
@@ -702,7 +702,7 @@ eval{$p **= $mbi;};
 if($@ =~ /Invalid argument/) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 45\n"}
-else {print "not ok 45\n"}
+else {print "not ok 45 $ok\n"}
 
 $mbi = "this is a string";
 $ok = '';
@@ -743,7 +743,7 @@ eval{if($p != $mbi){};};
 if($@ =~ /Invalid string/) {$ok .= 'q'}
 
 if($ok eq 'abcdefghijklmnopq') {print "ok 46\n"}
-else {print "not ok 46\n"}
+else {print "not ok 46 $ok\n"}
 
 $mbi = "-111111111111112.34567879";
 Rmpfr_set_si($p, 1234, GMP_RNDN);
@@ -822,7 +822,7 @@ eval{$p **= $mbi;};
 if($@ =~ /Invalid argument/) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 52\n"}
-else {print "not ok 52\n"}
+else {print "not ok 52 $ok\n"}
 
 my $p_copy = $p;
 $p_copy += 1;

@@ -115,7 +115,7 @@ my %options = %{
   LIBS => [
     $libs
   ],
-  'VERSION' => '1.06',
+  'VERSION' => '1.07',
 }
 };
 

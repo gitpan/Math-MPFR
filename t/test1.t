@@ -294,19 +294,19 @@ Rmpfr_rint($c, $d, GMP_RNDD);
 if(!Rmpfr_cmp_ui($c, 123456)) { $ret .= 'a'}
 
 Rmpfr_ceil($c, $d);
-if(!Rmpfr_cmp_ui($c, 123457)) { $ret .= 'a'}
+if(!Rmpfr_cmp_ui($c, 123457)) { $ret .= 'b'}
 
 Rmpfr_floor($c, $d);
-if(!Rmpfr_cmp_ui($c, 123456)) { $ret .= 'a'}
+if(!Rmpfr_cmp_ui($c, 123456)) { $ret .= 'c'}
 
 Rmpfr_round($c, $d);
-if(!Rmpfr_cmp_ui($c, 123457)) { $ret .= 'a'}
+if(!Rmpfr_cmp_ui($c, 123457)) { $ret .= 'd'}
 
 Rmpfr_trunc($c, $d);
-if(!Rmpfr_cmp_ui($c, 123456)) { $ret .= 'a'}
+if(!Rmpfr_cmp_ui($c, 123456)) { $ret .= 'e'}
 
-if($ret eq 'aaaaa') {print "ok 36\n"}
-else {print "not ok 36\n"}
+if($ret eq 'abcde') {print "ok 36\n"}
+else {print "not ok 36 $ret\n"}
 
 if(Rmpfr_get_emin() < -1000000 && Rmpfr_get_emax > 1000000) {print "ok 37\n"}
 else {print "not ok 37\n"}
@@ -470,13 +470,15 @@ $check *= 0;
 
 if($check == $c) {$ok .= 'b'}
 
+Rmpfr_clear_nanflag();
 my $flag = Rmpfr_nanflag_p();
 
 $check = $check / $c;
 if(!$flag && Rmpfr_nanflag_p()
    && Math::MPFR::get_refcnt($check) == 1
-   && Math::MPFR::get_refcnt($c) == 1) {print "ok 48\n"}
-else {print "not ok 48\n"}
+   && Math::MPFR::get_refcnt($c) == 1
+   && $ok eq 'ab') {print "ok 48  (Got: $flag ", Rmpfr_nanflag_p(), " $ok)\n"}
+else {print "not ok 48 (Got: $flag ", Rmpfr_nanflag_p(), " $ok)\n"}
 
 ########################
 
@@ -630,7 +632,7 @@ Rmpfr_max($check2, $check, $c, GMP_RNDN);
 if($check2 == $check) {$ok .= 'b'}
 
 if($ok eq 'ab') {print "ok 64\n"}
-else {print "not ok 64\n"}
+else {print "not ok 64 $ok\n"}
 
 Rmpfr_set_d($c, 1.003, GMP_RNDN);
 Rmpfr_gamma($c, $c, GMP_RNDN);
