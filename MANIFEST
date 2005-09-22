@@ -17,3 +17,5 @@ t/overload.t
 t/exceptions.t
 t/trig.t
 t/set_str.t
+t/flags.t
+t/constants.t

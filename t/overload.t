@@ -608,53 +608,93 @@ Rmpfr_set_ui($s, 3, GMP_RNDN);
 
 $ok = '';
 
-$c = atan2($s, $ui);
-if($c > 1.396983836e-009 && $c < 1.3969839e-009) {$ok = 'a'}
+my $y_atan2 = Rmpfr_init();
+Rmpfr_set_d($y_atan2, 2.07, GMP_RNDN); 
+my $atan2 = Rmpfr_init();
 
-$c = atan2($ui, $s);
-if($c > 1.57079632 && $c < 1.57079633) {$ok .= 'b'}
+my $x_atan2 = 2 ** 31 + 2;
 
-$c = atan2($s, $negi);
-my $check = atan2(-$s, -$negi);
-if($check == $c) {$ok .= 'c'}
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'z'}
 
-$c = atan2($negi, $s);
-if($c > -1.5683692 && $c < -1.5683691) {$ok .= 'd'}
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'a'}
 
-$c = atan2($posi, $s);
-if($c > 1.5683730 && $c < 1.5683731) {$ok .= 'e'}
+$x_atan2 *= -1;
 
-$c = atan2($s, $posi);
-if($c > 0.0024232 && $c < 0.0024233) {$ok .= 'f'}
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'b'}
 
-$c = atan2($posd, $s);
-if($c > 1.57079632 && $c < 1.57079633) {$ok .= 'g'}
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'c'}
 
-$c = atan2($s, $posd);
-if($c > 1.36424204e-012 && $c < 1.36424205e-012) {$ok .= 'h'}
+$x_atan2 = 2;
 
-$c = atan2($negd, $s);
-if($c > -1.57079633 && $c < -1.57079632) {$ok .= 'i'}
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'd'}
 
-$c = atan2($s, $negd);
-$check = atan2(-$s, -$negd);
-if($check == $c) {$ok .= 'j'}
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'e'}
 
-$c = atan2($frac, $s);
-if($c > 1.4417865 && $c < 1.4417866) {$ok .= 'k'}
+$x_atan2 *= -1;
 
-$c = atan2($s, $frac);
-if($c > 0.1290097624 && $c < 0.1290097625) {$ok .= 'l'}
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'f'}
 
-Rmpfr_set_ui($p, 113, GMP_RNDN);
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'g'}
 
-$c = atan2($s, $p);
-if($c > 0.0265424377 && $c < 0.0265424378) {$ok .= 'm'}
+$x_atan2 *= 0.50123;
 
-if($ok eq 'abcdefghijklm'
-  && Math::MPFR::get_refcnt($s) == 1
-  && Math::MPFR::get_refcnt($c) == 1
-  && Math::MPFR::get_refcnt($p) == 1) {print "ok 41\n"}
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'h'}
+
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'i'}
+
+$x_atan2 *= -1;
+
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'j'}
+
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'k'}
+
+$x_atan2 = "1.988766";
+
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'l'}
+
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'm'}
+
+$x_atan2 = "-1.988766";
+
+$atan2 = atan2($y_atan2, $x_atan2);
+if($atan2 - atan2(2.07, $x_atan2) < 0.0000001 &&
+   $atan2 - atan2(2.07, $x_atan2) > -0.0000001) {$ok .= 'n'}
+
+$atan2 = atan2($x_atan2, $y_atan2);
+if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
+   $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'o'}
+
+if($ok eq 'zabcdefghijklmno'
+  && Math::MPFR::get_refcnt($atan2) == 1
+  && Math::MPFR::get_refcnt($y_atan2) == 1) {print "ok 41\n"}
 else {print "not ok 41 $ok\n"}
 
 Rmpfr_set_d($p, 81, GMP_RNDN);

@@ -81,7 +81,7 @@ if($v_ok == 1) {
 In attempting to determine your MPFR version, the
 executable did not compile. This would indicate that
 you don't have a sufficiently recent version of MPFR. 
-You need MPFR version 2.1.0 or higher. Get it from:
+You need MPFR version 2.2.0 or higher. Get it from:
 
 http://www.mpfr.org/
 
@@ -96,7 +96,7 @@ sisyphus at cpan dot org
 if($v_ok == 0) {
   die "
 
-You need MPFR version 2.1.0 or higher. Get it from:
+You need MPFR version 2.2.0 or higher. Get it from:
 
 http://www.mpfr.org/
 
@@ -115,7 +115,7 @@ my %options = %{
   LIBS => [
     $libs
   ],
-  'VERSION' => '1.07',
+  'VERSION' => '1.08',
 }
 };
 
@@ -183,14 +183,14 @@ sub get_version {
         unless(system("$CC -o version.exe version.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
         my $v = `version.exe`;
         my @v = split /\./, $v;
-        if($v[0] >= 2 && $v[1] >= 1 && $v[2] >= 0) {return 2}
+        if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
         print "\nYou have MPFR version $v\n";
         return 0;
         }
       unless(system("$CC -o version.exe version.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
       my $v = `version.exe`;
       my @v = split /\./, $v;
-      if($v[0] >= 2 && $v[1] >= 1 && $v[2] >= 0) {return 2}
+      if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
       print "\nYou have MPFR version $v\n";
       return 0;
       }
@@ -199,7 +199,7 @@ sub get_version {
       unless(system("$CC -o version.exe version.c $INC $LIBS 2>/dev/null") == 0) {return 1}
       my $v = `./version.exe`;
       my @v = split /\./, $v;
-      if($v[0] >= 2 && $v[1] >= 1 && $v[2] >= 0) {return 2}
+      if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
       print "\nYou have MPFR version $v\n";
       return 0;
       }

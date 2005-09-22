@@ -42,7 +42,7 @@
  - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
 
 1.04
- - Built against MPFR-2.1.0.
+ - Math::MPFR-1.04 to 1.07 require MPFR-2.1.x.
  - Added the following functions, not available with versions earlier
    than 2.1.0 :
    Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
@@ -75,3 +75,22 @@
  - New() was allocating more memory than necessary in many instances.
    Rewrote the code (in those instances) to fix that.
  - Add Rmpfr_strtofr
+
+1.08
+ - As of this version, MPFR-2.2.x is required.
+ - Add new functions made available with the release of MPFR-2.2.0:
+   Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
+   Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2 
+   Rmpfr_pow_z Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec 
+   Rmpfr_csc Rmpfr_cot Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech
+   Rmpfr_csch Rmpfr_coth Rmpfr_lngamma RMPFR_VERSION_NUM
+ - Add constants (actually implemented as subroutines):
+   MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
+   MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
+ - Remove Rmpfr_add_one_ulp and Rmpfr_sub_one_ulp (no longer supported
+   by the MPFR library).
+ - Redefine '__gmpfr_default_rounding_mode' in MPFR.xs as it's no 
+   longer in mpfr.h. (Been moved to mpfr-impl.h which I don't want to
+   include.)
+ - Rewrite of overload_atan2 - now that mpfr_atan2 is available in 
+   MPFR-2.2.0. (Also fixes a bug in overload_atan2).

@@ -3,12 +3,13 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::Trig; # for checking results
 
-print "1..13\n";
+print "1..16\n";
 
 Rmpfr_set_default_prec(100);
 
-my $angle = 13.2314;
+my $angle = 2.2314; #13.2314;
 my $inv = 0.5123;
+my $angle2 = $angle * $inv;
 my $hangle = 0.1234;
 my $invatanh = 0.991;
 my $hinv = 1.4357;
@@ -19,6 +20,7 @@ my $tan = Rmpfr_init();
 my $asin = Rmpfr_init();
 my $acos = Rmpfr_init();
 my $atan = Rmpfr_init();
+my $atan2 = Rmpfr_init();
 my $sinh = Rmpfr_init();
 my $cosh = Rmpfr_init();
 my $tanh = Rmpfr_init();
@@ -26,13 +28,16 @@ my $asinh = Rmpfr_init();
 my $acosh = Rmpfr_init();
 my $atanh = Rmpfr_init();
 my $b_angle = Rmpfr_init();
+my $b_angle2 = Rmpfr_init();
 my $b_inv = Rmpfr_init();
 my $b_hangle = Rmpfr_init();
 my $b_invatanh = Rmpfr_init();
 my $b_hinv = Rmpfr_init();
+my $rop = Rmpfr_init();
 
 
 Rmpfr_set_d($b_angle, $angle, GMP_RNDN);
+Rmpfr_set_d($b_angle2, $angle2, GMP_RNDN);
 Rmpfr_set_d($b_inv, $inv, GMP_RNDN);
 Rmpfr_set_d($b_invatanh, $invatanh, GMP_RNDN);
 Rmpfr_set_d($b_hinv, $hinv, GMP_RNDN);
@@ -104,4 +109,50 @@ if($sin - sin($angle) < 0.00001 &&
    $cos - cos($angle) < 0.00001 &&
    $cos - cos($angle) > -0.00001) {print "ok 13\n"}
 else {print "not ok 13\n"}
+
+Rmpfr_atan2($atan2,$b_angle2, $b_angle, GMP_RNDN);
+if($atan2 - atan2($angle2, $angle) < 0.00000001 &&
+   $atan2 - atan2($angle2, $angle) > -0.00000001) {print "ok 14\n"}
+else {print "not ok 14 $atan2 ", atan2($angle2, $angle),"\n"}
+
+$angle *= -1;
+$b_angle *= -1;
+
+Rmpfr_atan2($atan2,$b_angle2, $b_angle, GMP_RNDN);
+if($atan2 - atan2($angle2, $angle) < 0.00000001 &&
+   $atan2 - atan2($angle2, $angle) > -0.00000001) {print "ok 15\n"}
+else {print "not ok 15 $atan2 ", atan2($angle2, $angle),"\n"}
+
+# Return $angle and $b_angle to their original values:
+$angle *= -1;
+$b_angle *= -1;
+
+my $ok = '';
+
+Rmpfr_sec($rop, $b_angle, GMP_RNDN);
+if($rop - sec($angle) < 0.000000001 
+   && $rop - sec($angle) > -0.000000001) {$ok .= 'a'}
+
+Rmpfr_csc($rop, $b_angle, GMP_RNDN);
+if($rop - csc($angle) < 0.000000001 
+   && $rop - csc($angle) > -0.000000001) {$ok .= 'b'}
+
+Rmpfr_cot($rop, $b_angle, GMP_RNDN);
+if($rop - cot($angle) < 0.000000001 
+   && $rop - cot($angle) > -0.000000001) {$ok .= 'c'}
+
+Rmpfr_sech($rop, $b_angle, GMP_RNDN);
+if($rop - sech($angle) < 0.000000001 
+   && $rop - sech($angle) > -0.000000001) {$ok .= 'd'}
+
+Rmpfr_csch($rop, $b_angle, GMP_RNDN);
+if($rop - csch($angle) < 0.000000001 
+   && $rop - csch($angle) > -0.000000001) {$ok .= 'e'}
+
+Rmpfr_coth($rop, $b_angle, GMP_RNDN);
+if($rop - coth($angle) < 0.000000001 
+   && $rop - coth($angle) > -0.000000001) {$ok .= 'f'}
+
+if($ok eq 'abcdef') {print "ok 16\n"}
+else {print "not ok 16 $ok\n"}
 

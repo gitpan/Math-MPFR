@@ -24,9 +24,12 @@ http://www.mpfr.org
 Do not use the (outdated) MPFR library source that ships with the
 GMP source.
 
-As of version 1.04 of this module, MPFR-2.1.0 is required - and you'll
-get errors if you try to build against an earlier version of the MPFR
+Math::MPFR-1.04 to 1.07 require MPFR-2.1.x - and you'll get errors
+if you try to build against an earlier or later version of the MPFR
 library.
+
+Math::MPFR-1.08 on require MPFR-2.2.x - and you'll get errors if
+you try to build against an earlier version of the MPFR library.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but

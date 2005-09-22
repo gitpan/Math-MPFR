@@ -2,11 +2,11 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..43\n";
+print "1..39\n";
 
 my ($have_mpq, $have_Gmpq) = (0, 0);
 
-eval{require Math::GnuMPq};
+eval{require Math::GMPq};
 if(!$@) {$have_mpq = 1}
 
 eval{require GMP::Mpq};
@@ -151,64 +151,47 @@ Math::MPFR::Rmpfr_nextbelow($next);
 if(Rmpfr_nan_p($next)) {print "ok 24\n"}
 else {print "not ok 24\n"}
 
-$ret = Rmpfr_sub_one_ulp($f, GMP_RNDN);
-
-if(!$ret && $f < 10.5 && $f > 10.49999) {print "ok 25\n"}
-else {print "not ok 25\n"}
-
-$ret = Rmpfr_add_one_ulp($f, GMP_RNDN);
-if(!$ret && $f == 10.5) {print "ok 26\n"}
-else {print "not ok 26\n"}
-
-$ret = Rmpfr_add_one_ulp($next, GMP_RNDN);
-if(!$ret && Rmpfr_nan_p($next)) {print "ok 27\n"}
-else {print "not ok 27\n"}
-
-$ret = Rmpfr_sub_one_ulp($next, GMP_RNDN);
-if(!$ret && Rmpfr_nan_p($next)) {print "ok 28\n"}
-else {print "not ok 28\n"}
-
 $ret = Rmpfr_ui_pow_ui($fma, 7, 5, GMP_RNDN);
-if(!$ret && $fma == 16807) {print "ok 29\n"}
-else {print "not ok 29\n"}
+if(!$ret && $fma == 16807) {print "ok 25\n"}
+else {print "not ok 25\n"}
 
 Rmpfr_set_d($f, 1.23456789, GMP_RNDU);
 $ret = Rmpfr_ui_pow($fma, 7, $f, GMP_RNDN);
-if($ret && $fma > 11.049201764 && $fma < 11.049201765) {print "ok 30\n"}
-else {print "not ok 30\n"}
+if($ret && $fma > 11.049201764 && $fma < 11.049201765) {print "ok 26\n"}
+else {print "not ok 26\n"}
 
 $ret = Rmpfr_pow_si($fma, $f, -3, GMP_RNDN);
-if($ret && $fma > 0.531441014 && $fma < 0.531441015) {print "ok 31\n"}
-else {print "not ok 31\n"}
+if($ret && $fma > 0.531441014 && $fma < 0.531441015) {print "ok 27\n"}
+else {print "not ok 27\n"}
 
 Rmpfr_set_d($f, 0.25, GMP_RNDN);
 $ret = Rmpfr_cmp_ui_2exp($f, 2, -3);
-if(!$ret) {print "ok 32\n"}
-else {print "not ok 32\n"}
+if(!$ret) {print "ok 28\n"}
+else {print "not ok 28\n"}
 
 $f *= -1;
 
 $ret = Rmpfr_cmp_si_2exp($f, -2, -3);
-if(!$ret) {print "ok 33\n"}
-else {print "not ok 33\n"}
+if(!$ret) {print "ok 29\n"}
+else {print "not ok 29\n"}
 
 Rmpfr_set_str_binary($f, '-1000.11E-3');
-if($f == -1.09375) {print "ok 34\n"}
-else {print "not ok 34\n"}
+if($f == -1.09375) {print "ok 30\n"}
+else {print "not ok 30\n"}
 
 $f *= -1;
 
 if($have_mpq) {
-  my $q = Math::GnuMPq::Rmpq_init();
-  Math::GnuMPq::Rmpq_set_ui($q, 11, 17);
+  my $q = Math::GMPq::Rmpq_init();
+  Math::GMPq::Rmpq_set_ui($q, 11, 17);
 
   Rmpfr_add_q($f, $f, $q, GMP_RNDN);
   Rmpfr_sub_q($f, $f, $q, GMP_RNDN);
 
-  if($f > 1.0937499 && $f < 1.0937501) {print "ok 35\n"}
-  else {print "not ok 35\n"}
+  if($f > 1.0937499 && $f < 1.0937501) {print "ok 31\n"}
+  else {print "not ok 31\n"}
   }
-else {print "ok 35 - skipped - no Math::GnuMPq\n"} 
+else {print "ok 31 - skipped - no Math::GMPq\n"} 
 
 if($have_Gmpq) {
   my $q = GMP::Mpq::mpq(11/17);
@@ -216,18 +199,18 @@ if($have_Gmpq) {
   Rmpfr_add_q($f, $f, $q, GMP_RNDN);
   Rmpfr_sub_q($f, $f, $q, GMP_RNDN);
 
-  if($f > 1.0937499 && $f < 1.0937501){print "ok 36\n"}
-  else {print "not ok 36\n"}
+  if($f > 1.0937499 && $f < 1.0937501){print "ok 32\n"}
+  else {print "not ok 32\n"}
   }
-else {print "ok 36 - skipped - no GMP::Mpq\n"}
+else {print "ok 32 - skipped - no GMP::Mpq\n"}
 
 my ($u1, $cmp1) = Rmpfr_init_set_str('1.a', 16, GMP_RNDN);
-if(!$cmp1) {print "ok 37\n"}
-else {print "not ok 37\n"}
+if(!$cmp1) {print "ok 33\n"}
+else {print "not ok 33\n"}
 
 my ($u2, $cmp2) = Rmpfr_init_set_str('1.a', 10, GMP_RNDZ);
-if($cmp2 == -1) {print "ok 38\n"}
-else {print "not ok 38\n"}
+if($cmp2 == -1) {print "ok 34\n"}
+else {print "not ok 34\n"}
 
 ####################################
 
@@ -247,15 +230,15 @@ Rmpfr_set_str_binary ($h, "0.101100100001111000011000011000111110101100001000111
 if (Rmpfr_can_round ($h, 65, GMP_RNDN, GMP_RNDN, 54)) {$ok .= 'E'}
 else {$ok .= 'c'}
 
-if($ok eq 'abc') {print "ok 39\n"}
-else {print "not ok 39 $ok\n"}
+if($ok eq 'abc') {print "ok 35\n"}
+else {print "not ok 35 $ok\n"}
 
 my $k = Rmpfr_init2(53);
 my $str = '1' x 53;
 Rmpfr_set_str($k, $str, 2, GMP_RNDN);
 my @deref = Math::MPFR::Rmpfr_deref2($k, 10, 0, GMP_RNDN);
-if($deref[0] eq '9007199254740991') {print "ok 40\n"}
-else {print "not ok 40\n"}
+if($deref[0] eq '9007199254740991') {print "ok 36\n"}
+else {print "not ok 36\n"}
 
 $ok = '';
 
@@ -267,13 +250,13 @@ if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok .=
 Rmpfr_set_d($k, 2147483648.4444, GMP_RNDN);
 if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && !Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok .= 'c'}
 
-if($ok eq 'abc') {print "ok 41\n"}
-else {print "not ok 41 $ok\n"}
+if($ok eq 'abc') {print "ok 37\n"}
+else {print "not ok 37 $ok\n"}
 
-if(Rmpfr_get_ui($k, GMP_RNDN) == 2147483648) {print "ok 42\n"}
-else {print "not ok 42\n"}
+if(Rmpfr_get_ui($k, GMP_RNDN) == 2147483648) {print "ok 38\n"}
+else {print "not ok 38\n"}
 
 Rmpfr_set_si($k, -2147483647, GMP_RNDN);
-if(Rmpfr_get_si($k, GMP_RNDN) == -2147483647) {print "ok 43\n"}
-else {print "not ok 43\n"}
+if(Rmpfr_get_si($k, GMP_RNDN) == -2147483647) {print "ok 39\n"}
+else {print "not ok 39\n"}
 

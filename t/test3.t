@@ -17,13 +17,13 @@ my $v;
 my($have_mpz, $have_mpf, $have_mpq, $have_Gmpz,
    $have_Gmpq, $have_Gmpf, $have_gmp) = (0, 0, 0, 0, 0, 0, 0);
 
-eval{require Math::GnuMPz};
+eval{require Math::GMPz};
 if(!$@) {$have_mpz = 1}
 
-eval{require Math::GnuMPf};
+eval{require Math::GMPf};
 if(!$@) {$have_mpf = 1}
 
-eval{require Math::GnuMPq};
+eval{require Math::GMPq};
 if(!$@) {$have_mpq = 1}
 
 # Load the GMP module - trap the
@@ -46,7 +46,7 @@ Rmpfr_set_d($mpfr1, $double, $rnd);
 
 if($have_mpz) {
   my $ok = '';
-  my $z = Math::GnuMPz::Rmpz_init_set_ui(123456);
+  my $z = Math::GMPz::Rmpz_init_set_ui(123456);
   my $cmp = Rmpfr_cmp_z($mpfr_nan, $z);
   if(Rmpfr_erangeflag_p() && !$cmp) {$ok .= 'a'}
   Rmpfr_clear_erangeflag();
@@ -59,12 +59,12 @@ if($have_mpz) {
   if($ok eq 'abcd') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
   }
-else {print "ok 1 - skipped - no Math::GnuMPz\n"} 
+else {print "ok 1 - skipped - no Math::GMPz\n"} 
 
 if($have_mpq) {
   my $ok = '';
-  my $q = Math::GnuMPq::Rmpq_init();
-  Math::GnuMPq::Rmpq_set_ui($q, 11, 17);
+  my $q = Math::GMPq::Rmpq_init();
+  Math::GMPq::Rmpq_set_ui($q, 11, 17);
   my $cmp = Rmpfr_cmp_q($mpfr_nan, $q);
   if(Rmpfr_erangeflag_p() && !$cmp) {$ok .= 'a'}
   Rmpfr_clear_erangeflag();
@@ -73,11 +73,11 @@ if($have_mpq) {
   if($ok eq 'abc') {print "ok 2\n"}
   else {print "not ok 2 $ok\n"}
   }
-else {print "ok 2 - skipped - no Math::GnuMPq\n"} 
+else {print "ok 2 - skipped - no Math::GMPq\n"} 
 
 if($have_mpf) {
   my $ok = '';
-  my $f = Math::GnuMPf::Rmpf_init_set_d(123456.12);
+  my $f = Math::GMPf::Rmpf_init_set_d(123456.12);
   my $cmp = Rmpfr_cmp_f($mpfr_nan, $f);
   if(Rmpfr_erangeflag_p() && !$cmp) {$ok .= 'a'}
   Rmpfr_clear_erangeflag();
@@ -86,7 +86,7 @@ if($have_mpf) {
   if($ok eq 'abc') {print "ok 3\n"}
   else {print "not ok 3 $ok\n"}
   }
-else {print "ok 3 - skipped - no Math::GnuMPf\n"} 
+else {print "ok 3 - skipped - no Math::GMPf\n"} 
 
 if($have_Gmpz) {
   my $ok = '';
