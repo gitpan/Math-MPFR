@@ -19,3 +19,4 @@ t/trig.t
 t/set_str.t
 t/flags.t
 t/constants.t
+t/new.t

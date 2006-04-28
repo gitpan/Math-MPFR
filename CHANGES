@@ -94,3 +94,9 @@
    include.)
  - Rewrite of overload_atan2 - now that mpfr_atan2 is available in 
    MPFR-2.2.0. (Also fixes a bug in overload_atan2).
+
+1.09
+ - Changes to the format returned by Rmpfr_get_str and overload_string.
+ - Add a new() method/function for creation of mpfr_t objects.
+ - Fix Rmpfr_out_str() and Rmpfr_inp_str() - were segfaulting with
+   MS compilers.

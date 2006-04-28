@@ -1,23 +1,8 @@
-use 5.006;
 use ExtUtils::MakeMaker;
 use Config;
+require 5.006;
 
 $| = 1;
-
-### NOTE FOR MSVC COMPILERS ###
-# (This may no longer be relevant, but it won't break anything
-# so I'll leave it as is.)
-# '-lgcc' is simply MinGW\lib\libgcc.a renamed (copied) to 
-# 'libgcc.lib' and placed where the MSVC compiler can find it.
-# '-lcoldname' is simply MinGW\lib\libcoldname.a renamed (copied) to
-# 'libcoldname.lib' and placed where the MSVC compiler can find it.
-# If you're trying to build this module against MinGW/MSYS built
-# GMP and MPFR libraries then you will need to link to these two
-# additional lbraries (ie libcoldname and libgcc).
-############
-
-if($Config{'cc'} =~ /cl/) {$libs = '-lmpfr -lgmp -lgcc -lcoldname'}
-else {$libs = '-lmpfr -lgmp'}
 
 print "Checking for a C compiler ....";
 
@@ -113,9 +98,9 @@ my %options = %{
   NAME => 'Math::MPFR',
   DEFINE   => $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL",
   LIBS => [
-    $libs
+    '-lmpfr -lgmp'
   ],
-  'VERSION' => '1.08',
+  'VERSION' => '1.09',
 }
 };
 
@@ -139,7 +124,7 @@ sub have_compiler {
 sub have_libraries {
     my $CC = $Config{cc};
     my %args = map{split /\s*=\s*/} @ARGV;
-    my $LIBS = $args{LIBS} || $libs;
+    my $LIBS = $args{LIBS} || '-lmpfr -lgmp';
     my $INC = $args{INC};
 
     if($^O =~ /mswin32/i) {
@@ -168,7 +153,7 @@ sub have_libraries {
 sub get_version {
     my $CC = $Config{cc};
     my %args = map{split /\s*=\s*/} @ARGV;
-    my $LIBS = $args{LIBS} || $libs;
+    my $LIBS = $args{LIBS} || '-lmpfr -lgmp';
     my $INC = $args{INC};
 
     if($^O =~ /mswin32/i) {

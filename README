@@ -10,6 +10,9 @@ well-defined semantics. It copies the good ideas from the
 ANSI/IEEE-754 standard for double-precision floating-point
 arithmetic (53-bit mantissa).
 
+It also offers a wide range of trig, log, and other functions, and
+constants.
+
 MPFR, like GMP, is free. It is distributed under the
 GNU Lesser General Public License (GNU Lesser GPL).
 
@@ -48,7 +51,8 @@ libraries will need to be accessible:
 
  gmp.h
  mpfr.h
- the static library files libgmp and libmpfr ('.a' or '.lib')
+ mpf2mpfr.h
+ the import library files libgmp and libmpfr ('.a' or '.lib')
 
 If those files are in a location where your compiler does not find
 them by default, then instead of running 'perl Makefile.PL', you'll
@@ -61,8 +65,8 @@ perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes"
 the compiler *does* find them by default - which was the option I
 chose on Win32.)
 
-If you have a dynamic build of GMP, then the GMP shared library file
-('.dll' or '.so') needs to be accessible to the system.
+If you use a dynamic builds, then the shared library files
+('.dll' or '.so') need to be accessible to the system.
 
 Win32 pre-compiled binaries (with installation instructions) of
 this module can be found at:

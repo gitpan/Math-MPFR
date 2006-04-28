@@ -104,7 +104,7 @@ Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec Rmpfr_csc Rmpfr_cot
 Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech Rmpfr_csch Rmpfr_coth
 Rmpfr_lngamma RMPFR_VERSION_NUM
 );
-    $Math::MPFR::VERSION = '1.08';
+    $Math::MPFR::VERSION = '1.09';
 
     bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -179,15 +179,108 @@ sub Rmpfr_get_str {
            substr($ret[0], -1, 1, '');
            }
       }
+
+    $ret[1]--;
+
     if(substr($ret[0], 0, 1) eq '-') {
        substr($ret[0], 0, 1, '');
-       return '-.' . $ret[0] . '@' . $ret[1];
+       substr($ret[0], 1, 0, '.');
+       if(length($ret[0]) == 2) {$ret[0] .= '0'}
+       if($ret[0] eq '0.0'){return '0'}
+       return '-' . $ret[0] . '@' . $ret[1];
        }
-    return '.' . $ret[0] . '@' . $ret[1];
+
+    substr($ret[0], 1, 0, '.');
+    if(length($ret[0]) == 2) {$ret[0] .= '0'}
+    if($ret[0] eq '0.0'){return '0'}
+    return $ret[0] . '@' . $ret[1];
 }
 
 sub overload_string {
-   return Rmpfr_get_str($_[0], 10, 0, Rmpfr_get_default_rounding_mode());
+    my $s = Rmpfr_get_str($_[0], 10, 0, Rmpfr_get_default_rounding_mode());
+    $s =~ s/@/e/;
+    my @split = split(/e/, $s);
+    if(!$split[1]) {
+      if(substr($split[0], -2, 1) eq '.' && substr($split[0], -1, 1) eq '0') {
+        my @ss = split /\./, $split[0];
+        return $ss[0];
+        }
+      return $split[0];
+      }
+    return $s;
+}
+
+sub new {
+    if(@_ > 3) {die "Too many arguments supplied to new()"}
+    my @ret = ();
+    if(!@_) {return Rmpfr_init()}
+    if($_[0] ne "Math::MPFR") {
+      my $type = _itsa($_[0]);
+
+      if(!$type) {die "Inappropriate argument supplied to new()"}
+
+      if($type == 1) {
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_ui($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+        }
+      if($type == 2) {
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_si($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+        }
+      if($type == 3) {
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_d($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+        }
+      if($type == 4) {
+        if(@_ > 2) {die "Too many arguments supplied to new() - expected no more than two"}
+        if(@_ == 2) {@ret = Rmpfr_init_set_str($_[0], $_[1], Rmpfr_get_default_rounding_mode())}
+        else {@ret = Rmpfr_init_set_str($_[0], 0, Rmpfr_get_default_rounding_mode())}
+        if($ret[1]) {warn "string supplied to new() contained invalid characters"}
+        return $ret[0];
+        }
+      if($type == 5) {
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+        }
+      }
+
+    if($_[0] ne "Math::MPFR") {die "Invalid argument supplied to new()"} 
+
+    if(@_ == 1) {return Rmpfr_init()}
+
+    my $type = _itsa($_[1]);
+
+    if(!$type) {die "Inappropriate argument supplied to new()"}
+
+    if($type == 1) {
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_ui($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+      }
+    if($type == 2) {
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_si($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+      }
+    if($type == 3) {
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_d($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+      }
+    if($type == 4) {
+      if(@_ == 3) {@ret = Rmpfr_init_set_str($_[1], $_[2], Rmpfr_get_default_rounding_mode())}
+      else {@ret = Rmpfr_init_set_str($_[1], 0, Rmpfr_get_default_rounding_mode())}
+      return $ret[0];
+      }
+    if($type == 5) {
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+      }
 }
 
 sub MPFR_VERSION {return _MPFR_VERSION()}
@@ -196,7 +289,6 @@ sub MPFR_VERSION_MINOR {return _MPFR_VERSION_MINOR()}
 sub MPFR_VERSION_PATCHLEVEL {return _MPFR_VERSION_PATCHLEVEL()}
 sub MPFR_VERSION_STRING {return _MPFR_VERSION_STRING()}
 
-    use Config;
 1;
 
 __END__
@@ -223,16 +315,22 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    use Math::MPFR qw(:mpfr);
    
-   # '@' is used to separate mantissa from exponent, instead of
-   # the usual 'e' or 'E'. This is because 'e' and 'E' are 
-   # valid hex digits.
-   # Use single quotes for string assignment. If you must use
-   # double quotes, you'll have to escape the '@'.
+   # '@' is mostly used to separate mantissa from exponent, instead 
+   # of the usual 'e' or 'E' (though 'e' or 'E' will work for bases
+   # <= 10). This is because 'e' and 'E' are valid hex digits.
+   # Use single quotes for string assignment if you're using '@' as
+   # the separator. If you must use double quotes, you'll have to 
+   # escape the '@'.
 
    my $str = '.123542@2'; # mantissa = (.)123452
                          # exponent = 2
    #Alternatively:
    # my $str = '12.3542';
+   # or:
+   # my $str = '1.23542e1';
+   # or:
+   # my $str = '1.23542E1';
+  
 
    my $base = 10;
    my $rnd = GMP_RNDZ; # Rounding mode - can be set to
@@ -240,24 +338,28 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
              # GMP_RNDD or to the corresponding numeric
              # value 0, 1, 2, or 3. See 'ROUNDING MODE'
 
-   # Create a Math::MPFR object with precision
-   # of 100 bits and an initial value of NaN.
-   my $bn1 = Rmpfr_init2(100);
-
-   # Assign the value -2314.451 to $bn1.
-   Rmpfr_set_d($bn1, -2314.451, GMP_RNDN);
-
-   # Create another Math::MPFR object that holds
-   # an initial value of NaN and has the default precision.
-   my $bn2 = Rmpfr_init();
-
-   # Create another Math::MPFR object that holds an initial
+   # Create an Math::MPFR object that holds an initial
    # value of $str (in base $base) and has the default
    # precision. $bn3 is the number. $nok will either be 0 
    # indicating that the string was a valid number string, or
    # -1, indicating that the string was not a valid number. 
    # See 'COMBINED INITIALISATION AND ASSIGNMENT', below.
-   my ($bn3, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
+   my ($bn1, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
+
+   # Or use the new() constructor - for complete documentation
+   # see 'COMBINED INITIALISATION AND ASSIGNMENT', below.
+   # my $bn1 = Math::MPFR->new($str);
+
+   # Create another Math::MPFR object with precision
+   # of 100 bits and an initial value of NaN.
+   my $bn2 = Rmpfr_init2(100);
+
+   # Assign the value -2314.451 to $bn1.
+   Rmpfr_set_d($bn2, -2314.451, GMP_RNDN);
+
+   # Create another Math::MPFR object that holds
+   # an initial value of NaN and has the default precision.
+   my $bn3 = Rmpfr_init();
 
    # Perform some operations ... see 'FUNCTIONS' below.
    # see 'OPERATOR OVERLOADING' below for docs re
@@ -272,7 +374,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    # print out the value held by $bn1 (in decimal):
    print Rmpfr_get_str($bn1, 10, 0, $rnd), "\n";
    # or just make use of overloading :
-   print $bn1, "\n";
+   print $bn1, "\n"; # is base 10, and uses 'e' rather than '@'.
 
    # print out the value held by $bn1 (in base 16) using the
    # 'Rmpfr_out_str' function. (No newline is printed.)
@@ -350,17 +452,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    AND/OR
 
-   2) The GMP module. This module ships with the GMP source
-      distribution. It provides access to all 3 types.
-      Win32 binaries of it are available from
-      http://www.kalinabears.com.au/w32perl/math_gmp.html
-   
-   AND/OR
-
-   3) Math::GMPz (for mpz types), Math::GMPq (for mpq types)
+   2) Math::GMPz (for mpz types), Math::GMPq (for mpq types)
       and Math::GMPf (for mpf types). These modules (both 
       source code and win32 binaries) are available from 
-      http://www.kalinabears.com.au/w32perl/math_gnump.html      
+      http://www.kalinabears.com.au/w32perl/math_gnump.html 
+
+   You may also be able to use objects from the GMP module
+   that ships with the GMP sources. I get occasional 
+   segfaults when I try to do that, so I've stopped
+   recommending it - and don't support the practice.     
 
 =head1 FUNCTIONS
 
@@ -539,6 +639,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $ui = Rmpfr_get_default_prec();
     Returns the default MPFR precision in bits.
 
+   $rop = Math::MPFR->new();
+   $rop = Math::MPFR::new();
+   $rop = new Math::MPFR();
    $rop = Rmpfr_init();
    $rop = Rmpfr_init_nobless();
     Initialize $rop, and set its value to NaN. The precision 
@@ -695,6 +798,22 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    First read the section 'MEMORY MANAGEMENT' (above).
 
+   $rop = Math::MPFR->new($arg);
+   $rop = Math::MPFR::new($arg);
+   $rop = new Math::MPFR($arg);
+    Returns a Math::MPFR object with the value of $arg, rounded
+    in the default rounding direction, with default precision.
+    $arg can be either a number (signed integer, unsigned integer,
+    signed fraction or unsigned fraction) or a string that 
+    represents a numeric value. If $arg is a string, an optional
+    additional argument that specifies the base of the number
+    can be supplied to new(). If $arg is a string and no 
+    additional argument is supplied, an attempt is made to deduce 
+    base. See 'Rmpfr_set_str' above for an explanation of how
+    that deduction is attempted. For finer grained control, use
+    one of the 'Rmpfr_init_set_*' functions documented immediately
+    below.
+
    ($rop, $si) = Rmpfr_init_set($op, $rnd);
    ($rop, $si) = Rmpfr_init_set_nobless($op, $rnd);
    ($rop, $si) = Rmpfr_init_set_ui($ui, $rnd);
@@ -727,7 +846,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    CONVERSION
 
    $str = Rmpfr_get_str($r, $base, $digits, $rnd); 
-    Returns a string of the form, eg, '.83456712@3'
+    Returns a string of the form, eg, '8.3456712@2'
     which means '834.56712'.
     The third argument to Rmpfr_get_str() specifies the number
     of digits required to be output. Up to $digits digits
@@ -1341,8 +1460,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     The low bits in X are not very random - for this reason
     only the high half of each X is actually used.
     $c and $m2exp sre both unsigned longs.
-    $a can be any one of Math::GMP, GMP::Mpz, or Math::GMPz
-    objects. Or it can be a string.
+    $a can be any one of Math::GMP, or Math::GMPz objects.
+    Or it can be a string.
     If it is a string of hex digits it must be prefixed with
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
@@ -1360,7 +1479,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $seed is the seed. It can be any one of Math::GMP, 
-    GMP::Mpz, or Math::GMPz objects. Or it can be a string.
+    or Math::GMPz objects. Or it can be a string.
     If it is a string of hex digits it must be prefixed with
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal

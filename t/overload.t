@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..53\n";
+print "1..54\n";
 
 Rmpfr_set_default_prec(200);
 
@@ -23,29 +23,29 @@ Rmpfr_set_si($q, -5678, GMP_RNDN);
 my $ok = '';
 
 my $z = $p * $q;
-if(Rmpfr_get_str($z, 10,7, GMP_RNDN) eq '-.7006652@7'
+if(Rmpfr_get_str($z, 10,7, GMP_RNDN) eq '-7.006652@6'
    && $z == -7006652
-   && "$z" eq '-.7006652@7') {$ok = 'a'}
+   && "$z" eq '-7.006652e6') {$ok = 'a'}
 
 $z = $p * $ui;
-if(Rmpfr_get_str($z, 10, 13, GMP_RNDN) eq '.2649994842610@13'
+if(Rmpfr_get_str($z, 10, 13, GMP_RNDN) eq '2.649994842610@12'
    && $z == 2649994842610
-   && "$z" eq '.264999484261@13') {$ok .= 'b'}
+   && "$z" eq '2.64999484261e12') {$ok .= 'b'}
 
 $z = $p * $negi;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-.1525224@7'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-1.525224@6'
    && $z == -1525224
-   && "$z" eq '-.1525224@7') {$ok .= 'c'}
+   && "$z" eq '-1.525224e6') {$ok .= 'c'}
 
 $z = $p * $posd;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '.2713594711213924@16'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.713594711213924@15'
    && $z == 2713594711213924
-   && "$z" eq '.2713594711213924@16') {$ok .= 'd'}
+   && "$z" eq '2.713594711213924e15') {$ok .= 'd'}
 
 $z = $p * $negd;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-.10854378789267698@17'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-1.0854378789267698@16'
    && $z == -10854378789267698
-   && "$z" eq '-.10854378789267698@17') {$ok .= 'e'}
+   && "$z" eq '-1.0854378789267698e16') {$ok .= 'e'}
 
 $z = $p * $frac;
 if($z > 28536.12783 && $z < 28536.12784) {$ok .= 'f'}
@@ -62,33 +62,33 @@ else {print "not ok 1 $ok\n"}
 $ok = '';
 
 $p *= $q;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-.7006652@7'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-7.006652@6'
    && $p == -7006652
-   && "$p" eq '-.7006652@7') {$ok = 'a'}
+   && "$p" eq '-7.006652e6') {$ok = 'a'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p *= $ui;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '.264999484261@13'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '2.64999484261@12'
    && $p == 2649994842610
-   && "$p" eq '.264999484261@13') {$ok .= 'b'}
+   && "$p" eq '2.64999484261e12') {$ok .= 'b'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p *= $negi;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-.1525224@7'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-1.525224@6'
    && $p == -1525224
-   && "$p" eq '-.1525224@7') {$ok .= 'c'}
+   && "$p" eq '-1.525224e6') {$ok .= 'c'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p *= $posd;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '.2713594711213924@16'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '2.713594711213924@15'
    && $p == 2713594711213924
-   && "$p" eq '.2713594711213924@16') {$ok .= 'd'}
+   && "$p" eq '2.713594711213924e15') {$ok .= 'd'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p *= $negd;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-.10854378789267698@17'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-1.0854378789267698@16'
    && $p == -10854378789267698
-   && "$p" eq '-.10854378789267698@17') {$ok .= 'e'}
+   && "$p" eq '-1.0854378789267698e16') {$ok .= 'e'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p *= $frac;
@@ -106,29 +106,29 @@ else {print "not ok 2 $ok\n"}
 $ok = '';
 
 $z = $p + $p;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '.2468@4'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.468@3'
    && $z == 2468
-   && "$z" eq '.2468@4') {$ok = 'a'}
+   && "$z" eq '2.468e3') {$ok = 'a'}
 
 $z = $p + $ui;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '.2147484899@10'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.147484899@9'
    && $z == 2147484899
-   && "$z" eq '.2147484899@10') {$ok .= 'b'}
+   && "$z" eq '2.147484899e9') {$ok .= 'b'}
 
 $z = $p + $negi;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-.2@1'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-2.0@0'
    && $z == -2
-   && "$z" eq '-.2@1') {$ok .= 'c'}
+   && "$z" eq '-2') {$ok .= 'c'}
 
 $z = $p + $posd;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '.219902326802@13'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.19902326802@12'
    && $z == 2199023268020
-   && "$z" eq '.219902326802@13') {$ok .= 'd'}
+   && "$z" eq '2.19902326802e12') {$ok .= 'd'}
 
 $z = $p + $negd;
-if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-.8796093020863@13'
+if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-8.796093020863@12'
    && $z == -8796093020863
-   && "$z" eq '-.8796093020863@13') {$ok .= 'e'}
+   && "$z" eq '-8.796093020863e12') {$ok .= 'e'}
 
 $z = $p + $frac;
 if($z > 1257.1249 && $z < 1257.124902) {$ok .= 'f'}
@@ -144,33 +144,33 @@ else {print "not ok 3 $ok\n"}
 $ok = '';
 
 $p += $p;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '.2468@4'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '2.468@3'
    && $p == 2468
-   && "$p" eq '.2468@4') {$ok = 'a'}
+   && "$p" eq '2.468e3') {$ok = 'a'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p += $ui;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '.2147484899@10'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '2.147484899@9'
    && $p == 2147484899
-   && "$p" eq '.2147484899@10') {$ok .= 'b'}
+   && "$p" eq '2.147484899e9') {$ok .= 'b'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p += $negi;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-.2@1'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-2.0@0'
    && $p == -2
-   && "$p" eq '-.2@1') {$ok .= 'c'}
+   && "$p" eq '-2') {$ok .= 'c'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p += $posd;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '.219902326802@13'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '2.19902326802@12'
    && $p == 2199023268020
-   && "$p" eq '.219902326802@13') {$ok .= 'd'}
+   && "$p" eq '2.19902326802e12') {$ok .= 'd'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p += $negd;
-if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-.8796093020863@13'
+if(Rmpfr_get_str($p, 10, 0, GMP_RNDN) eq '-8.796093020863@12'
    && $p == -8796093020863
-   && "$p" eq '-.8796093020863@13') {$ok .= 'e'}
+   && "$p" eq '-8.796093020863e12') {$ok .= 'e'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 $p += $frac;
@@ -269,7 +269,7 @@ if($ok eq 'abcdefg'
 else {print "not ok 6 $ok\n"}
 
 my $c = $p;
-if("$c" eq '.1234@4'
+if("$c" eq '1.234e3'
    && "$c" eq "$p"
    && $c == $p
    && $c != $q
@@ -279,7 +279,7 @@ if("$c" eq '.1234@4'
 else {print "not ok 7\n"}
 
 $c *= -1;
-if(Rmpfr_get_str(abs($c), 10, 0, GMP_RNDN) eq '.1234@4'
+if(Rmpfr_get_str(abs($c), 10, 0, GMP_RNDN) eq '1.234@3'
    && Math::MPFR::get_refcnt($c) == 1) {print "ok 8\n"}
 else {print "not ok 8\n"}
 
@@ -868,6 +868,35 @@ my $p_copy = $p;
 $p_copy += 1;
 if($p_copy - $p == 1) {print "ok 53\n"}
 else {print "not ok 53\n"}
+
+$ok = '';
+
+Rmpfr_set_str($z, '0.0e10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok = 'a'}
+
+Rmpfr_set_str($z, '0.0e-10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok .= 'b'}
+
+Rmpfr_set_str($z, '0.0@10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok .= 'c'}
+
+Rmpfr_set_str($z, '0.0@-10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok .= 'd'}
+
+Rmpfr_set_str($z, '0.0E10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok .= 'e'}
+
+Rmpfr_set_str($z, '0.0E-10', 10, GMP_RNDN);
+if("$z" eq '0') {$ok .= 'f'}
+
+Rmpfr_set_str($z, '1.0', 10, GMP_RNDN);
+if("$z" eq '1') {$ok .= 'g'}
+
+Rmpfr_set_str($z, '-1.0', 10, GMP_RNDN);
+if("$z" eq '-1') {$ok .= 'h'}
+
+if($ok eq 'abcdefgh') {print "ok 54\n"}
+else {print "not ok 54 $ok\n"}
 
 
 sub adjust {

@@ -1005,12 +1005,13 @@ void Rmpfr_random2(SV * p, SV * s, SV * exp) {
 }
 
 SV * Rmpfr_out_str(SV * p, SV * base, SV * dig, SV * round) {
-     return newSVuv(mpfr_out_str(stdout, SvUV(base), SvUV(dig), *((mpfr_t *) SvIV(SvRV(p))), SvUV(round)));
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     return newSVuv(mpfr_out_str(NULL, SvUV(base), SvUV(dig), *((mpfr_t *) SvIV(SvRV(p))), SvUV(round)));
 }
 
 SV * Rmpfr_inp_str(SV * p, SV * base, SV * round) {
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range");
-     return newSVuv(mpfr_inp_str(*((mpfr_t *) SvIV(SvRV(p))), stdin, SvUV(base), SvUV(round)));
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
+     return newSVuv(mpfr_inp_str(*((mpfr_t *) SvIV(SvRV(p))), NULL, SvUV(base), SvUV(round)));
 }
 
 SV * Rmpfr_gamma(SV * a, SV * b, SV * round) {
@@ -2431,6 +2432,17 @@ SV * _MPFR_VERSION_STRING() {
 
 SV * RMPFR_VERSION_NUM(SV * a, SV * b, SV * c) {
      return newSVuv(MPFR_VERSION_NUM((unsigned long)SvUV(a), (unsigned long)SvUV(b), (unsigned long)SvUV(c)));
+}
+
+SV * _itsa(SV * a) {
+     if(SvUOK(a)) return newSVuv(1);
+     if(SvIOK(a)) return newSVuv(2);
+     if(SvNOK(a)) return newSVuv(3);
+     if(SvPOK(a)) return newSVuv(4);
+     if(sv_isobject(a)) {
+       if(strEQ(HvNAME(SvSTASH(SvRV(a))), "Math::MPFR")) return newSVuv(5);
+       }
+     return newSVuv(0);
 }
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
 
@@ -4458,4 +4470,8 @@ RMPFR_VERSION_NUM (a, b, c)
 	SV *	a
 	SV *	b
 	SV *	c
+
+SV *
+_itsa (a)
+	SV *	a
 
