@@ -93,16 +93,17 @@ sisyphus at cpan dot org
 ";
 }
 
-my %options = %{       
-{
+my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
+if($Config::Config{use64bitint} eq 'define') {$defines .= " -DUSE_64_BIT_INT"}
+
+my %options = (       
   NAME => 'Math::MPFR',
-  DEFINE   => $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL",
+  DEFINE   => $defines,
   LIBS => [
     '-lmpfr -lgmp'
   ],
-  'VERSION' => '1.09',
-}
-};
+  'VERSION' => '1.10',
+);
 
 WriteMakefile(%options);
 
@@ -168,14 +169,14 @@ sub get_version {
         unless(system("$CC -o version.exe version.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
         my $v = `version.exe`;
         my @v = split /\./, $v;
-        if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
+        if($v[0] > 2 || ($v[0] == 2 && $v[1] >= 2 && $v[2] >= 0)) {return 2}
         print "\nYou have MPFR version $v\n";
         return 0;
         }
       unless(system("$CC -o version.exe version.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
       my $v = `version.exe`;
       my @v = split /\./, $v;
-      if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
+      if($v[0] > 2 || ($v[0] == 2 && $v[1] >= 2 && $v[2] >= 0)) {return 2}
       print "\nYou have MPFR version $v\n";
       return 0;
       }
@@ -184,7 +185,7 @@ sub get_version {
       unless(system("$CC -o version.exe version.c $INC $LIBS 2>/dev/null") == 0) {return 1}
       my $v = `./version.exe`;
       my @v = split /\./, $v;
-      if($v[0] >= 2 && $v[1] >= 2 && $v[2] >= 0) {return 2}
+      if($v[0] > 2 || ($v[0] == 2 && $v[1] >= 2 && $v[2] >= 0)) {return 2}
       print "\nYou have MPFR version $v\n";
       return 0;
       }

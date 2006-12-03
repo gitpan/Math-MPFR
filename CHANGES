@@ -1,80 +1,15 @@
-0.05
- - Requires mpfr-2.0.3
- - Add 'Rmpfr_out_str()'
- - Add 'Rmpfr_get_default_rounding_mode()'
- - Rename 'Rmpfr_set_str_raw()' to 'Rmpfr_set_str_binary()'
-   in keeping with changes to the MPFR library.
- - Alter 'Rmpfr_check_range()' in keeping with change to 
-   'mpfr_check_range()' in the MPFR library.
- - Introduce operator overloading.
+1.10
+ - No longer assign Exporter and DynaLoader to @Math::MPFR::ISA.
+ - Add support for perls built with -Duse64bitint. This involved the
+   inclusion of the Rmpfr_set_sj, Rmpfr_set_sj_2exp and Rmpfr_get_sj
+   functions - as well as some alterations to the overload subs.
 
-0.06
- - Add 'Rmpfr_gamma()', 'Rmpfr_zeta()', and 'Rmpfr_erf()'.
- - Add overloading for 'atan2', 'cos', 'sin', 'log', 'exp', and 'int'.
+1.09
+ - Changes to the format returned by Rmpfr_get_str and overload_string.
+ - Add a new() method/function for creation of mpfr_t objects.
+ - Fix Rmpfr_out_str() and Rmpfr_inp_str() - were segfaulting with
+   MS compilers.
 
-0.07
- - Replace 'Rmpfr_round_prec' with 'Rmpfr_prec_round' in keeping 
-   with changes to the MPFR library.
- - Remove 'Rmpfr_random' (deprecated).
- - Add 'Rmpfr_cbrt', 'Rmpfr_cmpabs', ', 'Rmpfr_greater_p',
-   'Rmpfr_greaterequal_p', 'Rmpfr_less_p', 'Rmpfr_lessequal_p',
-   'Rmpfr_lessgreater_p', 'Rmpfr_equal_p', 'Rmpfr_unordered_p',
-   'Rmpfr_inp_str', 'Rmpfr_frac', 'Rmpfr_integer_p',
-   'Rmpfr_nexttoward', 'Rmpfr_nextabove', 'Rmpfr_next_below',
-   'Rmpfr_min', 'Rmpfr_max', 'Rmpfr_get_exp', 'Rmpfr_set_exp'
-   'Rgmp_randinit_default', 'Rgmp_randinit_lc_2exp',
-   'Rgmp_randinit_lc_2exp_size', 'Rgmp_randseed', 'Rgmp_randseed_ui',
-   'Rgmp_randclear'.
- - Change module name from 'Math::GnuMPfr' to 'Math::MPFR'.
-
-1.01
- - Eradicate segfault that was occurring when 'overload_add',
-   'overload_sub', 'overload_mul', 'overload_div' and 'overload_pow'
-   croaked due to invalid argument(s).
-
-1.02
- - Make overloading work with strings.
- - Add 'Rmpfr_dump'.
- - Add 'Math::MPFR::gmp_v' (not exportable).
-
-1.03
- - Replace 'SvROK()' with 'sv_isobject()' in the overload functions.
- - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
-
-1.04
- - Math::MPFR-1.04 to 1.07 require MPFR-2.1.x.
- - Added the following functions, not available with versions earlier
-   than 2.1.0 :
-   Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
-   Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
-   Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
-   Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
-   Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
-   Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
-   Rmpfr_rint_ceil Rmpfr_rint_floor
-
-1.05
- - Add some checks to Makefile.PL to ensure that anyone trying to
-   build this module has an up-to-date MPFR library. This is mainly
-   an attempt to stop cpan testers who don't have an up-to-date MPFR
-   from testing the module and subsequently reporting "FAIL" or "NA".
-
-1.06
- - Modify the Makefile.PL checks added in version 1.05 to cater for
-   those building with a Microsoft compiler
- - Alter Rmpfr_set_str and Rmpfr_init_set_str so that a base of 0
-   can be specified - in which case the base is determined from the
-   input string
- - Added the following functions:
-   Rmpfr_get_ui Rmpfr_get_si Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
- - Fix a bug in 'Rmpfr_deref2()' - used by 'overload_print()'
- - Provide more complete testing with 4 new test files - namely
-   test4.t, trig.t, set_str.t and exceptions.t.
-
-1.07
- - New() was allocating more memory than necessary in many instances.
-   Rewrote the code (in those instances) to fix that.
- - Add Rmpfr_strtofr
 
 1.08
  - As of this version, MPFR-2.2.x is required.
@@ -95,8 +30,84 @@
  - Rewrite of overload_atan2 - now that mpfr_atan2 is available in 
    MPFR-2.2.0. (Also fixes a bug in overload_atan2).
 
-1.09
- - Changes to the format returned by Rmpfr_get_str and overload_string.
- - Add a new() method/function for creation of mpfr_t objects.
- - Fix Rmpfr_out_str() and Rmpfr_inp_str() - were segfaulting with
-   MS compilers.
+1.07
+ - New() was allocating more memory than necessary in many instances.
+   Rewrote the XS code (in those instances) to fix that.
+ - Add Rmpfr_strtofr
+
+
+1.06
+ - Modify the Makefile.PL checks added in version 1.05 to cater for
+   those building with a Microsoft compiler
+ - Alter Rmpfr_set_str and Rmpfr_init_set_str so that a base of 0
+   can be specified - in which case the base is determined from the
+   input string
+ - Added the following functions:
+   Rmpfr_get_ui Rmpfr_get_si Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
+ - Fix a bug in 'Rmpfr_deref2()' - used by 'overload_print()'
+ - Provide more complete testing with 4 new test files - namely
+   test4.t, trig.t, set_str.t and exceptions.t.
+
+
+1.05
+ - Add some checks to Makefile.PL to ensure that anyone trying to
+   build this module has an up-to-date MPFR library. This is mainly
+   an attempt to stop cpan testers who don't have an up-to-date MPFR
+   from testing the module and subsequently reporting "FAIL" or "NA".
+
+
+1.04
+ - Math::MPFR-1.04 to 1.07 require MPFR-2.1.x.
+ - Added the following functions, not available with versions earlier
+   than 2.1.0 :
+   Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
+   Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
+   Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
+   Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
+   Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
+   Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
+   Rmpfr_rint_ceil Rmpfr_rint_floor
+
+1.03
+ - Replace 'SvROK()' with 'sv_isobject()' in the overload functions.
+ - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
+
+1.02
+ - Make overloading work with strings.
+ - Add 'Rmpfr_dump'.
+ - Add 'Math::MPFR::gmp_v' (not exportable).
+
+1.01
+ - Eradicate segfault that was occurring when 'overload_add',
+   'overload_sub', 'overload_mul', 'overload_div' and 'overload_pow'
+   croaked due to invalid argument(s).
+
+0.07
+ - Replace 'Rmpfr_round_prec' with 'Rmpfr_prec_round' in keeping 
+   with changes to the MPFR library.
+ - Remove 'Rmpfr_random' (deprecated).
+ - Add 'Rmpfr_cbrt', 'Rmpfr_cmpabs', ', 'Rmpfr_greater_p',
+   'Rmpfr_greaterequal_p', 'Rmpfr_less_p', 'Rmpfr_lessequal_p',
+   'Rmpfr_lessgreater_p', 'Rmpfr_equal_p', 'Rmpfr_unordered_p',
+   'Rmpfr_inp_str', 'Rmpfr_frac', 'Rmpfr_integer_p',
+   'Rmpfr_nexttoward', 'Rmpfr_nextabove', 'Rmpfr_next_below',
+   'Rmpfr_min', 'Rmpfr_max', 'Rmpfr_get_exp', 'Rmpfr_set_exp'
+   'Rgmp_randinit_default', 'Rgmp_randinit_lc_2exp',
+   'Rgmp_randinit_lc_2exp_size', 'Rgmp_randseed', 'Rgmp_randseed_ui',
+   'Rgmp_randclear'.
+ - Change module name from 'Math::GnuMPfr' to 'Math::MPFR'.
+
+0.06
+ - Add 'Rmpfr_gamma()', 'Rmpfr_zeta()', and 'Rmpfr_erf()'.
+ - Add overloading for 'atan2', 'cos', 'sin', 'log', 'exp', and 'int'.
+
+0.05
+ - Requires mpfr-2.0.3
+ - Add 'Rmpfr_out_str()'
+ - Add 'Rmpfr_get_default_rounding_mode()'
+ - Rename 'Rmpfr_set_str_raw()' to 'Rmpfr_set_str_binary()'
+   in keeping with changes to the MPFR library.
+ - Alter 'Rmpfr_check_range()' in keeping with change to 
+   'mpfr_check_range()' in the MPFR library.
+ - Introduce operator overloading.
+

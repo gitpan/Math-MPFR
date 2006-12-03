@@ -20,3 +20,4 @@ t/set_str.t
 t/flags.t
 t/constants.t
 t/new.t
+t/use64bitint.t

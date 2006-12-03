@@ -42,9 +42,9 @@
     'sqrt' => \&overload_sqrt;
 
     require Exporter;
+    *import = \&Exporter::import;
     require DynaLoader;
 
-    @Math::MPFR::ISA = qw(Exporter DynaLoader);
     @Math::MPFR::EXPORT_OK = qw(GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
@@ -102,11 +102,11 @@ Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
 Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2 Rmpfr_pow_z
 Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec Rmpfr_csc Rmpfr_cot
 Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech Rmpfr_csch Rmpfr_coth
-Rmpfr_lngamma RMPFR_VERSION_NUM
+Rmpfr_lngamma RMPFR_VERSION_NUM Rmpfr_set_sj_2exp Rmpfr_set_sj Rmpfr_get_sj
 );
-    $Math::MPFR::VERSION = '1.09';
+    $Math::MPFR::VERSION = '1.10';
 
-    bootstrap Math::MPFR $Math::MPFR::VERSION;
+    DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
@@ -166,8 +166,10 @@ Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
 Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2 Rmpfr_pow_z
 Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec Rmpfr_csc Rmpfr_cot
 Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech Rmpfr_csch Rmpfr_coth
-Rmpfr_lngamma RMPFR_VERSION_NUM
+Rmpfr_lngamma RMPFR_VERSION_NUM Rmpfr_set_sj_2exp Rmpfr_set_sj Rmpfr_get_sj
 )]);
+
+sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub Rmpfr_get_str {
     my @ret = Rmpfr_deref2($_[0], $_[1], $_[2], $_[3]);
@@ -223,30 +225,36 @@ sub new {
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
         @ret = Rmpfr_init_set_ui($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
-        }
+      }
       if($type == 2) {
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        require Config;
+        if(defined($Config::Config{use64bitint})) {
+          my $ret = Rmpfr_init();
+          Rmpfr_set_sj($ret, $_[0], Rmpfr_get_default_rounding_mode());
+          return $ret;
+        }
         @ret = Rmpfr_init_set_si($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
-        }
+      }
       if($type == 3) {
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
         @ret = Rmpfr_init_set_d($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
-        }
+      }
       if($type == 4) {
         if(@_ > 2) {die "Too many arguments supplied to new() - expected no more than two"}
         if(@_ == 2) {@ret = Rmpfr_init_set_str($_[0], $_[1], Rmpfr_get_default_rounding_mode())}
         else {@ret = Rmpfr_init_set_str($_[0], 0, Rmpfr_get_default_rounding_mode())}
         if($ret[1]) {warn "string supplied to new() contained invalid characters"}
         return $ret[0];
-        }
+      }
       if($type == 5) {
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
         @ret = Rmpfr_init_set($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
-        }
       }
+    }
 
     if($_[0] ne "Math::MPFR") {die "Invalid argument supplied to new()"} 
 
@@ -260,28 +268,35 @@ sub new {
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
       @ret = Rmpfr_init_set_ui($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
-      }
+    }
     if($type == 2) {
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      require Config;
+      if(defined($Config::Config{use64bitint})) {
+        my $ret = Rmpfr_init();
+        Rmpfr_set_sj($ret, $_[1], Rmpfr_get_default_rounding_mode());
+        return $ret;
+      }
       @ret = Rmpfr_init_set_si($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
-      }
+    }
     if($type == 3) {
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
       @ret = Rmpfr_init_set_d($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
-      }
+    }
     if($type == 4) {
       if(@_ == 3) {@ret = Rmpfr_init_set_str($_[1], $_[2], Rmpfr_get_default_rounding_mode())}
       else {@ret = Rmpfr_init_set_str($_[1], 0, Rmpfr_get_default_rounding_mode())}
       return $ret[0];
-      }
+    }
     if($type == 5) {
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
       @ret = Rmpfr_init_set($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
-      }
+    }
 }
+
 
 sub MPFR_VERSION {return _MPFR_VERSION()}
 sub MPFR_VERSION_MAJOR {return _MPFR_VERSION_MAJOR()}
@@ -498,12 +513,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    it could be coded as $r1 = $r2 + $r3.
 
    "$ui" means any integer that will fit into a C 'unsigned long int',
-   which for most of us means that it will be less than 2**32 and
-   greater than or equal to zero.
 
    "$si" means any integer that will fit into a C 'signed long int'.
-   which for most of us means that it will be greater than
-   -(2**31) and less than 2**31.
+
+   "$sj" means any integer that will fit into a C 'intmax_t'. Don't
+   use any of these functions unless your perl was compiled with 64
+   bit support.
 
    "$double" is a C double.
 
@@ -684,6 +699,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set($rop, $op, $rnd);
    $si = Rmpfr_set_ui($rop, $ui, $rnd);
    $si = Rmpfr_set_si($rop, $si, $rnd);
+   $si = Rmpfr_set_sj($rop, $sj, $rnd); # 64 bit
    $si = Rmpfr_set_d($rop, $double, $rnd);
    $si = Rmpfr_set_z($rop, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
@@ -700,7 +716,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     and then only to a mpfr floating-point number.
 
    $si = Rmpfr_set_ui_2exp($rop, $ui, $exp, $rnd);
-   $si = Rmpfr_set_si_2exp($rop, $si1, $exp, $rnd);
+   $si = Rmpfr_set_si_2exp($rop, $si, $exp, $rnd);
+   $si = Rmpfr_set_sj_2exp($rop, $sj, $exp, $rnd); # 64 bit
     Set the value of $rop from the 2nd arg multiplied by two to the
     power $exp, rounded towards the given direction $rnd.  Note that
     the input 0 is converted to +0.
@@ -862,8 +879,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $ui = Rmpfr_get_ui($op, $rnd);
    $si = Rmpfr_get_si($op, $rnd);
-    Convert $op to a 'signed long' or an `unsigned long'
-    after rounding it with respect to $rnd.
+   $sj = Rmpfr_get_sj($op, $rnd); # 64 bit
+    Convert $op to a 'signed long', a 'signed long long' or an
+    `unsigned long' after rounding it with respect to $rnd.
     If $op is NaN, the result is undefined. If $op is too big
     for the return type, it returns the maximum or the minimum
     of the corresponding C type, depending on the direction of

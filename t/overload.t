@@ -13,8 +13,18 @@ my $q = Rmpfr_init();
 my $ui = (2 ** 31) + 17;
 my $negi = -1236;
 my $posi = 1238;
-my $posd = (2 ** 41) + 11234;
-my $negd = -((2 ** 43) - 111);
+my($posd, $negd);
+
+if(defined($Config::Config{use64bitint})) {
+   use integer;
+   $posd = (2 ** 41) + 11234;
+   $negd = -((2 ** 43) - 111);
+}
+
+else {
+   $posd = (2 ** 41) + 11234;
+   $negd = -((2 ** 43) - 111);
+}
 my $frac = 23.124901;
 
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
@@ -40,12 +50,14 @@ if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-1.525224@6'
 $z = $p * $posd;
 if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.713594711213924@15'
    && $z == 2713594711213924
-   && "$z" eq '2.713594711213924e15') {$ok .= 'd'}
+   && "$z" eq '2.713594711213924e15'
+                                    ) {$ok .= 'd'}
 
 $z = $p * $negd;
 if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-1.0854378789267698@16'
    && $z == -10854378789267698
-   && "$z" eq '-1.0854378789267698e16') {$ok .= 'e'}
+   && "$z" eq '-1.0854378789267698e16' 
+                                      ) {$ok .= 'e'}
 
 $z = $p * $frac;
 if($z > 28536.12783 && $z < 28536.12784) {$ok .= 'f'}

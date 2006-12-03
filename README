@@ -65,11 +65,9 @@ perl Makefile.pl INC="-I/path/to/gmp_include -I/path/to/mpfr_includes"
 the compiler *does* find them by default - which was the option I
 chose on Win32.)
 
-If you use a dynamic builds, then the shared library files
+If you use a dynamic build, then the shared library files
 ('.dll' or '.so') need to be accessible to the system.
 
 Win32 pre-compiled binaries (with installation instructions) of
 this module can be found at:
 http://www.kalinabears.com.au/w32perl/math_gnump.html .
-Using the pre-compiled perl binaries is probably the best option for
-Win32 perl (including ActiveState perl and IndigoPerl).
