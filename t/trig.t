@@ -5,6 +5,8 @@ use Math::Trig; # for checking results
 
 print "1..16\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 Rmpfr_set_default_prec(100);
 
 my $angle = 2.2314; #13.2314;

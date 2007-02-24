@@ -2,8 +2,11 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt;
+use Config;
 
-print "1..4\n";
+print "1..9\n";
+
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
 my $ui = 123569;
 my $si = -19907;
@@ -96,7 +99,18 @@ if($f25 == $str) {$ok .= 'g'}
 my $f26 = Math::MPFR->new($d);
 if($f26 == $d) {$ok .= 'h'}
 
-if($ok eq 'abcdefgh') {print "ok 3\n"}
+Rmpfr_set_default_prec(100);
+my $f27 = Math::MPFR->new(36028797018964023);
+my $f28 = Math::MPFR->new('36028797018964023');
+
+if(defined($Config::Config{use64bitint})) {
+  if($f27 == $f28) {$ok .= 'i'}
+}
+else {
+  if($f27 != $f28) {$ok .= 'i'}
+}
+
+if($ok eq 'abcdefghi') {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
 
 #############################
@@ -126,3 +140,67 @@ if($@ =~ /Inappropriate argument/) {$ok .= 'f'}
 if($ok eq 'abcdef') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
+###############################
+
+$ok = '';
+
+my($gmpf, $gmpq, $gmpz, $gmp) = (0, 0, 0, 0);
+
+eval{require Math::GMPf;};
+if(!$@) {$gmpf = 1}
+
+eval{require Math::GMPq;};
+if(!$@) {$gmpq = 1}
+
+eval{require Math::GMPz;};
+if(!$@) {$gmpz = 1}
+
+eval{require Math::GMP;};
+if(!$@) {$gmp = 1}
+
+if($gmpf) {
+  my $x = Math::GMPf::new(125.5);
+  my $y = Math::MPFR::new($x);
+  my $z = Math::MPFR->new($x);
+
+  if($y == $z && $z == 125.5) {print "ok 5\n"}
+  else {print "not ok 5 $y $z\n"}
+}
+else {print "ok 5 - skipped, no Math::GMPf\n"}
+
+if($gmpq) {
+  my $x = Math::GMPq::new('251/2');
+  my $y = Math::MPFR::new($x);
+  my $z = Math::MPFR->new($x);
+
+  if($y == $z && $z == 125.5) {print "ok 6\n"}
+  else {print "not ok 6 $y $z\n"}
+}
+else {print "ok 6 - skipped, no Math::GMPq\n"}
+
+if($gmpz) {
+  my $x = Math::GMPz::new(125.5);
+  my $y = Math::MPFR::new($x);
+  my $z = Math::MPFR->new($x);
+
+  if($y == $z && $z == 125) {print "ok 7\n"}
+  else {print "not ok 7 $y $z\n"}
+}
+else {print "ok 7 - skipped, no Math::GMPz\n"}
+
+if($gmp) {
+  my $x = Math::GMP->new(125);
+  my $y = Math::MPFR::new($x);
+  my $z = Math::MPFR->new($x);
+
+  if($y == $z && $z == 125) {print "ok 8\n"}
+  else {print "not ok 8 $y $z\n"}
+}
+else {print "ok 8 - skipped, no Math::GMP\n"}
+
+my $x = Math::MPFR::new(12345.5);
+my $y = Math::MPFR::new($x);
+my $z = Math::MPFR->new($x);
+
+if($y == $z && $z == 12345.5) {print "ok 9\n"}
+else {print "not ok 9 $y $z\n"}

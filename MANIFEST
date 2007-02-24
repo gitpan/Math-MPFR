@@ -5,7 +5,6 @@ MPFR.xs
 INLINE.h
 README
 CHANGES
-mpfr.info
 check.c
 comp.c
 version.c
@@ -21,3 +20,5 @@ t/flags.t
 t/constants.t
 t/new.t
 t/use64bitint.t
+t/not_zero.t
+t/longdouble.t

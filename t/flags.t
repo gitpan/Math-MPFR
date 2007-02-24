@@ -4,6 +4,8 @@ use Math::MPFR qw(:mpfr);
 
 print "1..1\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 my $ok = '';
 
 Rmpfr_set_overflow();

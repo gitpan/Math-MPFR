@@ -4,6 +4,8 @@ use Math::MPFR qw(:mpfr);
 
 print "1..15\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 my $hex = '0xabcde';
 my $dec = 703710;
 my $dec_str = '703710';

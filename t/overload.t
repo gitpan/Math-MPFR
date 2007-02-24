@@ -5,6 +5,8 @@ use Math::BigInt; # for some error tests
 
 print "1..54\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 Rmpfr_set_default_prec(200);
 
 my $p = Rmpfr_init();

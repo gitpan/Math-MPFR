@@ -1,8 +1,11 @@
 use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
+use Config;
 
 print "1..38\n";
+
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
 my $have_mpq = 0;
 
@@ -223,18 +226,30 @@ my $k = Rmpfr_init2(53);
 my $str = '1' x 53;
 Rmpfr_set_str($k, $str, 2, GMP_RNDN);
 my @deref = Math::MPFR::Rmpfr_deref2($k, 10, 0, GMP_RNDN);
-if($deref[0] eq '9007199254740991') {print "ok 35\n"}
-else {print "not ok 35\n"}
+if($deref[0] eq '90071992547409910') {print "ok 35\n"}
+else {print "not ok 35 $deref[0]\n"}
 
 $ok = '';
 
-if(!Rmpfr_fits_ulong_p($k, GMP_RNDN) && !Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok = 'a'}
+if($Config::Config{longsize} == 8) {
+  if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok = 'a'}
+}
+else {
+  if(!Rmpfr_fits_ulong_p($k, GMP_RNDN) && !Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok = 'a'}
+}
 
 Rmpfr_set_d($k, 123.456789, GMP_RNDN);
+
 if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok .= 'b'}
 
 Rmpfr_set_d($k, 2147483648.4444, GMP_RNDN);
+
+if($Config::Config{longsize} == 8) {
+  if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok .= 'c'}
+}
+else {
 if(Rmpfr_fits_ulong_p($k, GMP_RNDN) && !Rmpfr_fits_slong_p($k, GMP_RNDN)) {$ok .= 'c'}
+}
 
 if($ok eq 'abc') {print "ok 36\n"}
 else {print "not ok 36 $ok\n"}

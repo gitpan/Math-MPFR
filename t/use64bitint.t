@@ -1,11 +1,12 @@
 use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
-use Config;
 
 print "1..3\n";
 
-my $_64 = defined($Config::Config{use64bitint}) ? 1 : 0;
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
+my $_64 = Math::MPFR::_has_longlong() ? 1 : 0;
 
 Rmpfr_set_default_prec(300);
 
@@ -49,11 +50,11 @@ if($_64) {
   $pp2 *= -1;
   if(Math::MPFR::_itsa($pp2) == 2) {$ok = 'AB'}
   else {
-   eval{Rmpfr_set_sj($int3, $pp2, GMP_RNDN);};
-   if($@ =~ /Not an IV supplied to Rmpfr_set_sj/i) {$ok = 'a'}
+   Rmpfr_set_sj($int3, ~0, GMP_RNDN);
+   if($int3 == -1) {$ok = 'a'}
 
-   eval{Rmpfr_set_sj_2exp($int3, $pp2, 2, GMP_RNDN);};
-   if($@ =~ /Not an IV supplied to/i) {$ok .= 'b'}
+   Rmpfr_set_sj_2exp($int3, ~0, 2, GMP_RNDN);
+   if($int3 == -4) {$ok .= 'b'}
   }
 
   if(lc($ok) eq 'ab') {print "ok 2\n"}
@@ -171,13 +172,11 @@ if($_64) {
   else {print "not ok 3 $ok\n"}
 }
 
+$ok = '';
 
 if(!$_64) {
-  my $int1 = Rmpfr_init();
-  eval{Rmpfr_set_sj($int1, 2 ** 23, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i) {print "ok 1\n"}
-  else {print "not ok 1\n"}
-
+  print "ok 1 - skipped\n";
+  my $int1;
   eval{Rmpfr_set_sj_2exp($int1, 2 ** 23, 2, GMP_RNDN);};
   if($@ =~ /not implemented on this build of perl/i) {print "ok 2\n"}
   else {print "not ok 2 \n"}

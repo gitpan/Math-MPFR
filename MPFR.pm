@@ -47,126 +47,113 @@
 
     @Math::MPFR::EXPORT_OK = qw(GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
-Rmpfr_set_default_rounding_mode Rmpfr_prec_round Rmpfr_get_emin
-Rmpfr_get_default_rounding_mode 
-Rmpfr_get_emax Rmpfr_set_emin Rmpfr_set_emax Rmpfr_check_range
-Rmpfr_clear_underflow Rmpfr_clear_overflow Rmpfr_clear_nanflag
-Rmpfr_clear_inexflag Rmpfr_clear_flags Rmpfr_underflow_p
-Rmpfr_overflow_p Rmpfr_nanflag_p Rmpfr_inexflag_p 
-Rmpfr_set_default_prec Rmpfr_get_default_prec Rmpfr_init
-Rmpfr_init_set Rmpfr_init_set_ui Rmpfr_init_set_si Rmpfr_init_set_d
-Rmpfr_init_set_z Rmpfr_init_set_q Rmpfr_init_set_f Rmpfr_init_set_str
-Rmpfr_init2 Rmpfr_set_prec Rmpfr_get_prec Rmpfr_set_prec_raw
-Rmpfr_init_nobless Rmpfr_init2_nobless Rmpfr_clear
-Rmpfr_init_set_nobless Rmpfr_init_set_ui_nobless Rmpfr_init_set_si_nobless
-Rmpfr_init_set_d_nobless Rmpfr_init_set_z_nobless Rmpfr_init_set_q_nobless
-Rmpfr_init_set_f_nobless Rmpfr_init_set_str_nobless
-Rmpfr_min_prec Rmpfr_max_prec Rmpfr_set Rmpfr_set_ui Rmpfr_set_si
-Rmpfr_set_d Rmpfr_set_z Rmpfr_set_q Rmpfr_set_f Rmpfr_set_str
-Rmpfr_set_str_binary Rmpfr_set_inf Rmpfr_set_nan Rmpfr_swap
-Rmpfr_get_str Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_z_exp Rmpfr_out_str Rmpfr_inp_str
-Rmpfr_add Rmpfr_add_ui Rmpfr_add_z Rmpfr_add_q Rmpfr_sub Rmpfr_sub_ui
-Rmpfr_sub_z Rmpfr_sub_q Rmpfr_ui_sub Rmpfr_mul Rmpfr_mul_ui
-Rmpfr_mul_z Rmpfr_mul_q Rmpfr_div Rmpfr_div_ui Rmpfr_div_z
-Rmpfr_div_q Rmpfr_ui_div Rmpfr_sqrt Rmpfr_cbrt Rmpfr_sqrt_ui Rmpfr_pow_ui
-Rmpfr_ui_pow_ui Rmpfr_ui_pow Rmpfr_pow_si Rmpfr_pow Rmpfr_neg
-Rmpfr_abs Rmpfr_mul_2exp Rmpfr_mul_2ui Rmpfr_mul_2si Rmpfr_div_2exp
-Rmpfr_div_2ui Rmpfr_div_2si Rmpfr_cmp Rmpfr_cmpabs Rmpfr_cmp_ui Rmpfr_cmp_si
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_si_2exp Rmpfr_eq Rmpfr_nan_p Rmpfr_inf_p
-Rmpfr_number_p Rmpfr_reldiff Rmpfr_sgn
-Rmpfr_greater_p Rmpfr_greaterequal_p Rmpfr_less_p Rmpfr_lessequal_p
-Rmpfr_lessgreater_p Rmpfr_equal_p Rmpfr_unordered_p
-Rmpfr_log Rmpfr_exp Rmpfr_exp2 Rmpfr_sin Rmpfr_cos Rmpfr_tan
-Rmpfr_sin_cos Rmpfr_acos Rmpfr_asin Rmpfr_atan Rmpfr_cosh Rmpfr_sinh
-Rmpfr_tanh Rmpfr_acosh Rmpfr_asinh Rmpfr_atanh Rmpfr_fac_ui
-Rmpfr_log1p Rmpfr_expm1 Rmpfr_log2 Rmpfr_log10 Rmpfr_fma Rmpfr_agm
-Rmpfr_gamma Rmpfr_zeta Rmpfr_erf
-Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_const_euler
-Rmpfr_print_binary Rmpfr_rint Rmpfr_ceil Rmpfr_floor Rmpfr_round
-Rmpfr_trunc Rmpfr_can_round
-Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove 
-Rmpfr_nextbelow Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
-Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
-Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
-Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump
-Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
-Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
-Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
-Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
-Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
-Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
-Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
-Rmpfr_fits_ulong_p Rmpfr_fits_slong_p Rmpfr_strtofr
-Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
-Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2 Rmpfr_pow_z
-Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec Rmpfr_csc Rmpfr_cot
-Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech Rmpfr_csch Rmpfr_coth
-Rmpfr_lngamma RMPFR_VERSION_NUM Rmpfr_set_sj_2exp Rmpfr_set_sj Rmpfr_get_sj
-);
-    $Math::MPFR::VERSION = '1.10';
+MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM 
+Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
+Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q Rmpfr_add_ui Rmpfr_add_z 
+Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh 
+Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear 
+Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
+Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f 
+Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui 
+Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler 
+Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth 
+Rmpfr_csc Rmpfr_csch Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
+Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint 
+Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp 
+Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui Rmpfr_fits_slong_p 
+Rmpfr_fits_ulong_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
+Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
+Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin 
+Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld 
+Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui 
+Rmpfr_get_uj
+Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp Rmpfr_greater_p Rmpfr_greaterequal_p 
+Rmpfr_inexflag_p Rmpfr_inf_p Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless 
+Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_d Rmpfr_init_set_d_nobless 
+Rmpfr_init_set_f Rmpfr_init_set_f_nobless  
+Rmpfr_init_set_nobless Rmpfr_init_set_q 
+Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless 
+Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui 
+Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str 
+Rmpfr_integer_p Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
+Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
+Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
+Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
+Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
+Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round 
+Rmpfr_print_binary Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil 
+Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_round 
+Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_d Rmpfr_set_default_prec 
+Rmpfr_set_default_rounding_mode Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
+Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_inexflag Rmpfr_set_inf Rmpfr_set_ld 
+Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec 
+Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj 
+Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
+Rmpfr_set_uj Rmpfr_set_uj_2exp 
+Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
+Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
+Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize Rmpfr_swap 
+Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui 
+Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p 
+Rmpfr_zeta);
+
+    $Math::MPFR::VERSION = '1.11';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
-Rmpfr_set_default_rounding_mode Rmpfr_prec_round Rmpfr_get_emin
-Rmpfr_get_default_rounding_mode 
-Rmpfr_get_emax Rmpfr_set_emin Rmpfr_set_emax Rmpfr_check_range
-Rmpfr_clear_underflow Rmpfr_clear_overflow Rmpfr_clear_nanflag
-Rmpfr_clear_inexflag Rmpfr_clear_flags Rmpfr_underflow_p
-Rmpfr_overflow_p Rmpfr_nanflag_p Rmpfr_inexflag_p
-Rmpfr_set_default_prec Rmpfr_get_default_prec Rmpfr_init
-Rmpfr_init_set Rmpfr_init_set_ui Rmpfr_init_set_si Rmpfr_init_set_d
-Rmpfr_init_set_z Rmpfr_init_set_q Rmpfr_init_set_f Rmpfr_init_set_str
-Rmpfr_init2 Rmpfr_set_prec Rmpfr_get_prec Rmpfr_set_prec_raw
-Rmpfr_init_nobless Rmpfr_init2_nobless Rmpfr_clear
-Rmpfr_init_set_nobless Rmpfr_init_set_ui_nobless Rmpfr_init_set_si_nobless
-Rmpfr_init_set_d_nobless Rmpfr_init_set_z_nobless Rmpfr_init_set_q_nobless
-Rmpfr_init_set_f_nobless Rmpfr_init_set_str_nobless
-Rmpfr_min_prec Rmpfr_max_prec Rmpfr_set Rmpfr_set_ui Rmpfr_set_si
-Rmpfr_set_d Rmpfr_set_z Rmpfr_set_q Rmpfr_set_f Rmpfr_set_str
-Rmpfr_set_str_binary Rmpfr_set_inf Rmpfr_set_nan Rmpfr_swap Rmpfr_out_str Rmpfr_inp_str
-Rmpfr_get_str Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_z_exp
-Rmpfr_add Rmpfr_add_ui Rmpfr_add_z Rmpfr_add_q Rmpfr_sub Rmpfr_sub_ui
-Rmpfr_sub_z Rmpfr_sub_q Rmpfr_ui_sub Rmpfr_mul Rmpfr_mul_ui
-Rmpfr_mul_z Rmpfr_mul_q Rmpfr_div Rmpfr_div_ui Rmpfr_div_z
-Rmpfr_div_q Rmpfr_ui_div Rmpfr_sqrt Rmpfr_cbrt Rmpfr_sqrt_ui Rmpfr_pow_ui
-Rmpfr_ui_pow_ui Rmpfr_ui_pow Rmpfr_pow_si Rmpfr_pow Rmpfr_neg
-Rmpfr_abs Rmpfr_mul_2exp Rmpfr_mul_2ui Rmpfr_mul_2si Rmpfr_div_2exp
-Rmpfr_div_2ui Rmpfr_div_2si Rmpfr_cmp Rmpfr_cmpabs Rmpfr_cmp_ui Rmpfr_cmp_si
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_si_2exp Rmpfr_eq Rmpfr_nan_p Rmpfr_inf_p
-Rmpfr_number_p Rmpfr_reldiff Rmpfr_sgn
-Rmpfr_greater_p Rmpfr_greaterequal_p Rmpfr_less_p Rmpfr_lessequal_p
-Rmpfr_lessgreater_p Rmpfr_equal_p Rmpfr_unordered_p
-Rmpfr_log Rmpfr_exp Rmpfr_exp2 Rmpfr_sin Rmpfr_cos Rmpfr_tan
-Rmpfr_sin_cos Rmpfr_acos Rmpfr_asin Rmpfr_atan Rmpfr_cosh Rmpfr_sinh
-Rmpfr_tanh Rmpfr_acosh Rmpfr_asinh Rmpfr_atanh Rmpfr_fac_ui
-Rmpfr_log1p Rmpfr_expm1 Rmpfr_log2 Rmpfr_log10 Rmpfr_fma Rmpfr_agm
-Rmpfr_gamma Rmpfr_zeta Rmpfr_erf
-Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_const_euler
-Rmpfr_print_binary Rmpfr_rint Rmpfr_ceil Rmpfr_floor Rmpfr_round
-Rmpfr_trunc Rmpfr_can_round
-Rmpfr_frac Rmpfr_integer_p Rmpfr_nexttoward Rmpfr_nextabove 
-Rmpfr_nextbelow Rmpfr_min Rmpfr_max Rmpfr_get_exp Rmpfr_set_exp
-Rgmp_randinit_default Rgmp_randinit_lc_2exp Rgmp_randinit_lc_2exp_size
-Rgmp_randseed Rgmp_randseed_ui Rgmp_randclear
-Rmpfr_urandomb Rmpfr_random2 Rmpfr_dump
-Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub 
-Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
-Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
-Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max 
-Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
-Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
-Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_get_ui Rmpfr_get_si
-Rmpfr_fits_ulong_p Rmpfr_fits_slong_p Rmpfr_strtofr
-Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
-Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2 Rmpfr_pow_z
-Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec Rmpfr_csc Rmpfr_cot
-Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech Rmpfr_csch Rmpfr_coth
-Rmpfr_lngamma RMPFR_VERSION_NUM Rmpfr_set_sj_2exp Rmpfr_set_sj Rmpfr_get_sj
+MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM 
+Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
+Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q Rmpfr_add_ui Rmpfr_add_z 
+Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh 
+Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear 
+Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
+Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f 
+Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui 
+Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler 
+Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth 
+Rmpfr_csc Rmpfr_csch Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
+Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint 
+Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp 
+Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui Rmpfr_fits_slong_p 
+Rmpfr_fits_ulong_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
+Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
+Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin 
+Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld 
+Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui
+Rmpfr_get_uj 
+Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp Rmpfr_greater_p Rmpfr_greaterequal_p 
+Rmpfr_inexflag_p Rmpfr_inf_p Rmpfr_init Rmpfr_init2 Rmpfr_init2_nobless 
+Rmpfr_init_nobless Rmpfr_init_set Rmpfr_init_set_d Rmpfr_init_set_d_nobless 
+Rmpfr_init_set_f Rmpfr_init_set_f_nobless  
+Rmpfr_init_set_nobless Rmpfr_init_set_q 
+Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless 
+Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui 
+Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str 
+Rmpfr_integer_p Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
+Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
+Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
+Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
+Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
+Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round 
+Rmpfr_print_binary Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil 
+Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_round 
+Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_d Rmpfr_set_default_prec 
+Rmpfr_set_default_rounding_mode Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
+Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_inexflag Rmpfr_set_inf Rmpfr_set_ld 
+Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec 
+Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj 
+Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp 
+Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
+Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
+Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize Rmpfr_swap 
+Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui 
+Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p 
+Rmpfr_zeta
 )]);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
@@ -216,42 +203,56 @@ sub new {
     if(@_ > 3) {die "Too many arguments supplied to new()"}
     my @ret = ();
     if(!@_) {return Rmpfr_init()}
-    if($_[0] ne "Math::MPFR") {
+    if(ref($_[0]) || $_[0] ne "Math::MPFR") {
       my $type = _itsa($_[0]);
 
       if(!$type) {die "Inappropriate argument supplied to new()"}
 
-      if($type == 1) {
+      if($type == 1 || $type == 2) { # UOK or IOK
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
-        @ret = Rmpfr_init_set_ui($_[0], Rmpfr_get_default_rounding_mode());
+        @ret = Rmpfr_init_set_str($_[0], 10, Rmpfr_get_default_rounding_mode());
         return $ret[0];
       }
-      if($type == 2) {
+
+      if($type == 3) { # NOK
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
-        require Config;
-        if(defined($Config::Config{use64bitint})) {
-          my $ret = Rmpfr_init();
-          Rmpfr_set_sj($ret, $_[0], Rmpfr_get_default_rounding_mode());
-          return $ret;
+        if(Math::MPFR::_has_longdouble()) {
+           my $ret = Rmpfr_init();
+           Rmpfr_set_ld($ret, $_[0], Rmpfr_get_default_rounding_mode());
+           return $ret;
         }
-        @ret = Rmpfr_init_set_si($_[0], Rmpfr_get_default_rounding_mode());
-        return $ret[0];
-      }
-      if($type == 3) {
-        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
         @ret = Rmpfr_init_set_d($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
       }
-      if($type == 4) {
+      if($type == 4) { # POK
         if(@_ > 2) {die "Too many arguments supplied to new() - expected no more than two"}
         if(@_ == 2) {@ret = Rmpfr_init_set_str($_[0], $_[1], Rmpfr_get_default_rounding_mode())}
         else {@ret = Rmpfr_init_set_str($_[0], 0, Rmpfr_get_default_rounding_mode())}
         if($ret[1]) {warn "string supplied to new() contained invalid characters"}
         return $ret[0];
       }
-      if($type == 5) {
+
+      if($type == 5) { # Math::MPFR object
         if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
         @ret = Rmpfr_init_set($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+      }
+
+      if($type == 6) { # Math::GMPf object
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_f($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+      }
+
+      if($type == 7) { # Math::GMPq object
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_q($_[0], Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+      }
+
+      if($type == 8 || $type == 9) { # Math::GMPz or Math::GMP object
+        if(@_ > 1) {die "Too many arguments supplied to new() - expected only one"}
+        @ret = Rmpfr_init_set_z($_[0], Rmpfr_get_default_rounding_mode());
         return $ret[0];
       }
     }
@@ -264,35 +265,49 @@ sub new {
 
     if(!$type) {die "Inappropriate argument supplied to new()"}
 
-    if($type == 1) {
+    if($type == 1 || $type == 2) { # UOK or IOK
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
-      @ret = Rmpfr_init_set_ui($_[1], Rmpfr_get_default_rounding_mode());
-      return $ret[0];
+        @ret = Rmpfr_init_set_str($_[1], 10, Rmpfr_get_default_rounding_mode());
+        return $ret[0];
     }
-    if($type == 2) {
+
+    if($type == 3) { # NOK
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
-      require Config;
-      if(defined($Config::Config{use64bitint})) {
-        my $ret = Rmpfr_init();
-        Rmpfr_set_sj($ret, $_[1], Rmpfr_get_default_rounding_mode());
-        return $ret;
+      if(Math::MPFR::_has_longdouble()) {
+         my $ret = Rmpfr_init();
+         Rmpfr_set_ld($ret, $_[1], Rmpfr_get_default_rounding_mode());
+         return $ret;
       }
-      @ret = Rmpfr_init_set_si($_[1], Rmpfr_get_default_rounding_mode());
-      return $ret[0];
-    }
-    if($type == 3) {
-      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
       @ret = Rmpfr_init_set_d($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
     }
-    if($type == 4) {
+    if($type == 4) { # POK
+      if(@_ > 3) {die "Too many arguments supplied to new() - expected no more than three"}
       if(@_ == 3) {@ret = Rmpfr_init_set_str($_[1], $_[2], Rmpfr_get_default_rounding_mode())}
       else {@ret = Rmpfr_init_set_str($_[1], 0, Rmpfr_get_default_rounding_mode())}
       return $ret[0];
     }
-    if($type == 5) {
+    if($type == 5) { # Math::MPFR object
       if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
       @ret = Rmpfr_init_set($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+    }
+
+    if($type == 6) { # Math::GMPf object
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_f($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+    }
+
+    if($type == 7) { # Math::GMPq object
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_q($_[1], Rmpfr_get_default_rounding_mode());
+      return $ret[0];
+    }
+
+    if($type == 8 || $type == 9) { # Math::GMPz or Math::GMP object
+      if(@_ > 2) {die "Too many arguments supplied to new() - expected only two"}
+      @ret = Rmpfr_init_set_z($_[1], Rmpfr_get_default_rounding_mode());
       return $ret[0];
     }
 }
@@ -317,16 +332,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    A bigfloat module utilising the MPFR library. Basically
    this module simply wraps the 'mpfr' floating point functions
    provided by that library. See:
-   http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html or the
-   file mpfr.info (which is included with this distribution).
+   http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpfr
    documentation. (Believe the mpfr docs in preference to these
    docs if/when there's a conflict.)
    See also the Math::MPFR test suite for some examples of
    usage.
-
-=head1 SYNOPSIS
 
    use Math::MPFR qw(:mpfr);
    
@@ -340,6 +352,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    my $str = '.123542@2'; # mantissa = (.)123452
                          # exponent = 2
    #Alternatively:
+   # my $str = ".123542\@2";
+   # or:
    # my $str = '12.3542';
    # or:
    # my $str = '1.23542e1';
@@ -355,9 +369,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    # Create an Math::MPFR object that holds an initial
    # value of $str (in base $base) and has the default
-   # precision. $bn3 is the number. $nok will either be 0 
+   # precision. $bn1 is the number. $nok will either be 0 
    # indicating that the string was a valid number string, or
-   # -1, indicating that the string was not a valid number. 
+   # -1, indicating that the string contained at least one
+   # invalid numeric character. 
    # See 'COMBINED INITIALISATION AND ASSIGNMENT', below.
    my ($bn1, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
 
@@ -462,15 +477,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    1) Math::GMP from CPAN. (This module provides access to mpz
       objects only - NOT mpf and mpq objects.)
-      Win32 binaries of it are available from
-      http://www.kalinabears.com.au/w32perl/math_gmp.html
 
    AND/OR
 
    2) Math::GMPz (for mpz types), Math::GMPq (for mpq types)
-      and Math::GMPf (for mpf types). These modules (both 
-      source code and win32 binaries) are available from 
-      http://www.kalinabears.com.au/w32perl/math_gnump.html 
+      and Math::GMPf (for mpf types). 
 
    You may also be able to use objects from the GMP module
    that ships with the GMP sources. I get occasional 
@@ -821,10 +832,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Returns a Math::MPFR object with the value of $arg, rounded
     in the default rounding direction, with default precision.
     $arg can be either a number (signed integer, unsigned integer,
-    signed fraction or unsigned fraction) or a string that 
-    represents a numeric value. If $arg is a string, an optional
-    additional argument that specifies the base of the number
-    can be supplied to new(). If $arg is a string and no 
+    signed fraction or unsigned fraction), a string that 
+    represents a numeric value, or an object (of type Math::GMPf,
+    Math::GMPq, Math::GMPz, orMath::GMP) If $arg is a string, an
+    optional additional argument that specifies the base of the
+    number can be supplied to new(). If $arg is a string and no 
     additional argument is supplied, an attempt is made to deduce 
     base. See 'Rmpfr_set_str' above for an explanation of how
     that deduction is attempted. For finer grained control, use
@@ -1120,10 +1132,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_exp2($rop, $op, $rnd);
     Set $rop to 2 power of $op, rounded to the direction $rnd with
-    the precision of $rop.  Return zero iff the result is exact
-    (this occurs in fact only when OP is -infinity, 0, or
-    +infinity), a positive value when the result is greater than
-    the exponential of $op, and a negative value when it is smaller.
+    the precision of $rop.  Return zero iff the result is exact, a
+    positive value when the result is greater than 2 power of $op,
+    and a negative value when it is smaller.
+
+   $si = Rmpfr_exp10($rop, $op, $rnd);
+    Set $rop to 10 power of $op, rounded to the direction $rnd with
+    the precision of $rop.  Return zero iff the result is exact, a
+    positive value when the result is greater than 10 power of $op,
+    and a negative value when it is smaller.
 
    $si = Rmpfr_sin($rop $op, $rnd);
    $si = Rmpfr_cos($rop, $op, $rnd);
@@ -1580,10 +1597,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     2. If the variable is a signed long int, then that value is used.
        The variable is considered to be a signed long int if the
-       IOK flag is set.
+       IOK flag is set. (In the case of perls built with
+       -Duse64bitint, the variable is treated as a signed long long
+       int if the IOK flag is set.)
 
     3. If the variable is a double, then that value is used. The
        variable is considered to be a double if the NOK flag is set.
+       (In the case of perls built with -Duselongdouble, the variable
+       is treated as a long double if the NOK flag is set.)
 
     4. If the variable is a string (ie the POK flag is set) then the
        value of that string is used. If the POK flag is set, but the
@@ -1602,13 +1623,19 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    #####################
 
+=head1 ACKNOWLEDGEMENTS
+
+    Thanks to Vincent Lefevre for providing corrections to errors
+    and ommissions, and suggesting improvements (which were duly
+    put in place).
+
 =head1 LICENSE
 
-    This program is free software; you may redistribute it
+    This perl code is free software; you may redistribute it
     and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-    Sisyphus <kalinabears at iinet dot net dot au>
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
 
 =cut

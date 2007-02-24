@@ -4,6 +4,8 @@ use Math::MPFR qw(:mpfr);
 
 print "1..7\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 my $x = Rmpfr_init();
 my $y = Rmpfr_init();
 

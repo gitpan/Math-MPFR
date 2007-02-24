@@ -4,6 +4,8 @@ use Math::MPFR qw(:mpfr);
 
 print "1..5\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 my $have_gmp = 0;
 my $c = Rmpfr_init();
 my $check2 = Rmpfr_init();

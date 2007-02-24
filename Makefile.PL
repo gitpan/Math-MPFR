@@ -2,6 +2,16 @@ use ExtUtils::MakeMaker;
 use Config;
 require 5.006;
 
+$use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
+$use_long_double = 0;# Let perl decide whether to include 'long double' support
+
+#$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
+#$use_long_double = -1;# Force exclusion of 'long double' support
+
+#$use_64_bit_int = 1; # Force inclusion of 64-bit 'long long' support
+#$use_long_double = 1;# Force inclusion of 'long double' support
+
+
 $| = 1;
 
 print "Checking for a C compiler ....";
@@ -94,7 +104,33 @@ sisyphus at cpan dot org
 }
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
-if($Config::Config{use64bitint} eq 'define') {$defines .= " -DUSE_64_BIT_INT"}
+
+if($use_64_bit_int == -1) {}                                
+elsif($use_64_bit_int == 1) {$defines .= " -DUSE_64_BIT_INT"}
+else {
+  if($Config::Config{use64bitint} eq 'define' || 
+     $Config::Config{use64bitall} eq 'define' ||
+     $Config::Config{ivsize} == 8 ||
+     $Config::Config{usemorebits} eq 'define') {$defines .= " -DUSE_64_BIT_INT"}
+}
+
+if($use_long_double == -1) {}
+elsif($use_long_double == 1) {$defines .= " -DUSE_LONG_DOUBLE"}
+else {
+  if($Config::Config{uselongdouble} eq 'define' ||
+     $Config::Config{longdblsize} == $Config::Config{doublesize} ||
+     $Config::Config{usemorebits} eq 'define') {$defines .= " -DUSE_LONG_DOUBLE"}
+}
+
+$defines =~ /-DUSE_64_BIT_INT/ ? print "Building with 64-bit'long long' support\n" :
+                                 print "Building without 64-bit 'long long' support\n";
+
+print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
+
+$defines =~ /-DUSE_LONG_DOUBLE/ ? print "Building with 'long double' support\n" :
+                                 print "Building without 'long double' support\n";
+
+print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
 my %options = (       
   NAME => 'Math::MPFR',
@@ -102,7 +138,8 @@ my %options = (
   LIBS => [
     '-lmpfr -lgmp'
   ],
-  'VERSION' => '1.10',
+  VERSION_FROM => 'MPFR.pm',
+  clean   => { FILES => 'comp.exe check.exe version.exe' },
 );
 
 WriteMakefile(%options);
@@ -138,15 +175,15 @@ sub have_libraries {
           $LIBS =~ s/ -lgmp/\/libgmp.lib/;
           }
 
-        if(system("$CC check.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
+        if(system("$CC -o check.exe check.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
         else {return 0}
         }
-      if(system("$CC check.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
+      if(system("$CC -o check.exe check.c $INC $LIBS >NUL 2>&1") == 0) {return 1}
       else {return 0}
       }
 
     else {
-      if(system("$CC check.c $INC $LIBS 2>/dev/null") == 0) {return 1}
+      if(system("$CC -o check.exe check.c $INC $LIBS 2>/dev/null") == 0) {return 1}
       else {return 0}
       }
 }

@@ -5,6 +5,8 @@ use Math::MPFR qw(:mpfr);
 
 print "1..21\n";
 
+print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
 Rmpfr_set_default_prec(300);
 my $rnd = 0;
 
