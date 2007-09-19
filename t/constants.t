@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..5\n";
+print "1..6\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
@@ -24,4 +24,8 @@ my $v = Rmpfr_get_version();
 
 if($v eq MPFR_VERSION_STRING) {print "ok 5\n"}
 else {print "not ok 5 $v is not the same as ", MPFR_VERSION_STRING, "\n"} 
+
+eval{my $patches = Rmpfr_get_patches();};
+if(!$@) {print "ok 6\n"}
+else {print "not ok 6 $@\n"}
 

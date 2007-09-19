@@ -8,6 +8,7 @@ print "1..38\n";
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
 my $have_mpq = 0;
+my $ok;
 
 eval{require Math::GMPq};
 if(!$@) {$have_mpq = 1}
@@ -58,6 +59,8 @@ if(Rmpfr_get_emin() == $emin &&
    Rmpfr_get_emax() == $emax) {print "ok 9\n"}
 else {print "not ok 9\n"}
 
+$ok = '';
+
 my $fma = Rmpfr_init();
 my $m = Rmpfr_init();
 my $a = Rmpfr_init();
@@ -67,8 +70,14 @@ Rmpfr_set_d($a, 23.25, GMP_RNDN);
 
 Rmpfr_fma($fma, $f, $m, $a, GMP_RNDN);
 
-if($fma == 1663.5) {print "ok 10\n"}
-else {print "not ok 10\n"}
+if($fma == 1663.5) {$ok .= 'a'}
+
+Rmpfr_fms($fma, $f, $m, $a, GMP_RNDN);
+
+if($fma == 1617) {$ok .= 'b'}
+
+if($ok eq 'ab') {print "ok 10\n"}
+else {print "not ok 10 $ok\n"}
 
 Rmpfr_sqrt_ui($fma, 2, GMP_RNDN);
 
@@ -203,7 +212,7 @@ else {print "not ok 33\n"}
 
 ####################################
 
-my $ok = '';
+$ok = '';
 
 my $h = Rmpfr_init2(59);
 Rmpfr_set_str_binary ($h, "-0.10010001010111000011110010111010111110000000111101100111111E663");

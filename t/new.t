@@ -120,7 +120,7 @@ my $bi = Math::BigInt->new(123456789);
 $ok = '';
 
 eval{my $f30 = Math::MPFR->new(17, 12);};
-if($@ =~ /Too many arguments supplied to new\(\) \- expected only two/) {$ok = 'a'}
+if($@ =~ /Too many arguments supplied to new\(\) \- expected only one/) {$ok = 'a'}
 
 eval{my $f31 = Math::MPFR::new(17, 12);};
 if($@ =~ /Too many arguments supplied to new\(\) \- expected only one/) {$ok .= 'b'}
@@ -137,7 +137,10 @@ if($@ =~ /Inappropriate argument/) {$ok .= 'e'}
 eval{my $f35 = Math::MPFR::new($bi);};
 if($@ =~ /Inappropriate argument/) {$ok .= 'f'}
 
-if($ok eq 'abcdef') {print "ok 4\n"}
+eval{my $f36 = Math::MPFR->new("17", 42);};
+if($@ =~ /Invalid value for base/) {$ok .= 'g'}
+
+if($ok eq 'abcdefg') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
 ###############################
@@ -204,3 +207,4 @@ my $z = Math::MPFR->new($x);
 
 if($y == $z && $z == 12345.5) {print "ok 9\n"}
 else {print "not ok 9 $y $z\n"}
+

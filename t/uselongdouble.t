@@ -3,19 +3,22 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..3\n";
+print "1..4\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+
+if(Math::MPFR::_has_longdouble()) {print "Using long double\n"}
+else {print "Not using long double\n"}
 
 Rmpfr_set_default_prec(300);
 
 if(Math::MPFR::_has_longdouble()) {
   my $ok = '';
-  my $n = (2 ** 48) + 0.5;
+  my $n = (2 ** 55) + 0.5;
   my $ld1 = Math::MPFR->new($n);
   my $ld2 = Math::MPFR::new($n);
   my $ld3 = Math::MPFR->new();
-  Rmpfr_set_d($ld3, $n, GMP_RNDN);
+  Rmpfr_set_ld($ld3, $n, GMP_RNDN);
 
   if(
      $ld1 == $ld2 && 
@@ -71,13 +74,13 @@ if(Math::MPFR::_has_longdouble()) {
 
   if($ld1 == $n) {$ok .= 'h'}
 
-  if($ld1 ** 0.5 < 16777216.01 &&
-     $ld1 ** 0.5 > 16777216) {$ok .= 'i'}
+  if($ld1 ** 0.5 < 189812531.25 &&
+     $ld1 ** 0.5 > 189812531.24) {$ok .= 'i'}
 
   $ld1 **= 0.5;
 
-  if($ld1 < 16777216.01 &&
-     $ld1 > 16777216) {$ok .= 'j'}
+  if($ld1 < 189812531.25 &&
+     $ld1 > 189812531.24) {$ok .= 'j'}
 
   if($ok eq 'abcdefghij') {print "ok 2\n"}
   else {print "not ok 2 $ok\n"}
@@ -101,8 +104,53 @@ else {
   if($@ =~ /not implemented on this build of perl/i) {$ok .= 'b'}
   eval{Rmpfr_get_ld($int1, GMP_RNDN);};
   if($@ =~ /not implemented on this build of perl/i) {$ok .= 'c'}
-  if($ok eq 'abc') {print "ok 1\n"}
+  eval{my($int2, $ret) = Rmpfr_init_set_ld(2 ** 23, GMP_RNDN);};
+  if($@ =~ /not implemented on this build of perl/i) {$ok .= 'd'}
+  if($ok eq 'abcd') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
   print "ok 2 - skipped, built without long double support\n";
   print "ok 3 - skipped, built without long double support\n";
 }
+
+if(Math::MPFR::_has_longdouble()) {
+  my $mpfr = Math::MPFR->new('1' x 62, 2);
+  my $mpfr2 = Rmpfr_init();
+  my $ok = '';
+
+  if ($mpfr <  4611686018427387904 && $mpfr >  4611686018427387902) {$ok .= 'a'}
+  if ($mpfr <= 4611686018427387904 && $mpfr >= 4611686018427387902) {$ok .= 'b'}
+  if ($mpfr == 4611686018427387903) {$ok .= 'c'}
+  if ($mpfr <= 4611686018427387903) {$ok .= 'd'}
+  if ($mpfr >= 4611686018427387903) {$ok .= 'e'}
+
+  my $ld = Rmpfr_get_ld($mpfr, GMP_RNDN);
+  
+  if ($ld < 4611686018427387904 && $ld > 4611686018427387902) {$ok .= 'f'}
+  if ($ld == 4611686018427387903) {$ok .= 'g'} 
+
+  my $cmp = $mpfr <=> 4611686018427387902;
+  if($cmp > 0) {$ok .= 'h'}
+
+  $cmp = $mpfr <=> 4611686018427387903;
+  if($cmp == 0) {$ok .= 'i'}
+
+  $cmp = $mpfr <=> 4611686018427387904;
+  if($cmp < 0) {$ok .= 'j'}
+
+  $cmp = 4611686018427387902 <=> $mpfr;
+  if($cmp < 0) {$ok .= 'k'}
+
+  $cmp = 4611686018427387903 <=> $mpfr;
+  if($cmp == 0) {$ok .= 'l'}
+
+  $cmp = 4611686018427387904 <=> $mpfr;
+  if($cmp > 0) {$ok .= 'm'}
+
+  Rmpfr_set_ld($mpfr2, 4611686018427387903, GMP_RNDN);
+  if($mpfr2 == $mpfr) {$ok .= 'n'}
+
+  if($ok eq 'abcdefghijklmn') {print "ok 4\n"}
+  else {print "not ok 4 $ok\n"}
+}
+
+else {print "ok 4 - skipped, built without long double support\n"}

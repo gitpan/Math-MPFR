@@ -1,3 +1,34 @@
+2.01
+ - Needs version 2.3.0 (or later) of the mpfr library.
+ - Add Rmpfr_j0, Rmpfr_j1, Rmpfr_jn, Rmpfr_y0, Rmpfr_y1,
+   Rmpfr_yn, Rmpfr_lgamma, Rmpfr_remainder, Rmpfr_remquo,
+   Rmpfr_fms, Rmpfr_signbit, Rmpfr_setsign, and
+   Rmpfr_copysign(all new in 2.3.0). Add also Rmpfr_get_patches
+   (documented for the first time in 2.3.0).
+ - Add Rmpfr_init_set_ld.
+ - Add Rmpfr_deref2 to the list of exportable functions, and 
+   document it's usage in the POD section.
+ - Rmpfr_deref2 now has the mpfr library allocate (and free) memory
+   for the mantissa.
+ - Add Rmpfr_hypot (previously missed).
+ - Rmpfr_out_str now takes an optional fifth argument (a string that
+   will be appended to the mpfr_out_str output). And the output 
+   buffer is now flushed each time Rmpfr_out_str is called.
+ - Rewrite new() - to make it a little tidier.
+ - Add Rmpfr_set_uj and Rmpfr_set_uj_2exp to @EXPORT_TAGS. (Previously
+   overlooked.)
+ - Add Rmpfr_integer_string() - mainly to provide a simple means of
+   getting 'sj' and 'uj' values on a 64-bit perl where the MPFR 
+   library does not support mpfr_get_uj and mpfr_get_sj functions -
+   which happens with libraries built with Microsoft Compilers.
+ - Fix the rendering of Inf and NaN values. (Now matches the 
+   mpfr_out_str output for Inf and NaN.)
+ - Change the format returned by Rmpfr_get_str. (Hence the output of
+   Rmpfr_get_string and Math::MPFR::overload_string have changed
+   from earlier versions of Math::MPFR.) 
+ - Fix some of the overloaded subroutines as regards their handling
+   of NaN.
+
 1.11
  - Fix bug in Rmpfr_get_str. (Sometimes printed out one less digit
    than it ought.)

@@ -6,10 +6,9 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print"1..5\n";
+print"1..6\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
-
 Rmpfr_set_default_prec(65);
 
 my $n = ~0;
@@ -83,9 +82,61 @@ if($ok eq 'abcdefghij') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
 if(Math::MPFR::_has_longlong()) {
-  my $ul = Rmpfr_get_uj($mpfr2, GMP_RNDN);
+  my $ul;
+  if($Config::Config{cc} eq 'cl') {
+    $ul = Rmpfr_integer_string($mpfr2, 10, GMP_RNDN);
+  }
+  else {$ul = Rmpfr_get_uj($mpfr2, GMP_RNDN)}
   if($ul == $n) {print "ok 5\n"}
   else {print "not ok 5 $ul != $n\n"}
 }
 else {print "ok 5 - skipped, not using 'long long' support\n"}
+
+$ok = '';
+
+Rmpfr_set_str($mpfr1, ~0, 10, GMP_RNDN);
+my $string = Rmpfr_integer_string($mpfr1, 10, GMP_RNDN);
+
+if($string == ~0) {$ok .= 'a'}
+else {print "$string != ", ~0, "\n"}
+
+$mpfr1 += 0.25;
+
+$string = Rmpfr_integer_string($mpfr1, 10, GMP_RNDN);
+
+if($string == ~0) {$ok .= 'b'}
+else {print "$string != ", ~0, "\n"}
+
+if(Math::MPFR::_has_longdouble()) {
+  if(Math::MPFR::_has_inttypes()) {
+    Rmpfr_set_ld($mpfr1, (~0 - 1) / -2, GMP_RNDN);
+  }
+  else {Rmpfr_set_str($mpfr1, (~0 - 1) / -2, 10, GMP_RNDN)}
+}
+elsif(Math::MPFR::_has_longlong()){
+  if(Math::MPFR::_has_inttypes()) {
+    Rmpfr_set_sj($mpfr1, (~0 - 1) / -2, GMP_RNDN);
+  }
+  else {Rmpfr_set_str($mpfr1, (~0 - 1) / -2, 10, GMP_RNDN)}
+}
+else {
+  Rmpfr_set_d($mpfr1, (~0 - 1) / -2, GMP_RNDN);
+}
+$string = Rmpfr_integer_string($mpfr1, 10, GMP_RNDN);
+
+if($string == (~0 - 1) / -2) {$ok .= 'c'}
+else {print "$string != ", (~0 - 1) / -2, "\n"}
+
+$mpfr1 -= 0.25;
+
+$string = Rmpfr_integer_string($mpfr1, 10, GMP_RNDN);
+
+if($string == (~0 - 1) / -2) {$ok .= 'd'}
+else {print "$string != ", (~0 - 1) / -2, "\n"}
+
+if($ok eq 'abcd') {print "ok 6\n"}
+else {print "not ok 6 $ok \n"}
+
+
+
 

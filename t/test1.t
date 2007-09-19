@@ -6,13 +6,14 @@ use Config;
 
 $| = 1;
 
-print "1..77\n";
+print "1..78\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
 my $double = 12345.5;
 my $ui = 4;
 my $si = -1369012;
+my $ok;
 
 my($have_mpz, $have_mpf, $have_mpq, $have_Math_GMP) = (0, 0, 0, 0);
 
@@ -337,7 +338,7 @@ if($have_mpz) {
 
   Rgmp_randseed($state, $seed);
 
-  my $ok = 1;
+  $ok = 1;
 
   Rmpfr_urandomb(@r, $state);
 
@@ -461,7 +462,7 @@ if($have_mpz) {
    }
 else {print "ok 48 - skipped - no Math::GMPz\n"}
 
-my $ok = '';
+$ok = '';
 
 $check = $c;
 $c *= 0;
@@ -540,17 +541,30 @@ if($check2 == $check) {$ok .= 'b'}
 if($ok eq 'ab') {print "ok 55\n"}
 else {print "not ok 55 $ok\n"}
 
+my $log3 = Rmpfr_init2(200);
+my $signp;
+
 Rmpfr_set_d($c, 1.003, GMP_RNDN);
 Rmpfr_lngamma($log2, $c, GMP_RNDN);
+($signp, $ret) = Rmpfr_lgamma($log3, $c, GMP_RNDN);
 Rmpfr_gamma($c, $c, GMP_RNDN);
 Rmpfr_log($log1, $c, GMP_RNDN);
 
-if($c > 0.9982772 && $c < 0.9982773) {print "ok 56\n"}
+if($c > 0.9982772 && $c < 0.9982773){print "ok 56\n"}
 else {print "not ok 56\n"}
 
+$ok = '';
+
+if($log1 - $log3 < 0.000000001 &&
+   $log1 - $log3> -0.000000001){$ok .= 'a'}
+
+if($signp == 1) {$ok .= 'b'}
+
 if($log1 - $log2 < 0.000000001 &&
-   $log1 - $log2 > -0.000000001) {print "ok 57\n"}
-else {print "not ok 57\n"}
+   $log1 - $log2 > -0.000000001){$ok .= 'c'}
+
+if($ok eq 'abc'){print "ok 57\n"}
+else {print "not ok 57 $ok\n"}
 
 Rmpfr_set_ui($c, 0, GMP_RNDN);
 Rmpfr_erf($check, $c, GMP_RNDN);
@@ -774,6 +788,15 @@ if($s ==  12345.5 &&
    $s <   12345.6 &&
    $s <=  12345.6) {print "ok 77\n"}
 else {print "not ok 77\n"}
+
+my $hypot1 = Math::MPFR->new(5);
+my $hypot2 = Math::MPFR->new(12);
+
+Rmpfr_hypot($s, $hypot1, $hypot2, GMP_RNDN);
+
+if($s == 13) {print "ok 78\n"}
+else {print "not ok 78\n"}
+
 
 # Run the following to test Rmpfr_inp_str
 # and Rmpfr_dump

@@ -1,12 +1,16 @@
 use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
+use Config;
 
-print "1..3\n";
+print "1..4\n";
 
 print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
 
-my $_64 = Math::MPFR::_has_longlong() ? 1 : 0;
+my $_64 = Math::MPFR::_has_longlong();
+
+if($_64){print "Using 64-bit integer\n"}
+else {print "Using 32-bit integer\n"}
 
 Rmpfr_set_default_prec(300);
 
@@ -14,29 +18,45 @@ my $ok = '';
 
 if($_64) {
   use integer;
+  my $pp1;
   my $int1 = Math::MPFR->new(2 ** 57 + 12345);
   $int1 *= -1;
   if($int1 == -144115188075868217
      && $int1 == "-144115188075868217"
     ) {$ok = 'a'}
 
-  my $pp1 = Rmpfr_get_sj($int1, GMP_RNDN);
+  if($Config::Config{cc} eq 'cl') {
+    $pp1 = Rmpfr_integer_string($int1, 10, GMP_RNDN);
+  }
+  else {$pp1 = Rmpfr_get_sj($int1, GMP_RNDN)}
   if($pp1 == -144115188075868217) {$ok .= 'b'} 
  
   $pp1 += 14;
 
   my $int2 = Rmpfr_init();
-  Rmpfr_set_sj($int2, $pp1, GMP_RNDN);
+  if($Config::Config{cc} eq 'cl') {
+    Rmpfr_set_str($int2, $pp1, 10, GMP_RNDN);
+  }
+  else {Rmpfr_set_sj($int2, $pp1, GMP_RNDN)}
   if($int2 == $pp1
      && $int2 - $int1 - 14 == 0
      && !($int2 - $int1 - 14)
      ) {$ok .= 'c'}  
 
-  Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);
-  if($int2 == $pp1 * 4) {$ok .= 'd'}
+  if($Config::Config{cc} eq 'cl') {
+    eval{Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'd'}
+    else {print $@, "\n"}
+    eval{Rmpfr_set_uj_2exp($int2, $pp1, 2, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'e'}
+    else {print $@, "\n"}
+  }
+  else {
+    Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);
+    if($int2 == $pp1 * 4) {$ok .= 'de'}
+  }
 
-
-  if($ok eq 'abcd') {print "ok 1\n"}
+  if($ok eq 'abcde') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
 }
 
@@ -50,11 +70,14 @@ if($_64) {
   $pp2 *= -1;
   if(Math::MPFR::_itsa($pp2) == 2) {$ok = 'AB'}
   else {
-   Rmpfr_set_sj($int3, ~0, GMP_RNDN);
-   if($int3 == -1) {$ok = 'a'}
+    if($Config::Config{cc} eq 'cl') {$ok = 'ab'} # Skip
+    else {
+      Rmpfr_set_sj($int3, ~0, GMP_RNDN);
+      if($int3 == -1) {$ok = 'a'}
 
-   Rmpfr_set_sj_2exp($int3, ~0, 2, GMP_RNDN);
-   if($int3 == -4) {$ok .= 'b'}
+      Rmpfr_set_sj_2exp($int3, ~0, 2, GMP_RNDN);
+      if($int3 == -4) {$ok .= 'b'}
+    }
   }
 
   if(lc($ok) eq 'ab') {print "ok 2\n"}
@@ -157,7 +180,11 @@ if($_64) {
 
   my $temp2 = Math::MPFR->new($pint);
 
-  my $pint2 = Rmpfr_get_sj($temp2, GMP_RNDN);
+  my $pint2;
+  if($Config::Config{cc} eq 'cl') {
+    $pint2 = Rmpfr_integer_string($temp2, 10, GMP_RNDN);
+  }
+  else {$pint2 = Rmpfr_get_sj($temp2, GMP_RNDN)}
 
   if($pint2 == $pint
      && $pint2 < $pint + 1
@@ -174,15 +201,67 @@ if($_64) {
 
 $ok = '';
 
+if($_64) {
+  my $int3 = Math::MPFR->new();
+  if($Config::Config{cc} eq 'cl') {
+    eval{Rmpfr_set_sj($int3, ~0, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl \- use/) {$ok = 'a'}
+    eval{Rmpfr_set_uj($int3, ~0, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'b'}
+    eval{Rmpfr_get_sj($int3, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'c'}
+    eval{Rmpfr_get_uj($int3, GMP_RNDN);};
+    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'd'}
+
+    if($ok eq 'abcd') {print "ok 4\n"}
+    else {print "not ok $ok\n"}
+  }
+  else {print "ok 4 - skipped, 'cl' not used\n"}
+}
+
+$ok = '';
+
 if(!$_64) {
-  print "ok 1 - skipped\n";
-  my $int1;
+  my $int1 = Math::MPFR->new();
+
+  eval{Rmpfr_set_uj_2exp($int1, 2 ** 23, 2, GMP_RNDN);};
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
+  else {print $@, "\n"}
+
   eval{Rmpfr_set_sj_2exp($int1, 2 ** 23, 2, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i) {print "ok 2\n"}
-  else {print "not ok 2 \n"}
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
+  else {print $@, "\n"}
+
+  if($ok eq 'ab') {print "ok 1\n"}
+  else {print "not ok 1 $ok\n"}
+
+  $ok = '';
 
   eval{Rmpfr_get_sj($int1, GMP_RNDN);};
-  if($@ =~ /not implemented on this build of perl/i) {print "ok 3\n"}
-  else {print "not ok 3 \n"}
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
+  else {print $@, "\n"}
+
+  eval{Rmpfr_get_uj($int1, GMP_RNDN);};
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
+  else {print $@, "\n"}
+
+  if($ok eq 'ab') {print "ok 2\n"}
+  else {print "not ok 2 $ok\n"}
+
+  $ok = '';
+
+  eval{Rmpfr_set_sj($int1, 42, GMP_RNDN);};
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'a'}
+  else {print $@, "\n"}
+
+  eval{Rmpfr_set_uj($int1, 42, GMP_RNDN);};
+  if($@ =~ /not implemented on this build of perl/i && $@ !~ /\- use/) {$ok .= 'b'}
+  else {print $@, "\n"}
+
+  if($ok eq 'ab') {print "ok 3\n"}
+  else {print "not ok 3 $ok\n"}
+
+  print "ok 4 - skipped\n";
 
 }
+
