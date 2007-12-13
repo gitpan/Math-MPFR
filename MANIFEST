@@ -5,9 +5,7 @@ MPFR.xs
 INLINE.h
 README
 CHANGES
-check.c
-comp.c
-version.c
+t/basic.t
 t/bessel.t
 t/test1.t
 t/test2.t
@@ -20,6 +18,7 @@ t/exceptions.t
 t/integer_string.t
 t/sign.t
 t/trig.t
+t/TRmpfr_out_str.t
 t/set_str.t
 t/flags.t
 t/constants.t
@@ -28,4 +27,5 @@ t/new.t
 t/use64bitint.t
 t/not_zero.t
 t/uselongdouble.t
+t/pod.t
 typemap

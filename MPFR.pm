@@ -79,12 +79,14 @@ Rmpfr_init_set_nobless Rmpfr_init_set_q
 Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless 
 Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui 
 Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str 
+TRmpfr_inp_str
 Rmpfr_integer_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
 Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
+TRmpfr_out_str
 Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round 
 Rmpfr_print_binary Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil 
 Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_round 
@@ -105,7 +107,7 @@ Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld);
 
-    $Math::MPFR::VERSION = '2.01';
+    $Math::MPFR::VERSION = '2.02';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -143,12 +145,14 @@ Rmpfr_init_set_nobless Rmpfr_init_set_q
 Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless 
 Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui 
 Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str 
+TRmpfr_inp_str
 Rmpfr_integer_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
 Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
+TRmpfr_out_str
 Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round 
 Rmpfr_print_binary Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil 
 Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_round 
@@ -173,9 +177,37 @@ Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub Rmpfr_out_str {
-    if(@_ == 4) { return _Rmpfr_out_str($_[0], $_[1], $_[2], $_[3]) }
-    elsif(@_ == 5) { return _Rmpfr_out_str2($_[0], $_[1], $_[2], $_[3], $_[4]) }
-    else {die "Wrong number of arguments supplied to Rmpfr_out_str()"}
+    if(@_ == 4) {
+       die "Inappropriate 1st arg supplied to Rmpfr_out_str" if _itsa($_[0]) != 5;
+       return _Rmpfr_out_str($_[0], $_[1], $_[2], $_[3]);
+    }
+    if(@_ == 5) {
+      if(_itsa($_[0]) == 5) {return _Rmpfr_out_strS($_[0], $_[1], $_[2], $_[3], $_[4])}
+      die "Incorrect args supplied to Rmpfr_out_str" if _itsa($_[1]) != 5;
+      return _Rmpfr_out_strP($_[0], $_[1], $_[2], $_[3], $_[4]);
+    }
+    if(@_ == 6) {
+      die "Inappropriate 2nd arg supplied to Rmpfr_out_str" if _itsa($_[1]) != 5;
+      return _Rmpfr_out_strPS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5]);
+    }
+    die "Wrong number of arguments supplied to Rmpfr_out_str()";
+}
+
+sub TRmpfr_out_str {
+    if(@_ == 5) {
+      die "Inappropriate 4th arg supplied to TRmpfr_out_str" if _itsa($_[3]) != 5;
+      return _TRmpfr_out_str($_[0], $_[1], $_[2], $_[3], $_[4]);
+    }
+    if(@_ == 6) {
+      if(_itsa($_[3]) == 5) {return _TRmpfr_out_strS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5])}
+      die "Incorrect args supplied to TRmpfr_out_str" if _itsa($_[4]) != 5;
+      return _TRmpfr_out_strP($_[0], $_[1], $_[2], $_[3], $_[4], $_[5]);
+    }
+    if(@_ == 7) {
+      die "Inappropriate 5th arg supplied to TRmpfr_out_str" if _itsa($_[4]) != 5;
+      return _TRmpfr_out_strPS($_[0], $_[1], $_[2], $_[3], $_[4], $_[5], $_[6]);
+    }
+    die "Wrong number of arguments supplied to TRmpfr_out_str()";
 }
 
 sub Rmpfr_get_str {
@@ -332,6 +364,14 @@ __END__
 
 Math::MPFR - perl interface to the MPFR (floating point) library.
 
+=head1 DEPENDENCIES
+
+   This module needs the MPFR and GMP C libraries. (Install GMP
+   first as it is a pre-requisite for MPFR.)
+
+   The GMP library is availble from http://swox.com/gmp/
+   The MPFR library is available from http://www.mpfr.org/
+
 =head1 DESCRIPTION
 
    A bigfloat module utilising the MPFR library. Basically
@@ -416,10 +456,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    print $bn1, "\n"; # is base 10, and uses 'e' rather than '@'.
 
    # print out the value held by $bn1 (in base 16) using the
-   # 'Rmpfr_out_str' function. (No newline is printed - unless
-   # it's supplied as the optional fourth arg. See the
-   # 'Rmpfr_out-str' documentation below.)
-   Rmpfr_out_str($bn1, 16, 0, $rnd);
+   # 'TRmpfr_out_str' function. (No newline is printed - unless
+   # it's supplied as the optional fifth arg. See the
+   # 'TRmpfr_out_str' documentation below.)
+   TRmpfr_out_str(*stdout, 16, 0, $bn1, $rnd);
 
 =head1 ROUNDING MODE
 
@@ -1368,7 +1408,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    I-O FUNCTIONS
 
-   $ui = Rmpfr_out_str($op, $base, $digits, $round [, $suffix]);
+   $ui = Rmpfr_out_str([$prefix,] $op, $base, $digits, $round [, $suffix]);
+    BEST TO USE TRmpfr_out_str INSTEAD
     Output $op to STDOUT, as a string of digits in base $base,
     rounded in direction $round.  The base may vary from 2 to 36.
     Print $digits significant digits exactly, or if $digits is 0,
@@ -1377,13 +1418,24 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     digits, a decimal point at the right of the first digit and a
     trailing exponent in base 10, in the form `eNNN', are printed
     If $base is greater than 10, `@' will be used instead of `e'
-    as exponent delimiter. The optional fifth argument, $suffix,
-    is a string (eg "\n") that will be appended to the 
+    as exponent delimiter. The optional arguments, $prefix and 
+    $suffix, are strings that will be prepended/appended to the 
     mpfr_out_str output. Return the number of bytes written (not
-    counting those contained in $suffix), or if an error occurred,
-    return 0.
+    counting those contained in $suffix and $prefix), or if an error
+    occurred, return 0. (Note that none, one or both of $prefix and
+    $suffix can be supplied.)
+
+   $ui = TRmpfr_out_str([$prefix,] $stream, $base, $digits, $op, $round [, $suffix]);
+    As for Rmpfr_out_str, except that there's the capability to print
+    to somewhere other than STDOUT. Note that the order of the args
+    is different (to match the order of the mpfr_out_str args).
+    To print to STDERR:
+       TRmpfr_out_str(*stderr, $base, $digits, $op, $round);
+    To print to an open filehandle (let's call it FH):
+       TRmpfr_out_str(\*FH, $base, $digits, $op, $round);
 
    $ui = Rmpfr_inp_str($rop, $base, $round);
+    BEST TO USE TRmpfr_inp_str INSTEAD.
     Input a string in base $base from STDIN, rounded in
     direction $round, and put the read float in $rop.  The string
     is of the form `M@N' or, if the base is 10 or less, alternatively
@@ -1399,6 +1451,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     following strings are accepted too: `NaN', `Inf', `+Inf' and
     `-Inf'.
     Return the number of bytes read, or if an error occurred, return 0.
+
+   $ui = TRmpfr_inp_str($rop, $stream, $base, $round);
+    As for Rmpfr_inp_str, except that there's the capability to read
+    from somewhere other than STDIN.
+    To read from STDIN:
+       TRmpfr_inp_str($rop, *stdin, $base, $round);
+    To read from an open filehandle (let's call it FH):
+       TRmpfr_inp_str($rop, \*FH, $base,  $round);
 
    Rmpfr_print_binary($op);
     Output $op on stdout in raw binary format (the exponent is in
@@ -1417,7 +1477,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     which Math::MPFR has been built.
 
    $GMP_version = Math::MPFR::gmp_v();
-    Returns the version of the GMP library (eg. 4.1.3).
+    Returns the version of the GMP library (eg. 4.1.3) against
+    which the MPFR library was built.
     The function is not exportable.
 
    $ui = MPFR_VERSION;
@@ -1721,7 +1782,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 =head1 ACKNOWLEDGEMENTS
 
     Thanks to Vincent Lefevre for providing corrections to errors
-    and ommissions, and suggesting improvements (which were duly
+    and omissions, and suggesting improvements (which were duly
     put in place).
 
 =head1 LICENSE

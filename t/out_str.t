@@ -4,6 +4,10 @@ use Math::MPFR qw(:mpfr);
 
 print "1..3\n";
 
+print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
+print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
+print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
+
 Rmpfr_set_default_prec(100);
 
 my $str = Math::MPFR->new('3579' x 6);
@@ -21,9 +25,19 @@ $ret = Rmpfr_out_str($str, 16, 0, GMP_RNDN, " \n");
 if($ret == 30) {$ok .= 'b'}
 else {print "Returned: ", $ret, "\n"}
 
+$ret = Rmpfr_out_str("hello world ", $str, 16, 0, GMP_RNDN);
+
+if($ret == 30) {$ok .= 'c'}
+else {print "Returned: ", $ret, "\n"}
+
 print "\n";
 
-if($ok eq 'ab') {print "ok 1 \n"}
+$ret = Rmpfr_out_str("hello world ", $str, 16, 0, GMP_RNDN, " \n");
+
+if($ret == 30) {$ok .= 'd'}
+else {print "Returned: ", $ret, "\n"}
+
+if($ok eq 'abcd') {print "ok 1 \n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';
@@ -31,7 +45,7 @@ $ok = '';
 eval{$ret = Rmpfr_out_str($str, 16, 0);};
 $ok .= 'a' if $@ =~ /Wrong number of arguments/;
 
-eval{$ret = Rmpfr_out_str($str, 16, 0, GMP_RNDN, 7, 5);};
+eval{$ret = Rmpfr_out_str($str, 16, 0, GMP_RNDN, 7, 5, 6);};
 $ok .= 'b' if $@ =~ /Wrong number of arguments/;
 
 if($ok eq 'ab') {print "ok 2 \n"}

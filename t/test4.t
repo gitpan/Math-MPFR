@@ -5,7 +5,9 @@ use Config;
 
 print "1..38\n";
 
-print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
+print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
+print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 my $have_mpq = 0;
 my $ok;

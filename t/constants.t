@@ -4,7 +4,9 @@ use Math::MPFR qw(:mpfr);
 
 print "1..6\n";
 
-print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
+print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
+print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 my $version = RMPFR_VERSION_NUM(MPFR_VERSION_MAJOR, MPFR_VERSION_MINOR, MPFR_VERSION_PATCHLEVEL);
 

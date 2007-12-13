@@ -5,7 +5,9 @@ use Config;
 
 print "1..4\n";
 
-print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
+print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
+print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 if(Math::MPFR::_has_longdouble()) {print "Using long double\n"}
 else {print "Not using long double\n"}

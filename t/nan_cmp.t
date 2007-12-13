@@ -4,7 +4,9 @@ use Math::MPFR qw(:mpfr);
 
 print "1..2\n";
 
-print "# Using mpfr version ", MPFR_VERSION_STRING, "\n";
+print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
+print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
+print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 my $nan = Math::MPFR->new();
 my $zero = Math::MPFR->new(0);
@@ -67,10 +69,12 @@ if($nan != $zero) {$ok .= 'a'}
 if($nan != 0)     {$ok .= 'b'}
 if($nan != $one)  {$ok .= 'c'}
 if($nan != 1)     {$ok .= 'd'}
+if(!$nan)         {$ok .= 'e'}
+if($nan)          {$ok .= 'A'}
 
-if(Rmpfr_erangeflag_p()) {$ok .= 'A'}
+if(Rmpfr_erangeflag_p()) {$ok .= 'B'}
 
-if($ok eq 'abcd') {print "ok 2\n"}
+if($ok eq 'abcde') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 
 

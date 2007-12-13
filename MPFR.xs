@@ -1142,6 +1142,14 @@ void Rmpfr_urandomb(SV * x, ...) {
 void Rmpfr_random2(mpfr_t * p, SV * s, SV * exp) {
      mpfr_random2(*p, (int)SvIV(s), (mp_exp_t)SvIV(exp));
 }
+ 
+SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     return newSVuv(ret);
+}
 
 SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
      size_t ret;
@@ -1151,7 +1159,39 @@ SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
      return newSVuv(ret);
 }
 
-SV * _Rmpfr_out_str2(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
+SV * _TRmpfr_out_strS(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round, SV * suff) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     fprintf(stream, "%s", SvPV_nolen(suff));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
+SV * _TRmpfr_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     fprintf(stream, "%s", SvPV_nolen(pre));
+     fflush(stream);
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
+SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round, SV * suff) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     fprintf(stream, "%s", SvPV_nolen(pre));
+     fflush(stream);
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stream);
+     fprintf(stream, "%s", SvPV_nolen(suff));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
+SV * _Rmpfr_out_strS(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
@@ -1160,9 +1200,39 @@ SV * _Rmpfr_out_str2(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
      return newSVuv(ret);
 }
 
+SV * _Rmpfr_out_strP(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     printf("%s", SvPV_nolen(pre));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     fflush(stdout);
+     return newSVuv(ret);
+}
+
+SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     printf("%s", SvPV_nolen(pre));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     printf("%s", SvPV_nolen(suff));
+     fflush(stdout);
+     return newSVuv(ret);
+}
+
+SV * TRmpfr_inp_str(mpfr_t * p, FILE * stream, SV * base, SV * round) {
+     size_t ret;
+     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
+     ret = mpfr_inp_str(*p, stream, (int)SvIV(base), SvUV(round));
+     fflush(stream);
+     return newSVuv(ret);
+}
+
 SV * Rmpfr_inp_str(mpfr_t * p, SV * base, SV * round) {
+     size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
-     return newSVuv(mpfr_inp_str(*p, NULL, (int)SvIV(base), SvUV(round)));
+     ret = mpfr_inp_str(*p, NULL, (int)SvIV(base), SvUV(round));
+     fflush(stdin);
+     return newSVuv(ret);
 }
 
 SV * Rmpfr_gamma(mpfr_t * a, mpfr_t * b, SV * round) {
@@ -4824,6 +4894,14 @@ Rmpfr_random2 (p, s, exp)
 	return; /* assume stack size is correct */
 
 SV *
+_TRmpfr_out_str (stream, base, dig, p, round)
+	FILE *	stream
+	SV *	base
+	SV *	dig
+	mpfr_t *	p
+	SV *	round
+
+SV *
 _Rmpfr_out_str (p, base, dig, round)
 	mpfr_t *	p
 	SV *	base
@@ -4831,12 +4909,64 @@ _Rmpfr_out_str (p, base, dig, round)
 	SV *	round
 
 SV *
-_Rmpfr_out_str2 (p, base, dig, round, suff)
+_TRmpfr_out_strS (stream, base, dig, p, round, suff)
+	FILE *	stream
+	SV *	base
+	SV *	dig
+	mpfr_t *	p
+	SV *	round
+	SV *	suff
+
+SV *
+_TRmpfr_out_strP (pre, stream, base, dig, p, round)
+	SV *	pre
+	FILE *	stream
+	SV *	base
+	SV *	dig
+	mpfr_t *	p
+	SV *	round
+
+SV *
+_TRmpfr_out_strPS (pre, stream, base, dig, p, round, suff)
+	SV *	pre
+	FILE *	stream
+	SV *	base
+	SV *	dig
+	mpfr_t *	p
+	SV *	round
+	SV *	suff
+
+SV *
+_Rmpfr_out_strS (p, base, dig, round, suff)
 	mpfr_t *	p
 	SV *	base
 	SV *	dig
 	SV *	round
 	SV *	suff
+
+SV *
+_Rmpfr_out_strP (pre, p, base, dig, round)
+	SV *	pre
+	mpfr_t *	p
+	SV *	base
+	SV *	dig
+	SV *	round
+
+SV *
+_Rmpfr_out_strPS (pre, p, base, dig, round, suff)
+	SV *	pre
+	mpfr_t *	p
+	SV *	base
+	SV *	dig
+	SV *	round
+	SV *	suff
+
+SV *
+TRmpfr_inp_str (p, stream, base, round)
+	mpfr_t *	p
+	FILE *	stream
+	SV *	base
+	SV *	round
 
 SV *
 Rmpfr_inp_str (p, base, round)

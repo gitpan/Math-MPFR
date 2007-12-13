@@ -31,8 +31,11 @@ Math::MPFR-1.04 to 1.07 require MPFR-2.1.x - and you'll get errors
 if you try to build against an earlier or later version of the MPFR
 library.
 
-Math::MPFR-1.08 on require MPFR-2.2.x - and you'll get errors if
-you try to build against an earlier version of the MPFR library.
+Math::MPFR-1.08 to Math::MPFR-1.11 require MPFR-2.2.x - and you'll
+get errors if you try to build against an earlier version of the
+MPFR library.
+
+Beginning with Math::MPFR-2.01 you'll need MPFR-2.3.x.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but
@@ -89,7 +92,7 @@ you'll need to additionally link to MinGW's libgcc.a and libcoldname.a.
 First, create copies of the 4 '.a' files (named libgmp.lib, libmpfr.lib,
 libgcc.lib, libcoldname.lib) and then run:
 
-perl Makefile.pl INC="-IC:/path/to/gmp_includes -I/path/to/mpfr_includes" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+perl Makefile.pl INC="-IC:/path/to/gmp_includes -I/path/to/mpfr_includes" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -LC:/path/to/mpfr_lib -lmpfr -LC:/path/to/gmp_lib -lgmp"
 
 
 

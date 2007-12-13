@@ -1,3 +1,10 @@
+2.02
+ - Add TRmpfr_out_str/TRmpfr_inp_str (which wraps mpfr_out_str/mpfr_inp_str
+   more Truly than Rmpfr_out_str/Rmpfr_inp_str).
+ - Rmpfr_out_str now has the option to take a prefix string.
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler, GMP library and MPFR library.
+
 2.01
  - Needs version 2.3.0 (or later) of the mpfr library.
  - Add Rmpfr_j0, Rmpfr_j1, Rmpfr_jn, Rmpfr_y0, Rmpfr_y1,
