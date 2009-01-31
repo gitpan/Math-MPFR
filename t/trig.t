@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::Trig; # for checking results
 
-print "1..16\n";
+print "1..17\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -159,4 +159,13 @@ if($rop - coth($angle) < 0.000000001
 
 if($ok eq 'abcdef') {print "ok 16\n"}
 else {print "not ok 16 $ok\n"}
+
+$ok = '';
+
+Rmpfr_sinh_cosh($sinh, $cosh, $b_hinv, GMP_RNDN);
+if($sinh > 1.982318 && $sinh < 1.982319) {$ok .= 'a'}
+if($cosh > 2.22026726 && $cosh < 2.22026727) {$ok .= 'b'}
+
+if($ok eq 'ab') {print "ok 17\n"}
+else {print "not ok 17 $ok\n"}
 

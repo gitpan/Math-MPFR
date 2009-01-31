@@ -171,7 +171,10 @@ if($gmpf) {
   if($y == $z && $z == 125.5) {print "ok 5\n"}
   else {print "not ok 5 $y $z\n"}
 }
-else {print "ok 5 - skipped, no Math::GMPf\n"}
+else {
+  warn "Skipping test 5 - no Math::GMPf\n";
+  print "ok 5\n";
+}
 
 if($gmpq) {
   my $x = Math::GMPq::new('251/2');
@@ -181,7 +184,10 @@ if($gmpq) {
   if($y == $z && $z == 125.5) {print "ok 6\n"}
   else {print "not ok 6 $y $z\n"}
 }
-else {print "ok 6 - skipped, no Math::GMPq\n"}
+else {
+  warn "Skipping test 6 - no Math::GMPq\n";
+  print "ok 6\n";
+}
 
 if($gmpz) {
   my $x = Math::GMPz::new(125.5);
@@ -191,7 +197,10 @@ if($gmpz) {
   if($y == $z && $z == 125) {print "ok 7\n"}
   else {print "not ok 7 $y $z\n"}
 }
-else {print "ok 7 - skipped, no Math::GMPz\n"}
+else {
+  warn "Skipping test 7 - no Math::GMPz\n";
+  print "ok 7\n";
+}
 
 if($gmp) {
   my $x = Math::GMP->new(125);
@@ -201,7 +210,10 @@ if($gmp) {
   if($y == $z && $z == 125) {print "ok 8\n"}
   else {print "not ok 8 $y $z\n"}
 }
-else {print "ok 8 - skipped, no Math::GMP\n"}
+else {
+  warn "Skipping test 8 - no Math::GMP\n";
+  print "ok 8\n";
+}
 
 my $x = Math::MPFR::new(12345.5);
 my $y = Math::MPFR::new($x);

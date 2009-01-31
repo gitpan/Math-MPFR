@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..4\n";
+print "1..7\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -110,8 +110,10 @@ else {
   if($@ =~ /not implemented on this build of perl/i) {$ok .= 'd'}
   if($ok eq 'abcd') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
-  print "ok 2 - skipped, built without long double support\n";
-  print "ok 3 - skipped, built without long double support\n";
+  warn "Skipping test 2 - nothing to test\n";
+  print "ok 2\n";
+  warn "Skipping test 3 - nothing to test\n";
+  print "ok 3\n";
 }
 
 if(Math::MPFR::_has_longdouble()) {
@@ -154,5 +156,90 @@ if(Math::MPFR::_has_longdouble()) {
   if($ok eq 'abcdefghijklmn') {print "ok 4\n"}
   else {print "not ok 4 $ok\n"}
 }
+else {
+  warn "Skipping test 4 - no long double support\n";
+  print "ok 4\n";
+}
 
-else {print "ok 4 - skipped, built without long double support\n"}
+my $num1 = Math::MPFR->new(100);
+my $exp = \$num1;
+
+if(Math::MPFR::_has_longdouble()) {
+   my $double = Rmpfr_get_ld_2exp($exp, $num1, GMP_RNDN);
+   if($double > 0.781249 && $double < 0.781251 && $exp == 7) {print "ok 5\n"}
+   else {
+      warn "\n   Got (double): $double\n   Expected: 0.78125\n\n",
+           "   Got (exp): $exp\n   Expected: 7\n";
+      print "not ok 5\n";
+   }    
+}
+else {
+   eval{my $double = Rmpfr_get_ld_2exp($exp, $num1, GMP_RNDN);};
+   if($@ =~ /Rmpfr_get_ld_2exp\(\) not implemented/) {print "ok 5\n"}
+   else {
+      warn "\n\$\@: $@\n";
+      print "not ok 5\n";
+   }  
+}
+
+if(Math::MPFR::_has_longdouble()) {
+  my $double = (2 ** 55) + 0.5;
+
+  if($double == Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN)) {print "ok 6\n"}
+  else {
+    warn "\nGot: ", Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN) , "\nExpected: $double\n";
+    print "not ok 43\n";
+  }
+}
+else {
+  warn "Skipping test 6 - no long double support\n";
+  print "ok 6\n";
+}
+
+if(Math::MPFR::_has_longdouble()) {
+  my $nan = Math::MPFR->new();
+  my $posinf = Math::MPFR->new('inf');
+  my $neginf = Math::MPFR->new('-inf');
+
+  my $ok = '';
+
+  if($posinf == - $neginf) {$ok .= 'a'}
+  else {warn "a: $posinf ", $neginf * -1, "\n"}
+
+  my $double = Rmpfr_get_ld($nan, GMP_RNDN);
+  Rmpfr_set_ld($nan, $double, GMP_RNDN);
+  if(Rmpfr_nan_p($nan)) {$ok .= 'b'}
+  else {warn "b: $nan\n"} 
+
+  $double = Rmpfr_get_ld($posinf, GMP_RNDN);
+  Rmpfr_set_ld($posinf, $double, GMP_RNDN);
+  if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'c'}
+  else {warn "c: $posinf\n"} 
+
+  $double = Rmpfr_get_ld($neginf, GMP_RNDN);
+  Rmpfr_set_ld($neginf, $double, GMP_RNDN);
+  if(Rmpfr_inf_p($neginf) && $neginf < 0) {$ok .= 'd'}
+  else {warn "d: $neginf\n"}
+
+  $double = Rmpfr_get_NV($nan, GMP_RNDN);
+  Rmpfr_set_ld($nan, $double, GMP_RNDN);
+  if(Rmpfr_nan_p($nan)) {$ok .= 'e'}
+  else {warn "e: $nan\n"} 
+
+  $double = Rmpfr_get_NV($posinf, GMP_RNDN);
+  Rmpfr_set_ld($posinf, $double, GMP_RNDN);
+  if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'f'}
+  else {warn "f: $posinf\n"} 
+
+  $double = Rmpfr_get_NV($neginf, GMP_RNDN);
+  Rmpfr_set_ld($neginf, $double, GMP_RNDN);
+  if(Rmpfr_inf_p($neginf) && $neginf < 0) {$ok .= 'g'}
+  else {warn "g: $neginf\n"}
+
+  if($ok eq 'abcdefg') {print "ok 7\n"}
+  else {print "not ok 7 $ok\n"} 
+}
+else {
+  warn "Skipping test 7 - no long double support\n";
+  print "ok 7\n";
+}

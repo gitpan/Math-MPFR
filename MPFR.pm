@@ -8,7 +8,8 @@
     use constant GMP_RNDD => 3;
 
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-                MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING);
+                MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
+                RMPFR_PREC_MIN RMPFR_PREC_MAX);
 
     use overload
     '+'    => \&overload_add,
@@ -48,10 +49,12 @@
 
     @Math::MPFR::EXPORT_OK = qw(GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
-MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM 
+MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM
+RMPFR_PREC_MIN RMPFR_PREC_MAX
 Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
 Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
-Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q Rmpfr_add_ui Rmpfr_add_z 
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
+Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z 
 Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh 
 Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear 
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
@@ -60,14 +63,19 @@ Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
 Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler 
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth 
 Rmpfr_csc Rmpfr_csch
-Rmpfr_deref2 Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
+Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
 Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint 
 Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp 
-Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui Rmpfr_fits_slong_p 
-Rmpfr_fits_ulong_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
-Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
+Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
+Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
+Rmpfr_fits_sshort_p Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p
+Rmpfr_fits_ulong_p Rmpfr_fits_IV_p Rmpfr_fits_UV_p
+Rmpfr_fits_ushort_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
+Rmpfr_get_d Rmpfr_get_IV Rmpfr_get_UV Rmpfr_get_NV
+Rmpfr_get_d_2exp Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
 Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin 
-Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld 
+Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld
+Rmpfr_get_ld_2exp 
 Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui 
 Rmpfr_get_uj
 Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp Rmpfr_greater_p Rmpfr_greaterequal_p
@@ -98,16 +106,22 @@ Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp 
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
-Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
-Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize Rmpfr_swap 
+Rmpfr_sin_cos Rmpfr_sinh_cosh 
+Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
+Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize 
+Rmpfr_sum Rmpfr_swap 
 Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui 
 Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p 
-Rmpfr_zeta
+Rmpfr_zeta Rmpfr_zeta_ui
 Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
-Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld);
+Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
+Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
+Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_sprintf_ret
+);
 
-    $Math::MPFR::VERSION = '2.02';
+    $Math::MPFR::VERSION = '2.03';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -115,9 +129,11 @@ Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld);
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM 
+RMPFR_PREC_MIN RMPFR_PREC_MAX
 Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
 Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
-Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q Rmpfr_add_ui Rmpfr_add_z 
+Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
+Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z 
 Rmpfr_agm Rmpfr_asin Rmpfr_asinh Rmpfr_atan Rmpfr_atan2 Rmpfr_atanh 
 Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear 
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
@@ -126,14 +142,19 @@ Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
 Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler 
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth 
 Rmpfr_csc Rmpfr_csch
-Rmpfr_deref2 Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
+Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui 
 Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint 
 Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp 
-Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui Rmpfr_fits_slong_p 
-Rmpfr_fits_ulong_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
-Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
+Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
+Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
+Rmpfr_fits_sshort_p Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p
+Rmpfr_fits_ulong_p Rmpfr_fits_IV_p Rmpfr_fits_UV_p
+Rmpfr_fits_ushort_p Rmpfr_floor Rmpfr_fma Rmpfr_frac Rmpfr_free_cache Rmpfr_gamma 
+Rmpfr_get_d Rmpfr_get_IV Rmpfr_get_UV Rmpfr_get_NV
+Rmpfr_get_d_2exp Rmpfr_get_d1 Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode 
 Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin 
-Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld 
+Rmpfr_get_emin_max Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_ld
+Rmpfr_get_ld_2exp 
 Rmpfr_get_prec Rmpfr_get_si Rmpfr_get_sj Rmpfr_get_str Rmpfr_get_ui
 Rmpfr_get_uj 
 Rmpfr_get_version Rmpfr_get_z Rmpfr_get_z_exp Rmpfr_greater_p Rmpfr_greaterequal_p
@@ -164,14 +185,19 @@ Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
-Rmpfr_sin_cos Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
-Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize Rmpfr_swap 
+Rmpfr_sin_cos Rmpfr_sinh_cosh
+Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
+Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
+Rmpfr_sum Rmpfr_swap 
 Rmpfr_tan Rmpfr_tanh Rmpfr_trunc Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui 
 Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p Rmpfr_urandomb Rmpfr_zero_p 
-Rmpfr_zeta
+Rmpfr_zeta Rmpfr_zeta_ui
 Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
+Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
+Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_sprintf_ret
 )]);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
@@ -297,10 +323,30 @@ sub new {
 
     # Create a Math::MPFR object that has $arg1 as its value.
     # Die if there are any additional args (unless $type == 4)
-    if($type < 3) { # UOK or IOK
+    if($type == 1) { # UOK
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-      @ret = Rmpfr_init_set_str($arg1, 10, Rmpfr_get_default_rounding_mode());
-      return $ret[0];
+      if(Math::MPFR::_has_longlong()) {
+        my $ret = Rmpfr_init();
+	Rmpfr_set_uj($ret, $arg1, Rmpfr_get_default_rounding_mode());
+	return $ret;
+      }
+      else {
+        @ret = Rmpfr_init_set_ui($arg1, Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+      }
+    }
+
+    if($type == 2) { # IOK
+      if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+      if(Math::MPFR::_has_longlong()) {
+        my $ret = Rmpfr_init();
+	Rmpfr_set_sj($ret, $arg1, Rmpfr_get_default_rounding_mode());
+	return $ret;
+      }
+      else {
+        @ret = Rmpfr_init_set_si($arg1, Rmpfr_get_default_rounding_mode());
+        return $ret[0];
+      }
     }
 
     if($type == 3) { # NOK
@@ -350,6 +396,35 @@ sub new {
     }  
 }
 
+sub Rmpfr_printf {
+    if(@_ == 3){wrap_mpfr_printf_rnd(@_)}
+    else {die "Rmpfr_printf must take 2 or 3 arguments: format string, [rounding,], and variable" if @_ != 2;
+    wrap_mpfr_printf(@_)}
+}
+
+sub Rmpfr_fprintf {
+    if(@_ == 4){wrap_mpfr_fprintf_rnd(@_)}
+    else {die "Rmpfr_fprintf must take 3 or 4 arguments: filehandle, format string, [rounding,], and variable" if @_ != 3;
+    wrap_mpfr_fprintf(@_)}
+}
+
+sub Rmpfr_sprintf {
+    my $len;
+    if(@_ == 4){$len = wrap_mpfr_sprintf_rnd(@_)}
+    else {die "Rmpfr_sprintf must take 3 or 4 arguments: buffer, format string, [rounding,], and variable" if @_ != 3;
+    $len = wrap_mpfr_sprintf(@_)}
+    $_[0] = substr($_[0], 0, $len);
+    return $len;
+}
+
+sub Rmpfr_sprintf_ret {
+    my $len;
+    if(@_ == 4){$len = wrap_mpfr_sprintf_rnd(@_)}
+    else {die "Rmpfr_sprintf must take 3 or 4 arguments: buffer, format string, [rounding,], and variable" if @_ != 3;
+    $len = wrap_mpfr_sprintf(@_)}
+    return substr($_[0], 0, $len);
+}
+
 sub MPFR_VERSION {return _MPFR_VERSION()}
 sub MPFR_VERSION_MAJOR {return _MPFR_VERSION_MAJOR()}
 sub MPFR_VERSION_MINOR {return _MPFR_VERSION_MINOR()}
@@ -369,7 +444,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    This module needs the MPFR and GMP C libraries. (Install GMP
    first as it is a pre-requisite for MPFR.)
 
-   The GMP library is availble from http://swox.com/gmp/
+   The GMP library is availble from http://gmplib.org
    The MPFR library is available from http://www.mpfr.org/
 
 =head1 DESCRIPTION
@@ -405,7 +480,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    # my $str = '1.23542e1';
    # or:
    # my $str = '1.23542E1';
-  
 
    my $base = 10;
    my $rnd = GMP_RNDZ; # Rounding mode - can be set to
@@ -589,7 +663,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    or 'zsa34760sdfgq123r5@11' which would have to represent a base 36
    number (because "z" is a valid digit only in base 36). Valid
    bases for MPFR numbers are 2 to 36 (inclusive).
- 
+
    "$rnd" is simply one of the 4 rounding mode values (discussed above).
 
    "$p" is the (unsigned long) value for precision.
@@ -603,7 +677,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     The default rounding mode is to nearest initially (GMP_RNDN).
     The default rounding mode is the rounding mode that
     is used in overloaded operations.
- 
+
    $si = Rmpfr_get_default_rounding_mode();
     Returns the numeric value (0, 1, 2 or 3) of the
     current default rounding mode. This will initially be 0.
@@ -663,6 +737,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     result is smaller than the exact one. Note that unlike most
     functions, the result is compared to the exact one, not the input
     value $op, i.e. the ternary value is propagated.
+    Note: If $op is an infinity and $si1 is different from zero
+    (i.e., if the rounded result is an inexact infinity), then the
+    overflow flag is set.
 
    Rmpfr_set_underflow();
    Rmpfr_set_overflow();
@@ -749,6 +826,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $minimum_precision = Rmpfr_min_prec();
    $maximum_precision = Rmpfr_max_prec();
+   $minimum_precision = RMPFR_PREC_MIN;
+   $maximum_precision = RMPFR_PREC_MAX;
     Returns the minimum/maximum allowed precision
 
    ##########
@@ -759,7 +838,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_ui($rop, $ui, $rnd);
    $si = Rmpfr_set_si($rop, $si, $rnd);
    $si = Rmpfr_set_sj($rop, $sj, $rnd); # 64 bit
+   $si = Rmpfr_set_uj($rop, $uj, $rnd); # 64 bit
    $si = Rmpfr_set_d($rop, $double, $rnd);
+   $si = Rmpfr_set_ld($rop, $ld, $rnd); # long double
    $si = Rmpfr_set_z($rop, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
    $si = Rmpfr_set_f($rop, $f, $rnd); # $f is a mpf object.
@@ -776,6 +857,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_set_ui_2exp($rop, $ui, $exp, $rnd);
    $si = Rmpfr_set_si_2exp($rop, $si, $exp, $rnd);
+   $si = Rmpfr_set_uj_2exp($rop, $sj, $exp, $rnd); # 64 bit
    $si = Rmpfr_set_sj_2exp($rop, $sj, $exp, $rnd); # 64 bit
     Set the value of $rop from the 2nd arg multiplied by two to the
     power $exp, rounded towards the given direction $rnd.  Note that
@@ -814,34 +896,49 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     rounded in the direction $rnd. If successful, the result is
     stored in $rop. If $str doesn't start with a valid number then
     $rop is set to zero.
-    Parsing follows the standard C `strtod' function.  This means
-    optional leading whitespace, an optional `+' or `-', mantissa
-    digits, and an  optional exponent consisting of an `e' or `E'
-    (if $base <= 10) or `@', an optional sign, and digits.   A hex
-    mantissa can be given with a leading `0x' or `0X', in which case
-    `p' or `P' may introduce an optional binary exponent. A binary
-    mantissa can be given with a leading `0b' or `0B', in which case
-    `e', `E', `p', `P' or `@' may introduce the  binary exponent.
-    In addition `infinity', `inf' (if BASE <= 10)  or `@inf@' with an
-    optional sign, or `nan',  `nan(n-char-sequence)' (if $base <= 10),
-    `@nan@'  or `@nan@(n-char-sequence)' all non case significant, can
-    be given. A `n-char-sequence' is a string containing only digits
-    (0, 1, 2, ..., 9)  and non-digits (_, a, b, ..., z, A, B, ..., Z).
-    There must be at least one digit in the mantissa for the number to
-    be valid. If an exponent has no digits it's ignored and parsing
-    stops after the mantissa.  If an `0x', `0X', `0b' or  `0B' is not
-    followed by hexadecimal/binary digits, parsing stops after the
-    first `0'.
-    Note that in the hex format the exponent `P' represents a power of
-    2,  whereas `@' represents a power of the base (i.e. 16).
-    If the argument $base is different from 0, it must be in the range
-    2 to 36. Case is ignored; upper-case and lower-case letters have
-    the same value.
-    If `base' is 0, then it tries to identify the used base: if the
-    mantissa begins with the `0x' prefix, it assumes that BASE is 16.
-    If it begins with `0b', it assumes that BASE is 2. Otherwise, it
-    assumes it is 10.
-    It returns a usual ternary value.
+    Parsing follows the standard C `strtod' function with some
+    extensions.  Case is ignored. After optional leading whitespace,
+    one has a subject sequence consisting of an optional sign (`+' or
+    `-'), and either numeric data or special data. The subject
+    sequence is defined as the longest initial subsequence of the
+    input string, starting with the first non-whitespace character,
+    that is of the expected form.
+    The form of numeric data is a non-empty sequence of significand
+    digits with an optional decimal point, and an optional exponent
+    consisting of an exponent prefix followed by an optional sign and
+    a non-empty sequence of decimal digits. A significand digit is
+    either a decimal digit or a Latin letter (62 possible characters),
+    with `a' = 10, `b' = 11, ..., `z' = 36; its value must be strictly
+    less than the base.  The decimal point can be either the one
+    defined by the current locale or the period (the first one is
+    accepted for consistency with the C standard and the practice, the
+    second one is accepted to allow the programmer to provide MPFR
+    numbers from strings in a way that does not depend on the current
+    locale).  The exponent prefix can be `e' or `E' for bases up to
+    10, or `@' in any base; it indicates a multiplication by a power
+    of the base. In bases 2 and 16, the exponent prefix can also be
+    `p' or `P', in which case it introduces a binary exponent: it
+    indicates a multiplication by a power of 2 (there is a difference
+    only for base 16).  The value of an exponent is always written in
+    base 10.  In base 2, the significand can start with `0b' or `0B',
+    and in base 16, it can start with `0x' or `0X'.
+    If the argument BASE is 0, then the base is automatically detected
+    as follows. If the significand starts with `0b' or `0B', base 2 is
+    assumed. If the significand starts with `0x' or `0X', base 16 is
+    assumed. Otherwise base 10 is assumed.
+    Note: The exponent must contain at least a digit. Otherwise the
+    possible exponent prefix and sign are not part of the number
+    (which ends with the significand). Similarly, if `0b', `0B', `0x'
+    or `0X' is not followed by a binary/hexadecimal digit, then the
+    subject sequence stops at the character `0'.
+    Special data (for infinities and NaN) can be `@inf@' or
+    `@nan@(n-char-sequence)', and if BASE <= 16, it can also be
+    `infinity', `inf', `nan' or `nan(n-char-sequence)', all case
+    insensitive.  A `n-char-sequence' is a non-empty string containing
+    only digits, Latin letters and the underscore (0, 1, 2, ..., 9, a,
+    b, ..., z, A, B, ..., Z, _). Note: one has an optional sign for
+    all data, even NaN.
+    The function returns a usual ternary value.
 
    Rmpfr_set_str_binary($rop, $str);
     Set $rop to the value of the binary number in $str, which has to
@@ -921,7 +1018,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      See `Rmpfr_set_str' (above) and 'Rmpfr_inp_str' (below).
 
    ##########
-  
+
    CONVERSION
 
    $str = Rmpfr_get_str($op, $base, $digits, $rnd); 
@@ -951,26 +1048,41 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $str will be set to "231".
     (This function is mainly to provide a simple means of getting 'sj'
     and 'uj' values on a 64-bit perl where the MPFR library does not
-    support mpfr_get_uj and mpfr_get_sj functions - which happens, for
-    example, with libraries built with Microsoft Compilers.)
+    support mpfr_get_uj and mpfr_get_sj functions - which may happen,
+    for example, with libraries built with Microsoft Compilers.)
 
+   $bool = Rmpfr_fits_ushort_p($op, $rnd); # fits in unsigned long
+   $bool = Rmpfr_fits_sshort_p($op, $rnd); # fits in signed long
+   $bool = Rmpfr_fits_uint_p($op, $rnd); # fits in unsigned long
+   $bool = Rmpfr_fits_sint_p($op, $rnd); # fits in signed long
    $bool = Rmpfr_fits_ulong_p($op, $rnd); # fits in unsigned long
    $bool = Rmpfr_fits_slong_p($op, $rnd); # fits in signed long
-    Return non-zero if $op would fit in the respective C data
+   $bool = Rmpfr_fits_uintmax_p($op, $rnd); # fits in unsigned long
+   $bool = Rmpfr_fits_intmax_p($op, $rnd); # fits in signed long
+   $bool = Rmpfr_fits_IV_p($op, $rnd); # fits in perl IV
+   $bool = Rmpfr_fits_UV_p($op, $rnd); # fits in perl UV
+    Return non-zero if $op would fit in the respective data
     type, when rounded to an integer in the direction $rnd.
 
-   $ui = Rmpfr_get_ui($op, $rnd);
+   $ui = Rmpfr_get_ui($op, $rnd); 
    $si = Rmpfr_get_si($op, $rnd);
    $sj = Rmpfr_get_sj($op, $rnd); # 64 bit builds only
-    Convert $op to a 'signed long', a 'signed long long' or an
-    `unsigned long' after rounding it with respect to $rnd.
+   $uj = Rmpfr_get_uj($op, $rnd); # 64 bit builds only
+   $uv = Rmpfr_get_UV($op, $rnd); # 32 and 64 bit
+   $iv = Rmpfr_get_IV($op, $rnd); # 32 and 64 bit
+    Convert $op to an 'unsigned long long', a 'signed long', a
+   'signed long long', an `unsigned long long', a 'UV', or an
+   'IV' - after rounding it with respect to $rnd.
     If $op is NaN, the result is undefined. If $op is too big
     for the return type, it returns the maximum or the minimum
     of the corresponding C type, depending on the direction of
     the overflow. The flag erange is then also set.
 
    $double = Rmpfr_get_d($op, $rnd);
-    Convert $op to a double, using the rounding mode $rnd.
+   $ld     = Rmpfr_get_ld($op, $rnd);
+   $nv     = Rmpfr_get_NV($op, $rnd);
+    Convert $op to a 'double' a 'long double' or an 'NV', using
+    the rounding mode $rnd.
 
    $double = Rmpfr_get_d1($op);
     Convert $op to a double, using the default MPFR rounding mode
@@ -989,18 +1101,38 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Return zero iff no error occurred, in particular a non-zero value
     is returned if $op is NaN or Inf, which do not exist in `mpf'.
 
+   $d = Rmpfr_get_d_2exp ($exp, $op, $rnd); # $d is NV (double)
+   $d = Rmpfr_get_ld_2exp ($exp, $op, $rnd); # $d is NV (long double)
+    Set $exp and $d such that 0.5<=abs($d)<1 and $d times 2 raised
+    to $exp equals $op rounded to double (resp. long double)
+    precision, using the given rounding mode.  If $op is zero, then a
+    zero of the same sign (or an unsigned zero, if the implementation
+    does not have signed zeros) is returned, and $exp is set to 0.
+    If $op is NaN or an infinity, then the corresponding double
+    precision (resp. long-double precision) value is returned, and 
+    $exp is undefined.
+
    ##########
 
    ARITHMETIC
 
    $si = Rmpfr_add($rop, $op1, $op2, $rnd);
    $si = Rmpfr_add_ui($rop, $op, $ui, $rnd);
+   $si = Rmpfr_add_si($rop, $op, $si1, $rnd);
+   $si = Rmpfr_add_d($rop, $op, $double, $rnd);
    $si = Rmpfr_add_z($rop, $op, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_add_q($rop, $op, $q, $rnd); # $q is a mpq object.
     Set $rop to 2nd arg + 3rd arg rounded in the direction $rnd.
     The return  value is zero if $rop is exactly 2nd arg + 3rd arg,
     positive if $rop is larger than 2nd arg + 3rd arg, and negative
     if $rop is smaller than 2nd arg + 3rd arg.
+
+   $si = Rmpfr_sum($rop, \@ops, scalar(@ops), $rnd);
+    @ops is an array consisting entirely of Math::MPFR objects.
+    Set $rop to the sum of all members of @ops, rounded in the direction
+    $rnd. $si is zero when the computed value is the exact value, and
+    non-zero when this cannot be guaranteed, without giving the direction
+    of the error as the other functions do. 
 
    $si = Rmpfr_sub($rop, $op1, $op2, $rnd);
    $si = Rmpfr_sub_ui($rop, $op, $ui, $rnd);
@@ -1009,6 +1141,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_ui_sub($rop, $ui, $op, $rnd);
    $si = Rmpfr_si_sub($rop, $si1, $op, $rnd);
    $si = Rmpfr_sub_si($rop, $op, $si1, $rnd);
+   $si = Rmpfr_sub_d($rop, $op, $double, $rnd);
+   $si = Rmpfr_d_sub($rop, $double, $op, $rnd);
     Set $rop to 2nd arg - 3rd arg rounded in the direction $rnd.
     The return value is zero if $rop is exactly 2nd arg - 3rd arg,
     positive if $rop is larger than 2nd arg - 3rd arg, and negative
@@ -1017,6 +1151,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_mul($rop, $op1, $op2, $rnd);
    $si = Rmpfr_mul_ui($rop, $op, $ui, $rnd);
    $si = Rmpfr_mul_si($rop, $op, $si1, $rnd);
+   $si = Rmpfr_mul_d($rop, $op, $double, $rnd);
    $si = Rmpfr_mul_z($rop, $op, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_mul_q($rop, $op, $q, $rnd); # $q is a mpq object.
     Set $rop to 2nd arg * 3rd arg rounded in the direction $rnd.
@@ -1025,11 +1160,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_div($rop, $op1, $op2, $rnd);
    $si = Rmpfr_div_ui($rop, $op, $ui, $rnd);
+   $si = Rmpfr_ui_div($rop, $ui, $op, $rnd);
    $si = Rmpfr_div_si($rop, $op, $si1, $rnd);
    $si = Rmpfr_si_div($rop, $si1, $op, $rnd);
+   $si = Rmpfr_div_d($rop, $op, $double, $rnd);
+   $si = Rmpfr_d_div($rop, $double, $op, $rnd);
    $si = Rmpfr_div_z($rop, $op, $z, $rnd); # $z is a mpz object.
    $si = Rmpfr_div_q($rop, $op, $q, $rnd); # $q is a mpq object.
-   $si = Rmpfr_ui_div($rop, $ui, $op, $rnd);
     Set $rop to 2nd arg / 3rd arg rounded in the direction $rnd. 
     These functions return 0 if the division is exact, a positive
     value when $rop is larger than 2nd arg divided by 3rd arg,
@@ -1038,13 +1175,18 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_sqr($rop, $op, $rnd);
     Set $rop to the square of $op, rounded in direction $rnd.
 
-   $bool = Rmpfr_sqrt($rop, $op, $rnd);
-   $bool = Rmpfr_sqrt_ui($rop, $ui, $rnd);
+   $si = Rmpfr_sqrt($rop, $op, $rnd);
+   $si = Rmpfr_sqrt_ui($rop, $ui, $rnd);
     Set $rop to the square root of the 2nd arg rounded in the
     direction $rnd. Set $rop to NaN if 2nd arg is negative.
     Return 0 if the operation is exact, a non-zero value otherwise.
 
-   $bool = Rmpfr_cbrt($rop, $op, $rnd);
+   $si = Rmpfr_rec_sqrt($rop, $op, $rnd);
+    Set $rop to the reciprocal square root of $op rounded in the
+    direction $rnd. Return +Inf if OP is ±0, and +0 if OP is +Inf.
+    Set $rop to NaN if $op is negative.
+
+   $si = Rmpfr_cbrt($rop, $op, $rnd);
     Set $rop to the cubic root (defined over the real numbers)
     of $op, rounded in the direction $rnd.
 
@@ -1076,6 +1218,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     is larger than the absolute value of $op, and a negative value 
     otherwise.
 
+   $si = Rmpfr_dim($rop, $op1, $op2, $rnd);
+    Set $rop to the positive difference of $op1 and $op2, i.e.,
+    $op1 - $op2 rounded in the direction $rnd if $op1 > $op2, and
+    +0 otherwise. $rop is set to NaN when $op1 or $op2 is NaN.
+
    $si = Rmpfr_mul_2exp($rop, $op, $ui, $rnd);
    $si = Rmpfr_mul_2ui($rop, $op, $ui, $rnd);
    $si = Rmpfr_mul_2si($rop, $op, $si, $rnd);
@@ -1106,6 +1253,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_cmpabs($op1, $op2);
    $si = Rmpfr_cmp_ui($op, $ui);
    $si = Rmpfr_cmp_si($op, $si);
+   $si = Rmpfr_cmp_d($op, $double);
+   $si = Rmpfr_cmp_ld($op, $ld); # long double
    $si = Rmpfr_cmp_z($op, $z); # $z is a mpz object
    $si = Rmpfr_cmp_q($op, $q); # $q is a mpq object
    $si = Rmpfr_cmp_f($op, $f); # $f is a mpf object
@@ -1126,6 +1275,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     3rd arg.
 
    $bool = Rmpfr_eq($op1, $op2, $ui);
+    The mpfr library function mpfr_eq may change in future 
+    releases of the mpfr library (post 2.4.0). If that happens,
+    the change will also be relected in Rmpfr_eq.
     Return non-zero if the first $ui bits of $op1 and $op2 are
     equal, zero otherwise.  I.e., tests if $op1 and $op2 are 
     approximately equal.
@@ -1207,11 +1359,18 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     than the actual value. Return a positive result iff the
     return is greater than the actual value.
 
-   $bool = Rmpfr_sin_cos($rop1, $rop2, $op, $rnd);
+   $si = Rmpfr_sin_cos($rop1, $rop2, $op, $rnd);
     Set simultaneously $rop1 to the sine of $op and
     $rop2 to the cosine of $op, rounded to the direction $rnd
     with their corresponding precisions.  Return 0 iff both
     results are exact.
+
+   $si = Rmpfr_sinh_cosh($rop1, $rop2, $op, $rnd);
+    Set simultaneously $rop1SOP to the hyperbolic sine of $op and
+    $rop2 to the hyperbolic cosine of $op, rounded in the direction
+    $rnd with the corresponding precision of $rop1 and $rop2 which
+    must be different variables. Return 0 iff both results are
+    exact.
 
    $si = Rmpfr_acos($rop, $op, $rnd);
    $si = Rmpfr_asin($rop, $op, $rnd);
@@ -1364,7 +1523,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     is undefined, and when OP is ±0, $signp is the sign of the zero.
 
    $si = Rmpfr_zeta($rop, $op, $rnd);
-    Set $rop to the value of the Riemann Zeta function on $op,
+   $si = Rmpfr_zeta_ui($rop, $ul, $rnd);
+    Set $rop to the value of the Riemann Zeta function on 2nd arg,
     rounded to the direction $rnd. Return zero if $rop is exact,
     a positive value if $rop is larger than the exact value, or
     a negative value if $rop is less than the exact value.
@@ -1403,6 +1563,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_eint ($rop, $op, $rnd)
      Set $rop to the exponential integral of $op, rounded in the
      direction $rnd. See the MPFR documentation for details.
+
+   $si = Rmpfr_li2 ($rop, $op, $rnd);
+    Set $rop to real part of the dilogarithm of $op, rounded in the
+    direction $rnd. The dilogarithm function is defined here as
+    the integral of -log(1-t)/t from 0 to x.
 
    #############
 
@@ -1547,18 +1712,33 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     affects only how the exact fractional part is rounded, not how
     the fractional part is generated).
 
-   $si = Rmpfr_remainder ($rop, $op1, $op2, $rnd);
+   $si = Rmpfr_modf ($rop1, $rop2, $op, $rnd);
+    Set simultaneously $rop1 to the integral part of $op and $rop2
+    to the fractional part of $op, rounded in the direction RND with
+    the corresponding precision of $rop1 and $rop2 (equivalent to
+    `Rmpfr_trunc($rop1, $op, $rnd)' and `Rmpfr_frac($rop1, $op, $rnd)').
+    The variables $rop1 and $rop2 must be different. Return 0 iff both
+    results are exact.
+
+   $si = Rmpfr_remainder($rop, $op1, $op2, $rnd);
+   $si = Rmpfr_fmod($rop, $op1, $op2, $rnd);
    ($si2, $si) = Rmpfr_remquo ($rop, $op1, $op2, $rnd);
     Set $rop to the remainder of the division of $op1 by $op2, with
-    quotient rounded to the nearest integer (ties rounded to even), and
-    $rop rounded according to the direction $rnd.  If $rop is zero, it
-    has the sign of $op1.  The return value is the inexact flag
-    corresponding to $rop.  Additionally, `Rmpfr_remquo' stores the low
-    significant bits from the quotient in $si2, with the sign of $op1
-    divided by $op2 (except if those low bits are all zero, in which 
-    case zero is returned). Note that $op1 may be so large in magnitude
-    relative to $op2 that an exact representation of the quotient is 
-    not practical. These functions are useful for additive argument
+    quotient rounded toward zero for 'Rmpfr_fmod' and to the nearest
+    integer (ties rounded to even) for 'Rmpfr_remainder' and 
+    'Rmpfr_remquo', and $rop rounded according to the direction $rnd.
+    Special values are handled as described in Section F.9.7.1 of the
+    ISO C99 standard: If $op1 is infinite or $op2 is zero, $rop is NaN.
+    If $op2 is infinite and $op1 is finite, $rop is $op1 rounded to
+    the precision of $rop. If $rop is zero, it has the sign of $op1.
+    The return value is the ternary value corresponding to $rop.
+    Additionally, `Rmpfr_remquo' stores the low significant bits from
+    the quotient in $si2 (more precisely the number of bits in a `long'
+    minus one), with the sign of $op1 divided by $op2 (except if those
+    low bits are all zero, in which case zero is returned).  Note that
+    $op1 may be so large in magnitude relative to $op2 that an exact
+    representation of the quotient is not practical.  `Rmpfr_remainder'
+    and `Rmpfr_remquo' functions are useful for additive argument
     reduction.
 
    $si = Rmpfr_integer_p($op);
@@ -1606,6 +1786,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     either you call Rgmp_randclear, or the program ends.
 
    Rmpfr_random2($rop, $si, $ui);
+    The mpfr library function mpfr_random2 will be suprressed in
+    future versions (post 2.4.0) of the mpfr library - hence
+    Rmpfr_random2 will likewise be suppressed in future versions
+    Math::MPFR (post 2.03).
     Generate a random float of at most abs($si) limbs, with long
     strings of zeros and ones in the binary representation.
     The exponent of the number is in the interval -$ui to
@@ -1642,7 +1826,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     for $a, $c. and $m2exp are selected from a table, chosen
     so that $ui bits (or more) of each X will be used.
     (The GMP function is documented in the GMP, not MPFR, docs.)
-    
 
    Rgmp_randseed($state, $seed);
     $state is a reference to a gmp_randstate_t strucure (the
@@ -1699,7 +1882,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    ####################
 
    OPERATOR OVERLOADING
-    
+
     Overloading works with numbers, strings (bases 2, 10, and 16
     only - see step '4.' below) and Math::MPFR objects.
     Overloaded operations are performed using the current
@@ -1772,12 +1955,58 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    #####################
 
+   FORMATTED OUTPUT
+
+   Rmpfr_printf($format_string, [$rnd,] $var);
+
+    This function (unlike the MPFR counterpart) is limited to taking
+    2 or 3 arguments - the format string, optionally a rounding argument,
+    and the variable to be formatted.
+    That is, you can currently printf only one variable at a time.
+    See the mpfr documentation for details re the formatting options.
+    Note: Courtesy of operator overloading, you can also use perl's
+    printf() function with Math::MPFR objects.
+
+   Rmpfr_fprintf($fh, $format_string, [$rnd,] $var);
+
+    This function (unlike the MPFR counterpart) is limited to taking
+    3 or 4 arguments - the filehandle, the format string, optionally a
+    rounding argument, and the variable to be formatted. That is, you
+    can printf only one variable at a time.
+    See the mpfr documentation for details re the formatting options.
+
+   Rmpfr_sprintf($buffer, $format_string, [$rnd,] $var);
+
+    This function (unlike the MPFR counterpart) is limited to taking
+    3 or 4 arguments - the buffer, the format string, optionally a
+    rounding argument, and the variable to be formatted. $buffer must be
+    large enough to accommodate the formatted string, and is truncated
+    to the length of that formatted string. If you prefer to have the
+    resultant string returned (rather than stored in $buffer), use
+    Rmpfrf_sprintf_ret instead - which will also leave the length of
+    $buffer unaltered. 
+    See the mpfr documentation for details re the formatting options.
+    Note: Courtesy of operator overloading, you can also use perl's
+    sprintf() function with Math::MPFR objects.
+
+   $string = Rmpfr_sprintf_ret($buffer, $format_string, [$rnd,] $var);
+
+    As for Rmpfr_sprintf, but returns the formatted string, rather than
+    storing it in $buffer. $buffer needs to be large enough to 
+    accommodate the formatted string. The length of $buffer will be
+    unaltered.
+    See the mpfr documentation for details re the formatting options.
+    Note: Courtesy of operator overloading, you can also use perl's
+    sprintf() function with Math::MPFR objects.
+
+   #####################
+
 =head1 BUGS
 
-   You can get segfaults if you pass the wrong type of
-   argument to the functions - so if you get a segfault, the
-   first thing to do is to check that the argument types 
-   you have supplied are appropriate.
+    You can get segfaults if you pass the wrong type of
+    argument to the functions - so if you get a segfault, the
+    first thing to do is to check that the argument types 
+    you have supplied are appropriate.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1787,8 +2016,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
 =head1 LICENSE
 
-    This perl code is free software; you may redistribute it
-    and/or modify it under the same terms as Perl itself.
+    This program is free software; you may redistribute it and/or 
+    modify it under the same terms as Perl itself.
+    Copyright 2006-2008, Sisyphus
 
 =head1 AUTHOR
 

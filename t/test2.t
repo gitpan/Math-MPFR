@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
 
-print "1..5\n";
+print "1..7\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -24,8 +24,11 @@ if($have_gmp) {
   if($c == 1123 && Math::MPFR::get_refcnt($z) == 1
      && Math::MPFR::get_package_name($z) eq "Math::GMP") {print "ok 1\n"}
   else {print "not ok 1\n"}
-  }
-else {print "ok 1 - skipped - no Math::GMP\n"}
+}
+else {
+  warn "Skipping test 1 - no Math::GMP\n";
+  print "ok 1\n";
+}
 
 if($have_gmp) {
   Rmpfr_set_prec($c, 53);
@@ -35,8 +38,11 @@ if($have_gmp) {
   if($exp == -51 && "$z" eq '4503599627370496'
      && Math::MPFR::get_package_name($z) eq "Math::GMP") {print "ok 2\n"}
   else {print "not ok 2\n"}
-  }
-else {print "ok 2 - skipped - no Math::GMP\n"}
+}
+else {
+  warn "Skipping test 2 - no Math::GMP\n";
+  print "ok 2\n";
+}
 
 if($have_gmp) {
   $z = Math::GMP->new(11234);
@@ -48,8 +54,11 @@ if($have_gmp) {
      && $check2 - $c < 0.000001
      && Math::MPFR::get_package_name($z) eq "Math::GMP") {print "ok 3\n"}
   else {print "not ok 3\n"}
-  }
-else {print "ok 3 - skipped - no Math::GMP\n"}
+}
+else {
+  warn "Skipping test 3 - no Math::GMP\n";
+  print "ok 3\n";
+}
 
 if($have_gmp) {
   $z = Math::GMP->new("1123");
@@ -57,8 +66,11 @@ if($have_gmp) {
   if($c == 1123 && Math::MPFR::get_refcnt($z) == 1
      && Math::MPFR::get_package_name($z) eq "Math::GMP") {print "ok 4\n"}
   else {print "not ok 4\n"}
-  }
-else {print "ok 4 - skipped - no Math::GMP\n"}
+}
+else {
+  warn "Skipping test 4 - no Math::GMP\n";
+  print "ok 4\n";
+}
 
 if($have_gmp) {
   $z = Math::GMP->new(17);
@@ -69,6 +81,27 @@ if($have_gmp) {
  
   if($c == $check2) {print "ok 5\n"}
   else {print "not ok 5\n"}
-  }
-else {print "ok 5 - skipped - no Math::GMP\n"}
+}
+else {
+  warn "Skipping test 5 - no Math::GMP\n";
+  print "ok 5\n";
+}
+
+my $op1 = Math::MPFR->new(123);
+my $op2 = Math::MPFR->new(456);
+my $rop = Math::MPFR->new();
+
+Rmpfr_dim($rop, $op1, $op2, GMP_RNDN);
+if($rop == 0) {print "ok 6\n"}
+else {
+   warn "\n\$rop: $rop\n";
+   print "not ok 6\n";
+}
+
+Rmpfr_dim($rop, $op2, $op1, GMP_RNDN);
+if($rop == 333) {print "ok 7\n"}
+else {
+   warn "\n\$rop: $rop\n";
+   print "not ok 7\n";
+}
 

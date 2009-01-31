@@ -20,22 +20,20 @@ Because this module wraps the MPFR functions, it requires that both
 the GMP C library and the MPFR C library have been installed.
 
 For the GMP library see:
-http://swox.com/gmp
+http://gmplib.org
 
 For the MPFR library see:
 http://www.mpfr.org
 Do not use the (outdated) MPFR library source that ships with the
 GMP source.
 
-Math::MPFR-1.04 to 1.07 require MPFR-2.1.x - and you'll get errors
-if you try to build against an earlier or later version of the MPFR
-library.
+Math::MPFR-1.04 to 1.07 require mpfr-2.1.x (or later).
+Math::MPFR-1.08 to Math::MPFR-1.11 require mpfr-2.2.x (or later).
+Math::MPFR-2.01 and 2.02 require mpfr-2.3.x (or later).
+Math::MPFR-2.03 requires mpfr-2.4.x.
 
-Math::MPFR-1.08 to Math::MPFR-1.11 require MPFR-2.2.x - and you'll
-get errors if you try to build against an earlier version of the
-MPFR library.
-
-Beginning with Math::MPFR-2.01 you'll need MPFR-2.3.x.
+You'll get errors if you try to build Math::MPFR against an
+insufficiently recent version of the mpfr library.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but

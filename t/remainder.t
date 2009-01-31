@@ -12,13 +12,45 @@ my $ok = '';
 
 my $numerator = Math::MPFR->new(11.5);
 my $denominator = Math::MPFR->new(3);
+my $zero = Math::MPFR->new(0);
+my $inf = Math::MPFR->new(1);
+$inf /= $zero;
 my $rop = Rmpfr_init();
 
 Rmpfr_remainder($rop, $numerator, $denominator, GMP_RNDN);
-
 if($rop == -0.5) {$ok .= 'a'}
 
-if($ok eq 'a') {print "ok 1\n"}
+Rmpfr_fmod($rop, $numerator, $denominator, GMP_RNDN);
+if($rop == 2.5) {$ok .= 'b'}
+
+Rmpfr_remainder($rop, $numerator, $zero, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'c'}
+
+Rmpfr_fmod($rop, $numerator, $zero, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'd'}
+
+Rmpfr_remquo($rop, $numerator, $zero, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'e'}
+
+Rmpfr_remainder($rop, $inf, $denominator, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'f'}
+
+Rmpfr_fmod($rop, $inf, $denominator, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'g'}
+
+Rmpfr_remquo($rop, $inf, $denominator, GMP_RNDN);
+if(Rmpfr_nan_p($rop)) {$ok .= 'h'}
+
+Rmpfr_remainder($rop, $numerator, $inf, GMP_RNDN);
+if($rop == $numerator) {$ok .= 'i'}
+
+Rmpfr_fmod($rop, $numerator, $inf, GMP_RNDN);
+if($rop == $numerator) {$ok .= 'j'}
+
+Rmpfr_remquo($rop, $numerator, $inf, GMP_RNDN);
+if($rop == $numerator) {$ok .= 'k'}
+
+if($ok eq 'abcdefghijk') {print "ok 1\n"}
 else {print "not ok 1 $ok \n"}
 
 $ok = '';

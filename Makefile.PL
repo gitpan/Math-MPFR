@@ -31,7 +31,7 @@ else {
 }
 
 print "\nThis module requires the following C libraries:\n";
-print " gmp-4.2.0 (or later)\n mpfr-2.3.0 (or later)\n\n";
+print " gmp-4.2.0 (or later)\n mpfr-2.4.0 (or later)\n\n";
 $defines =~ /-DUSE_64_BIT_INT/ ? print "Building with 64-bit'long long' support\n" :
                                  print "Building without 64-bit 'long long' support\n";
 

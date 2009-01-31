@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..1\n";
+print "1..2\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -37,3 +37,25 @@ if(!Rmpfr_nanflag_p()) {$ok .= 'j'}
 
 if($ok eq 'abcdefghij') {print "ok 1\n"}
 else {print "not ok 1\n"}
+
+my $zero = Math::MPFR->new(0);
+my $inf = Math::MPFR->new(1);
+
+$ok = '';
+
+$inf /= $zero;
+
+Rmpfr_clear_overflow();
+if(!Rmpfr_overflow_p()) {$ok .= 'a'}
+Rmpfr_check_range($inf, 123, GMP_RNDN);
+if(Rmpfr_overflow_p()) {$ok .= 'b'}
+
+$inf *= -1;
+
+Rmpfr_clear_overflow();
+if(!Rmpfr_overflow_p()) {$ok .= 'c'}
+Rmpfr_check_range($inf, 123, GMP_RNDN);
+if(Rmpfr_overflow_p()) {$ok .= 'd'}
+
+if($ok eq 'abcd') {print "ok 2\n"}
+else {print "not ok 2 $ok\n"}

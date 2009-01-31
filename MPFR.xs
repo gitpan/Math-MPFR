@@ -1,20 +1,21 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "INLINE.h"
+
 #include <stdio.h>
+
+#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
+#ifndef _MSC_VER
+#include <inttypes.h>
+#endif
+#endif
+
 #include <gmp.h>
 #include <mpfr.h>
 
 // Squash some annoying compiler warnings (Microsoft compilers only).
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
-#endif
-
-#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
-#ifndef _MSC_VER
-#include <inttypes.h>
-#endif
 #endif
 
 #ifdef OLDPERL
@@ -25,8 +26,21 @@
 #define __gmpfr_default_rounding_mode mpfr_get_default_rounding_mode()
 #endif
 
+/* Has inttypes.h been included ? */
+int _has_inttypes() {
+#ifdef _MSC_VER
+return 0;
+#else
+#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
+return 1;
+#else
+return 0;
+#endif
+#endif
+}
+
 void Rmpfr_set_default_rounding_mode(SV * round) {
-     mpfr_set_default_rounding_mode(SvUV(round));    
+     mpfr_set_default_rounding_mode((mp_rnd_t)SvUV(round));    
 }
 
 SV * Rmpfr_get_default_rounding_mode() {
@@ -34,7 +48,7 @@ SV * Rmpfr_get_default_rounding_mode() {
 }
 
 SV * Rmpfr_prec_round(mpfr_t * p, SV * prec, SV * round) {
-     return newSViv(mpfr_prec_round(*p, (mpfr_prec_t)SvUV(prec), SvUV(round)));
+     return newSViv(mpfr_prec_round(*p, (mpfr_prec_t)SvUV(prec), (mp_rnd_t)SvUV(round)));
 }
 
 void DESTROY(mpfr_t * p) {
@@ -116,114 +130,114 @@ SV * Rmpfr_init2_nobless(SV * prec) {
 }
 
 void Rmpfr_init_set(mpfr_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_ui(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_ui(*mpfr_t_obj, (unsigned long)SvUV(q), SvUV(round));
+     ret = mpfr_init_set_ui(*mpfr_t_obj, (unsigned long)SvUV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_si(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_si(*mpfr_t_obj, (long)SvIV(q), SvUV(round));
+     ret = mpfr_init_set_si(*mpfr_t_obj, (long)SvIV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_d(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp =  mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_d(*mpfr_t_obj, SvNV(q), SvUV(round));
+     ret = mpfr_init_set_d(*mpfr_t_obj, SvNV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed;
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_ld(SV * q, SV * round) {
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_ld(*mpfr_t_obj, SvNV(q), SvUV(round));
+     ret = mpfr_init_set_ld(*mpfr_t_obj, SvNV(q), (mp_rnd_t)SvUV(round));
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed;
+     XSRETURN(2);
 #else
      croak("Rmpfr_init_set_ld() not implemented on this build of perl - use Rmpfr_init_set_d() instead");
 #endif
@@ -233,78 +247,78 @@ void Rmpfr_init_set_ld(SV * q, SV * round) {
 }
 
 void Rmpfr_init_set_f(mpf_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; //not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_f(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_f(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_z(mpz_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not neededInline_Stack_Reset;
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_z(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_z(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_q(mpq_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     ret = mpfr_init_set_q(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_q(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpf_init_set str is out of allowable range");
 
@@ -314,123 +328,123 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
      obj = newSVrv(obj_ref, "Math::MPFR");
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), ret, SvUV(round));
+     ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), ret, (mp_rnd_t)SvUV(round));
 
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_nobless(mpfr_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_ui_nobless(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp  = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_ui(*mpfr_t_obj, (unsigned long)SvUV(q), SvUV(round));
+     ret = mpfr_init_set_ui(*mpfr_t_obj, (unsigned long)SvUV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_si_nobless(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_si(*mpfr_t_obj, (long)SvIV(q), SvUV(round));
+     ret = mpfr_init_set_si(*mpfr_t_obj, (long)SvIV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_d_nobless(SV * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_d(*mpfr_t_obj, SvNV(q), SvUV(round));
+     ret = mpfr_init_set_d(*mpfr_t_obj, SvNV(q), (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_ld_nobless(SV * q, SV * round) {
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_ld(*mpfr_t_obj, SvNV(q), SvUV(round));
+     ret = mpfr_init_set_ld(*mpfr_t_obj, SvNV(q), (mp_rnd_t)SvUV(round));
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 #else
      croak("Rmpfr_init_set_ld_nobless() not implemented on this build of perl - use Rmpfr_init_set_d_nobless() instead");
 #endif
@@ -440,80 +454,80 @@ void Rmpfr_init_set_ld_nobless(SV * q, SV * round) {
 }
 
 void Rmpfr_init_set_f_nobless(mpf_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_f(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_f(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1)  = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_z_nobless(mpz_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp  = mark; //not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_z(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_z(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_q_nobless(mpq_t * q, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     ret = mpfr_init_set_q(*mpfr_t_obj, *q, SvUV(round));
+     ret = mpfr_init_set_q(*mpfr_t_obj, *q, (mp_rnd_t)SvUV(round));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set_str_nobless is out of allowable range");
 
-     Inline_Stack_Reset;
+     // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str_nobless function");
@@ -521,16 +535,16 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
      obj = newSVrv(obj_ref, NULL);
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
-     ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), ret, SvUV(round));
+     ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), ret, (mp_rnd_t)SvUV(round));
 
-     Inline_Stack_Push(sv_2mortal(obj_ref));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(0) = sv_2mortal(obj_ref);
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      char * out;
      mp_exp_t ptr, *expptr;
      unsigned long b = (unsigned long)SvUV(base);
@@ -539,16 +553,16 @@ void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(b < 2 || b > 36) croak("Second argument supplied to Rmpfr_get_str() is not in acceptable range");
 
-     out = mpfr_get_str(0, expptr, b, (unsigned long)SvUV(n_digits), *p, SvUV(round));
+     out = mpfr_get_str(0, expptr, b, (unsigned long)SvUV(n_digits), *p, (mp_rnd_t)SvUV(round));
 
      if(out == NULL) croak("An error occurred in mpfr_get_str()\n");
 
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSVpv(out, 0)));
+     // sp  = mark; // not needed
+     ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
-     Inline_Stack_Push(sv_2mortal(newSViv(ptr)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     ST(1) = sv_2mortal(newSViv(ptr));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 }
 
 void Rmpfr_set_default_prec(SV * prec) {
@@ -580,21 +594,21 @@ SV * Rmpfr_get_prec(mpfr_t * p) {
 }
 
 SV * Rmpfr_set(mpfr_t * p, mpfr_t * q, SV * round) {
-     return newSViv(mpfr_set(*p, *q, SvUV(round)));
+     return newSViv(mpfr_set(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_ui(mpfr_t * p, SV * q, SV * round) {
-     return newSViv(mpfr_set_ui(*p, (unsigned long)SvUV(q), SvUV(round)));
+     return newSViv(mpfr_set_ui(*p, (unsigned long)SvUV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_si(mpfr_t * p, SV * q, SV * round) {
-     return newSViv(mpfr_set_si(*p, (long)SvIV(q), SvUV(round)));
+     return newSViv(mpfr_set_si(*p, (long)SvIV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_uj(mpfr_t * p, SV * q, SV * round) {
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
-     return newSViv(mpfr_set_uj(*p, SvUV(q), SvUV(round)));
+     return newSViv(mpfr_set_uj(*p, SvUV(q), (mp_rnd_t)SvUV(round)));
 #else
      croak("Rmpfr_set_uj() not implemented on this build of perl - use Rmpfr_set_str() instead");
 #endif
@@ -606,7 +620,7 @@ SV * Rmpfr_set_uj(mpfr_t * p, SV * q, SV * round) {
 SV * Rmpfr_set_sj(mpfr_t * p, SV * q, SV * round) {
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
-     return newSViv(mpfr_set_sj(*p, SvIV(q), SvUV(round)));
+     return newSViv(mpfr_set_sj(*p, SvIV(q), (mp_rnd_t)SvUV(round)));
 #else
      croak("Rmpfr_set_sj() not implemented on this build of perl - use Rmpfr_set_str() instead");
 #endif
@@ -618,7 +632,7 @@ SV * Rmpfr_set_sj(mpfr_t * p, SV * q, SV * round) {
 SV * Rmpfr_set_ld(mpfr_t * p, SV * q, SV * round) {
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
-     return newSViv(mpfr_set_ld(*p, SvNV(q), SvUV(round)));
+     return newSViv(mpfr_set_ld(*p, SvNV(q), (mp_rnd_t)SvUV(round)));
 #else
      croak("Rmpfr_set_ld() not implemented on this build of perl - use Rmpfr_set_d() instead");
 #endif
@@ -628,25 +642,25 @@ SV * Rmpfr_set_ld(mpfr_t * p, SV * q, SV * round) {
 }
 
 SV * Rmpfr_set_d(mpfr_t * p, SV * q, SV * round) {
-     return newSViv(mpfr_set_d(*p, SvNV(q), SvUV(round)));
+     return newSViv(mpfr_set_d(*p, SvNV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_z(mpfr_t * p, mpz_t * q, SV * round) {
-     return newSViv(mpfr_set_z(*p, *q, SvUV(round)));
+     return newSViv(mpfr_set_z(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_q(mpfr_t * p, mpq_t * q, SV * round) {
-     return newSViv(mpfr_set_q(*p, *q, SvUV(round)));
+     return newSViv(mpfr_set_q(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_f(mpfr_t * p, mpf_t * q, SV * round) {
-     return newSViv(mpfr_set_f(*p, *q, SvUV(round)));
+     return newSViv(mpfr_set_f(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_str(mpfr_t * p, SV * num, SV * base, SV * round) {
      int b = (int)SvIV(base);
      if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_set_str is out of allowable range");
-     return newSViv(mpfr_set_str(*p, SvPV_nolen(num), b, SvUV(round)));
+     return newSViv(mpfr_set_str(*p, SvPV_nolen(num), b, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_set_str_binary(mpfr_t * p, SV * str) {
@@ -666,13 +680,37 @@ void Rmpfr_swap(mpfr_t *p, mpfr_t * q) {
 }
 
 SV * Rmpfr_get_d(mpfr_t * p, SV * round){
-     return newSVnv(mpfr_get_d(*p, SvUV(round)));
+     return newSVnv(mpfr_get_d(*p, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_get_d_2exp(SV * exp, mpfr_t * p, SV * round){
+     long _exp;
+     double ret;
+     ret = mpfr_get_d_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
+     sv_setuv(exp, _exp);
+     return newSVnv(ret);
+}
+
+SV * Rmpfr_get_ld_2exp(SV * exp, mpfr_t * p, SV * round){
+#ifdef USE_LONG_DOUBLE
+#ifndef _MSC_VER
+     long _exp;
+     long double ret;
+     ret = mpfr_get_ld_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
+     sv_setuv(exp, _exp);
+     return newSVnv(ret);
+#else
+     croak("Rmpfr_get_ld_2exp() not implemented on this build of perl - use Rmpfr_get_d_2exp() instead");
+#endif
+#else
+     croak("Rmpfr_get_ld_2exp() not implemented on this build of perl");
+#endif
 }
 
 SV * Rmpfr_get_ld(mpfr_t * p, SV * round){
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
-     return newSVnv(mpfr_get_ld(*p, SvUV(round)));
+     return newSVnv(mpfr_get_ld(*p, (mp_rnd_t)SvUV(round)));
 #else
      croak("Rmpfr_get_ld() not implemented on this build of perl - use Rmpfr_get_d() instead");
 #endif
@@ -690,139 +728,176 @@ SV * Rmpfr_get_z_exp(mpz_t * z, mpfr_t * p){
 }
 
 SV * Rmpfr_add(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_add(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_add(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
-     return newSViv(mpfr_add_ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_add_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_add_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+     return newSViv(mpfr_add_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_add_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+     return newSViv(mpfr_add_si(*a, *b, (int)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
-     return newSViv(mpfr_add_z(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_add_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
-     return newSViv(mpfr_add_q(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_add_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_sub(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_sub(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_sub_ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_sub_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_sub_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+     return newSViv(mpfr_sub_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
-     return newSViv(mpfr_sub_z(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_sub_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
-     return newSViv(mpfr_sub_q(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_sub_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_sub(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_ui_sub(*a, (unsigned long)SvUV(b), *c, SvUV(round)));
+     return newSViv(mpfr_ui_sub(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_d_sub(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+     return newSViv(mpfr_d_sub(*a, (double)SvNV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_mul(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_mul(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
-     return newSViv(mpfr_mul_ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_mul_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_mul_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+     return newSViv(mpfr_mul_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
-     return newSViv(mpfr_mul_z(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_mul_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
-     return newSViv(mpfr_mul_q(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_mul_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_dim(mpfr_t * rop, mpfr_t * op1, mpfr_t * op2, SV * round) {
+         int ret = mpfr_dim( *rop, *op1, *op2, (mp_rnd_t)SvUV(round));
+         return newSViv(ret);
 }
 
 SV * Rmpfr_div(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_div(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_div(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
-     return newSViv(mpfr_div_ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_div_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_div_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+     return newSViv(mpfr_div_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
-     return newSViv(mpfr_div_z(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_div_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
-     return newSViv(mpfr_div_q(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_div_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_div(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_ui_div(*a, (unsigned long)SvUV(b), *c, SvUV(round)));
+     return newSViv(mpfr_ui_div(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_d_div(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+     return newSViv(mpfr_d_div(*a, (double)SvNV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sqrt(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_sqrt(*a, *b, SvUV(round)));
+     return newSViv(mpfr_sqrt(*a, *b, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_rec_sqrt(mpfr_t * a, mpfr_t * b, SV * round) {
+     return newSViv(mpfr_rec_sqrt(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cbrt(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_cbrt(*a, *b, SvUV(round)));
+     return newSViv(mpfr_cbrt(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sqrt_ui(mpfr_t * a, SV * b, SV * round) {
-     return newSViv(mpfr_sqrt_ui(*a, (unsigned long)SvUV(b), SvUV(round)));
+     return newSViv(mpfr_sqrt_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_pow_ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_pow_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_pow_ui(mpfr_t * a, SV * b, SV * c, SV * round) {
-     return newSViv(mpfr_ui_pow_ui(*a, (unsigned long)SvUV(b), (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_ui_pow_ui(*a, (unsigned long)SvUV(b), (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_pow(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_ui_pow(*a, (unsigned long)SvUV(b), *c, SvUV(round)));
+     return newSViv(mpfr_ui_pow(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_pow_si(*a, *b, (long)SvIV(c), SvUV(round)));
+     return newSViv(mpfr_pow_si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_pow(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_pow(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_neg(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_neg(*a, *b, SvUV(round)));
+     return newSViv(mpfr_neg(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_abs(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_abs(*a, *b, SvUV(round)));
+     return newSViv(mpfr_abs(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2exp(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_mul_2exp(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_mul_2exp(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_mul_2ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_mul_2ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_mul_2si(*a, *b, (long)SvIV(c), SvUV(round)));
+     return newSViv(mpfr_mul_2si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2exp(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_div_2exp(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_div_2exp(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_div_2ui(*a, *b, (unsigned long)SvUV(c), SvUV(round)));
+     return newSViv(mpfr_div_2ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
-     return newSViv(mpfr_div_2si(*a, *b, (long)SvIV(c), SvUV(round)));
+     return newSViv(mpfr_div_2si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cmp(mpfr_t * a, mpfr_t * b) {
@@ -882,7 +957,7 @@ SV * Rmpfr_number_p(mpfr_t * p) {
 }
 
 void Rmpfr_reldiff(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     mpfr_reldiff(*a, *b, *c, SvUV(round));
+     mpfr_reldiff(*a, *b, *c, (mp_rnd_t)SvUV(round));
 }
 
 SV * Rmpfr_sgn(mpfr_t * p) {
@@ -918,103 +993,107 @@ SV * Rmpfr_unordered_p(mpfr_t * a, mpfr_t * b) {
 }
 
 SV * Rmpfr_sin_cos(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_sin_cos(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_sin_cos(*a, *b, *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_sinh_cosh(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+     return newSViv(mpfr_sinh_cosh(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sin(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_sin(*a, *b, SvUV(round)));
+     return newSViv(mpfr_sin(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cos(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_cos(*a, *b, SvUV(round)));
+     return newSViv(mpfr_cos(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_tan(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_tan(*a, *b, SvUV(round)));
+     return newSViv(mpfr_tan(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_asin(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_asin(*a, *b, SvUV(round)));
+     return newSViv(mpfr_asin(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_acos(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_acos(*a, *b, SvUV(round)));
+     return newSViv(mpfr_acos(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_atan(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_atan(*a, *b, SvUV(round)));
+     return newSViv(mpfr_atan(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sinh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_sinh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_sinh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cosh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_cosh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_cosh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_tanh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_tanh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_tanh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_asinh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_asinh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_asinh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_acosh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_acosh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_acosh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_atanh(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_atanh(*a, *b, SvUV(round)));
+     return newSViv(mpfr_atanh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fac_ui(mpfr_t * a, SV * b, SV * round) {
-     return newSViv(mpfr_fac_ui(*a, (unsigned long)SvUV(b), SvUV(round)));
+     return newSViv(mpfr_fac_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log1p(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_log1p(*a, *b, SvUV(round)));
+     return newSViv(mpfr_log1p(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_expm1(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_expm1(*a, *b, SvUV(round)));
+     return newSViv(mpfr_expm1(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log2(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_log2(*a, *b, SvUV(round)));
+     return newSViv(mpfr_log2(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log10(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_log10(*a, *b, SvUV(round)));
+     return newSViv(mpfr_log10(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fma(mpfr_t * a, mpfr_t * b, mpfr_t * c, mpfr_t * d, SV * round) {
-     return newSViv(mpfr_fma(*a, *b, *c, *d, SvUV(round)));
+     return newSViv(mpfr_fma(*a, *b, *c, *d, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fms(mpfr_t * a, mpfr_t * b, mpfr_t * c, mpfr_t * d, SV * round) {
-     return newSViv(mpfr_fms(*a, *b, *c, *d, SvUV(round)));
+     return newSViv(mpfr_fms(*a, *b, *c, *d, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_agm(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_agm(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_agm(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_hypot(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_hypot(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_hypot(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_log2(mpfr_t * p, SV * round) {
-     return newSViv(mpfr_const_log2(*p, SvUV(round)));
+     return newSViv(mpfr_const_log2(*p, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_pi(mpfr_t * p, SV * round) {
-     return newSViv(mpfr_const_pi(*p, SvUV(round)));
+     return newSViv(mpfr_const_pi(*p, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_euler(mpfr_t * p, SV * round) {
-     return newSViv(mpfr_const_euler(*p, SvUV(round)));
+     return newSViv(mpfr_const_euler(*p, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_print_binary(mpfr_t * p) {
@@ -1022,7 +1101,7 @@ void Rmpfr_print_binary(mpfr_t * p) {
 }
 
 SV * Rmpfr_rint(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_rint(*a, *b, SvUV(round)));
+     return newSViv(mpfr_rint(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ceil(mpfr_t * a, mpfr_t * b) {
@@ -1043,12 +1122,12 @@ SV * Rmpfr_trunc(mpfr_t * a, mpfr_t * b) {
 
 /* NO LONGER SUPPORTED
 SV * Rmpfr_add_one_ulp(mpfr_t * p, SV * round) {
-     return newSViv(mpfr_add_one_ulp(*p, SvUV(round)));
+     return newSViv(mpfr_add_one_ulp(*p, (mp_rnd_t)SvUV(round)));
 } */
 
 /* NO LONGER SUPPORTED
 SV * Rmpfr_sub_one_ulp(SV * p, SV * round) {
-     return newSViv(mpfr_sub_one_ulp(*p, SvUV(round)));
+     return newSViv(mpfr_sub_one_ulp(*p, (mp_rnd_t)SvUV(round)));
 } */
 
 SV * Rmpfr_can_round(mpfr_t * p, SV * err, SV * round1, SV * round2, SV * prec) {
@@ -1072,7 +1151,7 @@ SV * Rmpfr_set_emax(SV * e) {
 }
 
 SV * Rmpfr_check_range(mpfr_t * p, SV * t, SV * round) {
-     return newSViv(mpfr_check_range(*p, (int)SvIV(t), SvUV(round)));
+     return newSViv(mpfr_check_range(*p, (int)SvIV(t), (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_clear_underflow() {
@@ -1112,31 +1191,32 @@ SV * Rmpfr_inexflag_p() {
 }
 
 SV * Rmpfr_log(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_log(*a, *b, SvUV(round)));
+     return newSViv(mpfr_log(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_exp(*a, *b, SvUV(round)));
+     return newSViv(mpfr_exp(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp2(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_exp2(*a, *b, SvUV(round)));
+     return newSViv(mpfr_exp2(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp10(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_exp10(*a, *b, SvUV(round)));
+     return newSViv(mpfr_exp10(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_urandomb(SV * x, ...) {
-     Inline_Stack_Vars;
+     dXSARGS;
      unsigned long i, t;
 
-     t = Inline_Stack_Items;
+     t = items;
      --t;
 
      for(i = 0; i < t; ++i) {
-        mpfr_urandomb(*(INT2PTR(mpfr_t *, SvIV(SvRV(Inline_Stack_Item(i))))), *(INT2PTR(gmp_randstate_t *, SvIV(SvRV(Inline_Stack_Item(t))))));
+        mpfr_urandomb(*(INT2PTR(mpfr_t *, SvIV(SvRV(ST(i))))), *(INT2PTR(gmp_randstate_t *, SvIV(SvRV(ST(t))))));
         }
+     XSRETURN(0);
 }
 
 void Rmpfr_random2(mpfr_t * p, SV * s, SV * exp) {
@@ -1146,7 +1226,7 @@ void Rmpfr_random2(mpfr_t * p, SV * s, SV * exp) {
 SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      return newSVuv(ret);
 }
@@ -1154,7 +1234,7 @@ SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round)
 SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stdout);
      return newSVuv(ret);
 }
@@ -1162,7 +1242,7 @@ SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
 SV * _TRmpfr_out_strS(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round, SV * suff) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      fprintf(stream, "%s", SvPV_nolen(suff));
      fflush(stream);
@@ -1174,7 +1254,7 @@ SV * _TRmpfr_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, 
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
-     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      return newSVuv(ret);
 }
@@ -1184,7 +1264,7 @@ SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p,
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
-     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      fprintf(stream, "%s", SvPV_nolen(suff));
      fflush(stream);
@@ -1194,7 +1274,7 @@ SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p,
 SV * _Rmpfr_out_strS(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      printf("%s", SvPV_nolen(suff));
      fflush(stdout);
      return newSVuv(ret);
@@ -1204,7 +1284,7 @@ SV * _Rmpfr_out_strP(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      printf("%s", SvPV_nolen(pre));
-     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stdout);
      return newSVuv(ret);
 }
@@ -1213,7 +1293,7 @@ SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV 
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      printf("%s", SvPV_nolen(pre));
-     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, SvUV(round));
+     ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      printf("%s", SvPV_nolen(suff));
      fflush(stdout);
      return newSVuv(ret);
@@ -1222,48 +1302,60 @@ SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV 
 SV * TRmpfr_inp_str(mpfr_t * p, FILE * stream, SV * base, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_inp_str(*p, stream, (int)SvIV(base), SvUV(round));
-     fflush(stream);
+     ret = mpfr_inp_str(*p, stream, (int)SvIV(base), (mp_rnd_t)SvUV(round));
+     /* fflush(stream); */
      return newSVuv(ret);
 }
 
 SV * Rmpfr_inp_str(mpfr_t * p, SV * base, SV * round) {
      size_t ret;
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
-     ret = mpfr_inp_str(*p, NULL, (int)SvIV(base), SvUV(round));
-     fflush(stdin);
+     ret = mpfr_inp_str(*p, NULL, (int)SvIV(base), (mp_rnd_t)SvUV(round));
+     /* fflush(stdin); */
      return newSVuv(ret);
 }
 
 SV * Rmpfr_gamma(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_gamma(*a, *b, SvUV(round)));
+     return newSViv(mpfr_gamma(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_zeta(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_zeta(*a, *b, SvUV(round)));
+     return newSViv(mpfr_zeta(*a, *b, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_zeta_ui(mpfr_t * a, SV * b, SV * round) {
+     return newSViv(mpfr_zeta_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_erf(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_erf(*a, *b, SvUV(round)));
+     return newSViv(mpfr_erf(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_frac(mpfr_t * a, mpfr_t * b, SV * round) {
-     return newSViv(mpfr_frac(*a, *b, SvUV(round)));
+     return newSViv(mpfr_frac(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_remainder(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_remainder(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_remainder(*a, *b, *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_modf(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+     return newSViv(mpfr_modf(*a, *b, *c, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fmod(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+     return newSViv(mpfr_fmod(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_remquo(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      long ret, q;
      ret = mpfr_remquo(*a, &q, *b, *c, (mp_rnd_t)SvUV(round)); 
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSViv(q)));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     // sp  = mark; // not needed
+     ST(0) = sv_2mortal(newSViv(q));
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 } 
 
 SV * Rmpfr_integer_p(mpfr_t * p) {
@@ -1283,11 +1375,11 @@ void Rmpfr_nextbelow(mpfr_t * p) {
 }
 
 SV * Rmpfr_min(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_min(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_min(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_max(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
-     return newSViv(mpfr_max(*a, *b, *c, SvUV(round)));
+     return newSViv(mpfr_max(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_exp(mpfr_t * p) {
@@ -1303,11 +1395,11 @@ SV * Rmpfr_signbit(mpfr_t * op) {
 }
 
 SV * Rmpfr_setsign(mpfr_t * rop, mpfr_t * op, SV * sign, SV * round) {
-     return newSViv(mpfr_setsign(*rop, *op, SvIV(sign), SvUV(round)));
+     return newSViv(mpfr_setsign(*rop, *op, SvIV(sign), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_copysign(mpfr_t * rop, mpfr_t * op1, mpfr_t * op2, SV * round) {
-     return newSViv(mpfr_copysign(*rop, *op1, *op2, SvUV(round)));
+     return newSViv(mpfr_copysign(*rop, *op1, *op2, (mp_rnd_t)SvUV(round)));
 }
 
 SV * get_refcnt(SV * s) {
@@ -1467,11 +1559,7 @@ SV * Rmpfr_get_si(mpfr_t * a, SV * round) {
 
 SV * Rmpfr_get_uj(mpfr_t * a, SV * round) {
 #ifdef USE_64_BIT_INT
-#ifndef _MSC_VER
      return newSVuv(mpfr_get_uj(*a, (mp_rnd_t)SvUV(round)));
-#else
-     croak ("Rmpfr_get_uj() not implemented on this build of perl - use Rmpfr_integer_string() instead");
-#endif
 #else
      croak ("Rmpfr_get_uj() not implemented on this build of perl");
 #endif
@@ -1479,14 +1567,44 @@ SV * Rmpfr_get_uj(mpfr_t * a, SV * round) {
 
 SV * Rmpfr_get_sj(mpfr_t * a, SV * round) {
 #ifdef USE_64_BIT_INT
-#ifndef _MSC_VER
      return newSViv(mpfr_get_sj(*a, (mp_rnd_t)SvUV(round)));
-#else
-     croak ("Rmpfr_get_sj() not implemented on this build of perl - use Rmpfr_integer_string() instead");
-#endif
 #else
      croak ("Rmpfr_get_sj() not implemented on this build of perl");
 #endif
+}
+
+SV * Rmpfr_get_IV(mpfr_t * x, SV * round) {
+     if(sizeof(IV) == sizeof(int)) return newSViv(mpfr_get_si(*x, (mp_rnd_t)SvUV(round)));
+#if defined USE_64_BIT_INT
+#ifndef _MSC_VER
+     if(sizeof(IV) == sizeof(intmax_t)) return newSViv(mpfr_get_sj(*x, (mp_rnd_t)SvUV(round)));
+#else
+     if(sizeof(IV) == sizeof(signed _int64)) return newSViv(mpfr_get_sj(*x, (mp_rnd_t)SvUV(round)));
+#endif
+#endif
+     croak("Rmpfr_get_IV not implemented on this build of perl");
+}
+
+SV * Rmpfr_get_UV(mpfr_t * x, SV * round) {
+     if(sizeof(UV) == sizeof(unsigned long)) return newSVuv(mpfr_get_ui(*x, (mp_rnd_t)SvUV(round)));
+#if defined USE_64_BIT_INT
+#ifndef _MSC_VER
+     if(sizeof(UV) == sizeof(uintmax_t)) return newSVuv(mpfr_get_uj(*x, (mp_rnd_t)SvUV(round)));
+#else
+     if(sizeof(UV) == sizeof(unsigned _int64)) return newSVuv(mpfr_get_uj(*x, (mp_rnd_t)SvUV(round)));
+#endif
+#endif
+     croak("Rmpfr_get_UV not implemented on this build of perl");
+}
+
+SV * Rmpfr_get_NV(mpfr_t * x, SV * round) {
+     if(sizeof(NV) == sizeof(double)) return newSVnv(mpfr_get_d(*x, (mp_rnd_t)SvUV(round)));
+#if defined USE_LONG_DOUBLE
+#ifndef _MSC_VER
+     if(sizeof(NV) == sizeof(long double)) return newSVnv(mpfr_get_ld(*x, (mp_rnd_t)SvUV(round)));
+#endif
+#endif
+     croak("Rmpfr_get_NV not implemented on this build of perl");
 }
 
 SV * Rmpfr_fits_ulong_p(mpfr_t * a, SV * round) {
@@ -1495,6 +1613,124 @@ SV * Rmpfr_fits_ulong_p(mpfr_t * a, SV * round) {
 
 SV * Rmpfr_fits_slong_p(mpfr_t * a, SV * round) {
      return newSVuv(mpfr_fits_slong_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_ushort_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_ushort_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_sshort_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_sshort_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_uint_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_uint_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_sint_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_sint_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_uintmax_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_uintmax_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_intmax_p(mpfr_t * a, SV * round) {
+     return newSVuv(mpfr_fits_intmax_p(*a, (mp_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fits_IV_p(mpfr_t * x, SV * round) {
+     unsigned long ret = 0, bits = sizeof(IV) * 8;
+     mpfr_t high, low, copy;
+
+     if(sizeof(IV) == sizeof(long)) {
+       if(mpfr_fits_slong_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+
+     if(sizeof(IV) == sizeof(int)) {
+       if(mpfr_fits_sint_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+
+#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
+#ifndef _MSC_VER
+     if(sizeof(IV) == sizeof(intmax_t)) {
+       if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+#else
+     if(sizeof(IV) == sizeof(signed _int64)) {
+       if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+#endif
+#endif
+
+     mpfr_init2(high, bits);
+     mpfr_init2(low, bits);
+     mpfr_init2(copy, bits - 1);
+
+     mpfr_set_ui(high, 1, GMP_RNDN);
+     mpfr_mul_2exp(high, high, bits - 1, GMP_RNDN);
+     mpfr_sub_ui(high, high, 1, GMP_RNDN);
+
+     mpfr_setsign(low, high, 1, GMP_RNDN);
+     mpfr_sub_ui(low, low, 1, GMP_RNDN);
+     mpfr_set(copy, *x, (mp_rnd_t)SvUV(round));
+
+     if(mpfr_lessequal_p(copy, high) && mpfr_greaterequal_p(copy, low)) ret = 1;
+
+     mpfr_clear(high);
+     mpfr_clear(low);
+     mpfr_clear(copy);
+
+     return newSVuv(ret);
+}
+
+SV * Rmpfr_fits_UV_p(mpfr_t * x, SV * round) {
+     unsigned long ret = 0, bits = sizeof(UV) * 8;
+     mpfr_t high, copy;
+
+     if(sizeof(UV) == sizeof(unsigned long)) {
+       if(mpfr_fits_ulong_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+
+     if(sizeof(UV) == sizeof(unsigned int)) {
+       if(mpfr_fits_uint_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+
+#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
+#ifndef _MSC_VER
+     if(sizeof(UV) == sizeof(uintmax_t)) {
+       if(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+#else
+     if(sizeof(UV) == sizeof(unsigned _int64)) {
+       if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
+       return newSVuv(0);
+     }
+#endif
+#endif
+
+     mpfr_init2(high, bits + 1);
+     mpfr_init2(copy, bits);
+
+     mpfr_set_ui(high, 1, GMP_RNDN);
+     mpfr_mul_2exp(high, high, bits, GMP_RNDN);
+     mpfr_sub_ui(high, high, 1, GMP_RNDN);
+
+     mpfr_set(copy, *x, (mp_rnd_t)SvUV(round));
+
+     if(mpfr_lessequal_p(copy, high) && mpfr_cmp_ui(copy, 0) >= 0) ret = 1;
+
+     mpfr_clear(high);
+     mpfr_clear(copy);
+
+     return newSVuv(ret);
 }
 
 SV * Rmpfr_strtofr(mpfr_t * a, SV * str, SV * base, SV * round) {
@@ -1588,6 +1824,10 @@ SV * Rmpfr_eint(mpfr_t * a, mpfr_t * b, SV * round) {
      return newSViv(mpfr_eint(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
+SV * Rmpfr_li2(mpfr_t * a, mpfr_t * b, SV * round) {
+     return newSViv(mpfr_li2(*a, *b, (mp_rnd_t)SvUV(round)));
+}
+
 SV * Rmpfr_get_f(mpf_t * a, mpfr_t * b, SV * round) {
      return newSViv(mpfr_get_f(*a, *b, (mp_rnd_t)SvUV(round)));
 }
@@ -1609,14 +1849,14 @@ SV * Rmpfr_lngamma(mpfr_t * a, mpfr_t * b, SV * round) {
 }
 
 void Rmpfr_lgamma(mpfr_t * a, mpfr_t * b, SV * round) {
-     Inline_Stack_Vars;
+     dXSARGS;
      int ret, signp;
      ret = mpfr_lgamma(*a, &signp, *b, (mp_rnd_t)SvUV(round)); 
-     Inline_Stack_Reset;
-     Inline_Stack_Push(sv_2mortal(newSViv(signp)));
-     Inline_Stack_Push(sv_2mortal(newSViv(ret)));
-     Inline_Stack_Done;
-     Inline_Stack_Return(2);
+     // sp = mark; // not needed
+     ST(0) = sv_2mortal(newSViv(signp));
+     ST(1) = sv_2mortal(newSViv(ret));
+     // PUTBACK; // not needed
+     XSRETURN(2);
 } 
 
 SV * _MPFR_VERSION() {
@@ -1641,6 +1881,26 @@ SV * _MPFR_VERSION_STRING() {
 
 SV * RMPFR_VERSION_NUM(SV * a, SV * b, SV * c) {
      return newSVuv(MPFR_VERSION_NUM((unsigned long)SvUV(a), (unsigned long)SvUV(b), (unsigned long)SvUV(c)));
+}
+
+SV * Rmpfr_sum(mpfr_t * rop, SV * avref, SV * len, SV * round) {
+     mpfr_ptr *p;
+     SV ** elem;
+     int ret, i;
+     unsigned long s = (unsigned long)SvUV(len);
+
+     New(42, p, s, mpfr_ptr);
+     if(p == NULL) croak("Unable to allocate memory in Rmpfr_sum()"); 
+
+     for(i = 0; i < s; ++i) {
+        elem = av_fetch((AV*)SvRV(avref), i, 0);
+        p[i] = (INT2PTR(mpfr_t *, SvIV(SvRV(*elem))))[0];
+     }  
+
+     ret = mpfr_sum(*rop, p, s, (mp_rnd_t)SvUV(round));  
+
+     Safefree(p);
+     return newSVuv(ret);
 }
 
 /* Finish typemapping - typemap 1st arg only */
@@ -2645,7 +2905,9 @@ SV * overload_sqrt(mpfr_t * p, SV * second, SV * third) {
      obj = newSVrv(obj_ref, "Math::MPFR");
      mpfr_init(*mpfr_t_obj);
 
-     if(mpfr_cmp_ui(*p, 0) < 0) croak("Negative value supplied as argument to overload_sqrt");
+     /* No - this was wrong. If a negative value is supplied, a NaN should be returned instad */
+     /* if(mpfr_cmp_ui(*p, 0) < 0) croak("Negative value supplied as argument to overload_sqrt"); */
+
      mpfr_sqrt(*mpfr_t_obj, *p, __gmpfr_default_rounding_mode);
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
@@ -3507,25 +3769,255 @@ int _has_longdouble() {
 #endif
 }
 
+/*
+int _mpfr_longsize() {
+    mpfr_t x, y;
 
-/* Has inttypes.h been included ? */
-int _has_inttypes() {
-#ifdef _MSC_VER
-return 0;
-#else
-#if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
-return 1;
-#else
-return 0;
-#endif
-#endif
+    mpfr_init2(x, 100);
+    mpfr_init2(y, 100);
+
+    mpfr_set_str(x, "18446744073709551615", 10, GMP_RNDN);
+    mpfr_set_ui(y, 18446744073709551615, GMP_RNDN);
+
+    if(!mpfr_cmp(x,y)) return 64;
+    return 32;
 }
+*/
+
+SV * RMPFR_PREC_MAX() {
+     return newSVuv(MPFR_PREC_MAX);
+}
+
+SV * RMPFR_PREC_MIN() {
+     return newSVuv(MPFR_PREC_MIN);
+}
+
+SV * wrap_mpfr_printf(SV * a, SV * b) {
+     int ret;
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")){
+         ret = mpfr_printf(SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         fflush(stdout);
+         return newSViv(ret);
+       }
+   
+       croak("Unrecognised object supplied as argument to Rmpfr_printf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), SvUV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvIOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), SvIV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvNOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), SvNV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvPOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), SvPV_nolen(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+  
+     croak("Unrecognised type supplied as argument to Rmpfr_printf");
+}
+
+SV * wrap_mpfr_fprintf(FILE * stream, SV * a, SV * b) {
+     int ret;
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_fprintf(stream, SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         fflush(stream);
+         return newSViv(ret);
+       }
+ 
+       croak("Unrecognised object supplied as argument to Rmpfr_fprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), SvUV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvIOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), SvIV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvNOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), SvNV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvPOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_fprintf");
+}
+
+SV * wrap_mpfr_sprintf(char * stream, SV * a, SV * b) {
+     int ret;
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_sprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), SvUV(b));
+       return newSViv(ret);
+     }
+
+     if(SvIOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), SvIV(b));
+       return newSViv(ret);
+     }
+
+     if(SvNOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), SvNV(b));
+       return newSViv(ret);
+     }
+
+     if(SvPOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
+}
+
+SV * wrap_mpfr_printf_rnd(SV * a, SV * round, SV * b) {
+     int ret;
+     if(SvUV(round) > 3)croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_printf", SvUV(round));
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")){
+         ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         fflush(stdout);
+         return newSViv(ret);
+       }
+   
+       croak("Unrecognised object supplied as argument to Rmpfr_printf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvIOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvNOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+     if(SvPOK(b)) {
+       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+  
+     croak("Unrecognised type supplied as argument to Rmpfr_printf");
+}
+
+SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
+     int ret;
+     if(SvUV(round) > 3)croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_fprintf", SvUV(round));
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         fflush(stream);
+         return newSViv(ret);
+       }
+ 
+       croak("Unrecognised object supplied as argument to Rmpfr_fprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvIOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvNOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+     if(SvPOK(b)) {
+       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_fprintf");
+}
+
+SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
+     int ret;
+     if(SvUV(round) > 3)croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_sprintf", SvUV(round));
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_sprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
+       return newSViv(ret);
+     }
+
+     if(SvIOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
+       return newSViv(ret);
+     }
+
+     if(SvNOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
+       return newSViv(ret);
+     }
+
+     if(SvPOK(b)) {
+       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
+}
+
+
+
 
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
 
 PROTOTYPES: DISABLE
 
+
+int
+_has_inttypes ()
 
 void
 Rmpfr_set_default_rounding_mode (round)
@@ -4160,6 +4652,18 @@ Rmpfr_get_d (p, round)
 	SV *	round
 
 SV *
+Rmpfr_get_d_2exp (exp, p, round)
+	SV *	exp
+	mpfr_t *	p
+	SV *	round
+
+SV *
+Rmpfr_get_ld_2exp (exp, p, round)
+	SV *	exp
+	mpfr_t *	p
+	SV *	round
+
+SV *
 Rmpfr_get_ld (p, round)
 	mpfr_t *	p
 	SV *	round
@@ -4182,6 +4686,20 @@ Rmpfr_add (a, b, c, round)
 
 SV *
 Rmpfr_add_ui (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_add_d (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_add_si (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	SV *	c
@@ -4216,6 +4734,13 @@ Rmpfr_sub_ui (a, b, c, round)
 	SV *	round
 
 SV *
+Rmpfr_sub_d (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	c
+	SV *	round
+
+SV *
 Rmpfr_sub_z (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
@@ -4237,6 +4762,13 @@ Rmpfr_ui_sub (a, b, c, round)
 	SV *	round
 
 SV *
+Rmpfr_d_sub (a, b, c, round)
+	mpfr_t *	a
+	SV *	b
+	mpfr_t *	c
+	SV *	round
+
+SV *
 Rmpfr_mul (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
@@ -4245,6 +4777,13 @@ Rmpfr_mul (a, b, c, round)
 
 SV *
 Rmpfr_mul_ui (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_mul_d (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	SV *	c
@@ -4265,6 +4804,13 @@ Rmpfr_mul_q (a, b, c, round)
 	SV *	round
 
 SV *
+Rmpfr_dim (rop, op1, op2, round)
+	mpfr_t *	rop
+	mpfr_t *	op1
+	mpfr_t *	op2
+	SV *	round
+
+SV *
 Rmpfr_div (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
@@ -4273,6 +4819,13 @@ Rmpfr_div (a, b, c, round)
 
 SV *
 Rmpfr_div_ui (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	c
+	SV *	round
+
+SV *
+Rmpfr_div_d (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	SV *	c
@@ -4300,7 +4853,20 @@ Rmpfr_ui_div (a, b, c, round)
 	SV *	round
 
 SV *
+Rmpfr_d_div (a, b, c, round)
+	mpfr_t *	a
+	SV *	b
+	mpfr_t *	c
+	SV *	round
+
+SV *
 Rmpfr_sqrt (a, b, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	round
+
+SV *
+Rmpfr_rec_sqrt (a, b, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	SV *	round
@@ -4526,6 +5092,13 @@ Rmpfr_unordered_p (a, b)
 
 SV *
 Rmpfr_sin_cos (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	mpfr_t *	c
+	SV *	round
+
+SV *
+Rmpfr_sinh_cosh (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	mpfr_t *	c
@@ -4987,6 +5560,12 @@ Rmpfr_zeta (a, b, round)
 	SV *	round
 
 SV *
+Rmpfr_zeta_ui (a, b, round)
+	mpfr_t *	a
+	SV *	b
+	SV *	round
+
+SV *
 Rmpfr_erf (a, b, round)
 	mpfr_t *	a
 	mpfr_t *	b
@@ -5000,6 +5579,20 @@ Rmpfr_frac (a, b, round)
 
 SV *
 Rmpfr_remainder (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	mpfr_t *	c
+	SV *	round
+
+SV *
+Rmpfr_modf (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	mpfr_t *	c
+	SV *	round
+
+SV *
+Rmpfr_fmod (a, b, c, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	mpfr_t *	c
@@ -5347,6 +5940,21 @@ Rmpfr_get_sj (a, round)
 	SV *	round
 
 SV *
+Rmpfr_get_IV (x, round)
+	mpfr_t *	x
+	SV *	round
+
+SV *
+Rmpfr_get_UV (x, round)
+	mpfr_t *	x
+	SV *	round
+
+SV *
+Rmpfr_get_NV (x, round)
+	mpfr_t *	x
+	SV *	round
+
+SV *
 Rmpfr_fits_ulong_p (a, round)
 	mpfr_t *	a
 	SV *	round
@@ -5354,6 +5962,46 @@ Rmpfr_fits_ulong_p (a, round)
 SV *
 Rmpfr_fits_slong_p (a, round)
 	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_ushort_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_sshort_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_uint_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_sint_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_uintmax_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_intmax_p (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_fits_IV_p (x, round)
+	mpfr_t *	x
+	SV *	round
+
+SV *
+Rmpfr_fits_UV_p (x, round)
+	mpfr_t *	x
 	SV *	round
 
 SV *
@@ -5539,6 +6187,12 @@ Rmpfr_eint (a, b, round)
 	SV *	round
 
 SV *
+Rmpfr_li2 (a, b, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	round
+
+SV *
 Rmpfr_get_f (a, b, round)
 	mpf_t *	a
 	mpfr_t *	b
@@ -5606,6 +6260,13 @@ RMPFR_VERSION_NUM (a, b, c)
 	SV *	a
 	SV *	b
 	SV *	c
+
+SV *
+Rmpfr_sum (rop, avref, len, round)
+	mpfr_t *	rop
+	SV *	avref
+	SV *	len
+	SV *	round
 
 SV *
 overload_mul (a, b, third)
@@ -5848,6 +6509,46 @@ _has_longlong ()
 int
 _has_longdouble ()
 
-int
-_has_inttypes ()
+SV *
+RMPFR_PREC_MAX ()
+
+SV *
+RMPFR_PREC_MIN ()
+
+SV *
+wrap_mpfr_printf (a, b)
+	SV *	a
+	SV *	b
+
+SV *
+wrap_mpfr_fprintf (stream, a, b)
+	FILE *	stream
+	SV *	a
+	SV *	b
+
+SV *
+wrap_mpfr_sprintf (stream, a, b)
+	char *	stream
+	SV *	a
+	SV *	b
+
+SV *
+wrap_mpfr_printf_rnd (a, round, b)
+	SV *	a
+	SV *	round
+	SV *	b
+
+SV *
+wrap_mpfr_fprintf_rnd (stream, a, round, b)
+	FILE *	stream
+	SV *	a
+	SV *	round
+	SV *	b
+
+SV *
+wrap_mpfr_sprintf_rnd (stream, a, round, b)
+	char *	stream
+	SV *	a
+	SV *	round
+	SV *	b
 

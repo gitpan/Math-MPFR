@@ -1,3 +1,20 @@
+2.03
+ - Needs version 2.4.0 (or later) of the mpfr library.
+ - Add the following functions (new in mpfr-2.4.0):
+   Rmpfr_add_d, Rmpfr_sub_d, Rmpfr_d_sub Rmpfr_mul_d, Rmpfr_div_d,
+   Rmpfr_d_div, Rmpfr_rec_sqrt, Rmpfr_sinh_cosh, Rmpfr_li2, Rmpfr_zeta_ui,
+   Rmpfr_modf, Rmpfr_fmod, Rmpfr_printf, Rmpfr_fprintf, Rmpfr_sprintf,
+   Rmpfr_sprintf_ret
+ - Fix overload_sqrt() so that it returns a NaN for negative operands
+   instead of croaking, as was originally the case.
+ - Remove (the need for) INLINE.h
+ - Add RMPFR_PREC_MIN and RMPFR_PREC_MAX.
+ - Add Rmpfr_sum, Rmpfr_get_d_2exp, Rmpfr_get_ld_2exp, Rmpfr_dim,
+   Rmpfr_fits_ushort_p, Rmpfr_fits_sshort_p, Rmpfr_fits_uint_p,
+   Rmpfr_fits_sint_p, Rmpfr_fits_uintmax_p, Rmpfr_fits_intmax_p,
+   Rmpfr_fits_IV_p, Rmpfr_fits_UV_p Rmpfr_add_si Rmpfr_get_UV
+   Rmpfr_get_IV Rmpfr_get_NV 
+
 2.02
  - Add TRmpfr_out_str/TRmpfr_inp_str (which wraps mpfr_out_str/mpfr_inp_str
    more Truly than Rmpfr_out_str/Rmpfr_inp_str).

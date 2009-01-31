@@ -1,4 +1,4 @@
-# Just some additional tests to check that ~0, unsigned and signed longs are 
+# Just some additional tests to check that ~0, unsigned and signed longs are
 # are being handled as expected.
 
 use warnings;
@@ -42,34 +42,56 @@ else {
 my $ok = '';
 
 # Check the overloaded operators.
+# But skip these tests 4a to 4h (as they fail) if
+# $] < 5.007 and perl was built with -Duse64bitint
+# but without -Duselongdouble
+if(!($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong())) {
+  if($mpfr1 - 1 == $n - 1) {$ok .= 'a'}
+  else {warn "4a: ", $mpfr1 - 1, " != ", $n - 1}
 
-if($mpfr1 - 1 == $n - 1) {$ok .= 'a'}
+  $mpfr1 -= 1;
 
-$mpfr1 -= 1;
+  if($mpfr1 == $n - 1) {$ok .= 'b'}
+  else {warn "4b: ", $mpfr1, " != ", $n - 1}
 
-if($mpfr1 == $n - 1) {$ok .= 'b'}
+  $mpfr1 = $mpfr1 / 2;
 
-$mpfr1 = $mpfr1 / 2;
+  if($mpfr1 == ($n - 1) / 2) {$ok .= 'c'}
+  else {
+    my $t = ($n - 1) / 2;
+    warn "4c: ", $mpfr1, " != ", $t;
+  }
 
-if($mpfr1 == ($n - 1) / 2) {$ok .= 'c'}
+  $mpfr1 = $mpfr1 * 2;
 
-$mpfr1 = $mpfr1 * 2;
+  if($mpfr1 == $n - 1) {$ok .= 'd'}
+  else {warn "4d: ", $mpfr1, " != ", $n - 1}
 
-if($mpfr1 == $n - 1) {$ok .= 'd'}
+  $mpfr1 /= 2;
 
-$mpfr1 /= 2;
+  if($mpfr1 == ($n - 1) / 2) {$ok .= 'e'} 
+  else {
+    my $t = ($n - 1) / 2;
+    warn "4e: ", $mpfr1 - 1, " != ", $t;
+  }
 
-if($mpfr1 == ($n - 1) / 2) {$ok .= 'e'} 
+  $mpfr1 *= 2;
 
-$mpfr1 *= 2;
+  if($mpfr1 == $n - 1) {$ok .= 'f'}
+  else {warn "4f: ", $mpfr1, " != ", $n - 1}
 
-if($mpfr1 == $n - 1) {$ok .= 'f'}
+  if($mpfr1 + 1 == $n) {$ok .= 'g'}
+  else {warn "4g: ", $mpfr1 + 1, " != ", $n}
 
-if($mpfr1 + 1 == $n) {$ok .= 'g'}
+  $mpfr1 += 1;
 
-$mpfr1 += 1;
-
-if($mpfr1 == $n) {$ok .= 'h'}
+  if($mpfr1 == $n) {$ok .= 'h'}
+  else {warn "4h: ", $mpfr1, " != ", $n}
+}
+else {
+  warn "Skipping tests 4a to 4h as they fail on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
+  $ok = 'abcdefgh';
+}
 
 my $bits = Math::MPFR::_has_longlong() ? 32 : 16;
 
@@ -93,7 +115,10 @@ if(Math::MPFR::_has_longlong()) {
   if($ul == $n) {print "ok 5\n"}
   else {print "not ok 5 $ul != $n\n"}
 }
-else {print "ok 5 - skipped, not using 'long long' support\n"}
+else {
+  warn "Skipping test 5 - no 'long long' support\n";
+  print "ok 5\n";
+}
 
 $ok = '';
 

@@ -2,8 +2,9 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
+#use Devel::Peek;
 
-print "1..4\n";
+print "1..7\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -11,8 +12,8 @@ print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 my $_64 = Math::MPFR::_has_longlong();
 
-if($_64){print "Using 64-bit integer\n"}
-else {print "Using 32-bit integer\n"}
+if($_64){warn "Using 64-bit integer\n"}
+else {warn "Using 32-bit integer\n"}
 
 Rmpfr_set_default_prec(300);
 
@@ -133,26 +134,36 @@ if($_64) {
      && ($int <=> 2) == -1
     ) {$ok .= 'e'}
 
+#####################################
+
   $int = 2;
   my $temp = Math::MPFR->new();
 
   $temp = $int * $pint;
 
-  if($temp == -288230376151736434
-     && $temp != -288230376151736435
-    ) {$ok .= 'f'}
+  if(!($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong())) {
+    if($temp == -288230376151736434
+       && $temp != -288230376151736435
+      ) {$ok .= 'f'}
 
-  $temp = $temp + $pint;
+    $temp = $temp + $pint;
 
-  if($temp == -432345564227604651
-     && $temp != -432345564227604653
-    ) {$ok .= 'g'}
+    if($temp == -432345564227604651
+       && $temp != -432345564227604653
+      ) {$ok .= 'g'}
 
-  $temp = $temp - $pint;
+    $temp = $temp - $pint;
 
-  if($temp == -288230376151736434
-     && $temp != -288230376151736435
-    ) {$ok .= 'h'}
+    if($temp == -288230376151736434
+       && $temp != -288230376151736435
+      ) {$ok .= 'h'}
+  }
+  else {
+    warn "Skipping tests 3f to 3h as they fail on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
+    $ok .= 'fgh';
+  }
+
+#####################################
 
   $temp = $temp + 12345;
   $temp = $temp / $pint; # $temp no longer an integer value
@@ -188,10 +199,16 @@ if($_64) {
   }
   else {$pint2 = Rmpfr_get_sj($temp2, GMP_RNDN)}
 
-  if($pint2 == $pint
-     && $pint2 < $pint + 1
-     && $pint2 > $pint - 1
-    ) {$ok .= 'm'}
+  if(!($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong())) {
+    if($pint2 == $pint
+       && $pint2 < $pint + 1
+       && $pint2 > $pint - 1
+      ) {$ok .= 'm'}
+  }
+  else {
+    warn "Skipping test 3m as it fails on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
+    $ok .= 'm';
+  }
   
   my $temp3 = new Math::MPFR($pint);
 
@@ -211,14 +228,17 @@ if($_64) {
     eval{Rmpfr_set_uj($int3, ~0, GMP_RNDN);};
     if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'b'}
     eval{Rmpfr_get_sj($int3, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'c'}
+    if(!$@) {$ok .= 'c'}
     eval{Rmpfr_get_uj($int3, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'd'}
+    if(!$@) {$ok .= 'd'}
 
     if($ok eq 'abcd') {print "ok 4\n"}
     else {print "not ok $ok\n"}
   }
-  else {print "ok 4 - skipped, 'cl' not used\n"}
+  else {
+    warn "Skipping test 4 - 'cl' compiler not used\n";
+    print "ok 4\n";
+  }
 }
 
 $ok = '';
@@ -263,7 +283,75 @@ if(!$_64) {
   if($ok eq 'ab') {print "ok 3\n"}
   else {print "not ok 3 $ok\n"}
 
-  print "ok 4 - skipped\n";
+  warn "Skipping test 4 - nothing to test\n";
+  print "ok 4\n";
 
+}
+
+my $bits = $Config{ivsize} * 8;
+my ($uhigh, $uhigh1, $uhigh2);
+{
+use integer;
+my $temp = (2 ** ($bits - 2)) - 1;
+$uhigh = (2 * $temp) + 1;
+#$uhigh = (2 ** $bits) - 1;
+}
+
+$uhigh = (2 * $uhigh) + 1;
+
+#Dump($uhigh);
+
+$uhigh1 = Math::MPFR->new($uhigh);
+$uhigh2 = Rmpfr_init();
+if(Math::MPFR::_has_longlong()) {
+  Rmpfr_set_uj($uhigh2, $uhigh, GMP_RNDN);
+}
+else {
+  Rmpfr_set_ui($uhigh2, $uhigh, GMP_RNDN);
+}
+
+if($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong()) {
+  warn "Skipping tests 5 and 6 as they fail on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
+  print "ok 5\n";
+  print "ok 6\n";
+}
+else {
+  if(!Rmpfr_cmp($uhigh1, $uhigh2)) {print "ok 5\n"}
+  else {
+    warn "\n\$uhigh1: $uhigh1\n\$uhigh2: $uhigh2\n";
+    print "not ok 5\n";
+  }
+
+  if(Math::MPFR::_has_longlong()) {
+    # No mpfr_cmp_uj() yet available
+    if(!Rmpfr_cmp($uhigh1, Math::MPFR->new($uhigh))) {print "ok 6\n"}
+    else {
+      warn "\n\$uhigh1: $uhigh1\n\$uhigh: ", Math::MPFR->new($uhigh), "\n";
+      print "not ok 6\n";
+    }
+  }
+  else {
+    if(!Rmpfr_cmp_ui($uhigh1, $uhigh)) {print "ok 6\n"}
+    else {
+      warn "\n\$uhigh1: $uhigh1\n\$uhigh: $uhigh\n";
+      print "not ok 6\n";
+    }
+  }
+}
+
+if(Math::MPFR::_has_longlong()) {
+  # No mpfr_cmp_uj() yet available
+  if(!Rmpfr_cmp($uhigh2, Math::MPFR->new($uhigh))) {print "ok 7\n"}
+  else {
+    warn "\n\$uhigh2: $uhigh2\n\$uhigh: $uhigh\n";
+    print "not ok 7\n";
+  }
+}
+else {
+  if(!Rmpfr_cmp_ui($uhigh2, $uhigh)) {print "ok 7\n"}
+  else {
+    warn "\n\$uhigh2: $uhigh2\n\$uhigh: $uhigh\n";
+    print "not ok 7\n";
+  }
 }
 

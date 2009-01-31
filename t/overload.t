@@ -611,7 +611,10 @@ if($] >= 5.008) {
     && Math::MPFR::get_refcnt($int) == 1) {print "ok 39\n"}
   else {print "not ok 39\n"}
   }
-else {print "ok 39 - skipped - no overloading of 'int()' on perl $] \n"}
+else {
+  warn "Skipping test 39 - no overloading of 'int' on perl $]\n";
+  print "ok 39\n";
+}
 
 $s = exp($s);
 

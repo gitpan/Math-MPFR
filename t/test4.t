@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..38\n";
+print "1..43\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -201,8 +201,11 @@ if($have_mpq) {
 
   if($f > 1.0937499 && $f < 1.0937501) {print "ok 31\n"}
   else {print "not ok 31\n"}
-  }
-else {print "ok 31 - skipped - no Math::GMPq\n"} 
+}
+else {
+  warn "Skipping test 31 - no Math::GMPq\n";
+  print "ok 31\n";
+} 
 
 my ($u1, $cmp1) = Rmpfr_init_set_str('1.a', 16, GMP_RNDN);
 if(!$cmp1) {print "ok 32\n"}
@@ -272,3 +275,158 @@ Rmpfr_set_si($k, -2147483647, GMP_RNDN);
 if(Rmpfr_get_si($k, GMP_RNDN) == -2147483647) {print "ok 38\n"}
 else {print "not ok 38\n"}
 
+my $u = Math::MPFR->new(256);
+
+if(Rmpfr_fits_intmax_p($u, GMP_RNDN) && Rmpfr_fits_sint_p($u, GMP_RNDN) &&
+   Rmpfr_fits_slong_p($u, GMP_RNDN) && Rmpfr_fits_sshort_p($u, GMP_RNDN) &&
+   Rmpfr_fits_uint_p($u, GMP_RNDN) && Rmpfr_fits_uintmax_p($u, GMP_RNDN) &&
+   Rmpfr_fits_ulong_p($u, GMP_RNDN) && Rmpfr_fits_ushort_p($u, GMP_RNDN)) {print "ok 39\n"}
+else {print "not ok 39\n"}
+
+my $bits = $Config{ivsize} * 8;
+Rmpfr_set_default_prec($bits + 5);
+my $check = '10111101111110100101110101101111011111101001011101011011110110110010010111010110111101111110100100110101';
+my $shigh;
+$ok = '';
+
+{
+use integer;
+my $temp = (2 ** ($bits - 2)) - 1;
+$shigh = (2 * $temp) + 1;
+}
+my $uhigh = (2 * $shigh) + 1;
+my $ulow = 0;
+my $slow = ($shigh * -1) - 1;
+
+
+my @obj= (
+Math::MPFR->new($uhigh),
+Math::MPFR->new($shigh),
+Math::MPFR->new($ulow),
+Math::MPFR->new($slow),
+Math::MPFR->new($shigh) + Math::MPFR->new(0.299),
+Math::MPFR->new($shigh) - Math::MPFR->new(0.239),
+Math::MPFR->new($uhigh) + Math::MPFR->new(0.467),
+Math::MPFR->new($uhigh) - Math::MPFR->new(0.6),
+Math::MPFR->new($slow) + Math::MPFR->new(0.299),
+Math::MPFR->new($slow) - Math::MPFR->new(0.239),
+Math::MPFR->new($ulow) + Math::MPFR->new(0.467),
+Math::MPFR->new($ulow) - Math::MPFR->new(0.6),
+Math::MPFR->new(-1),
+);
+
+my @rnd = (GMP_RNDN, GMP_RNDZ, GMP_RNDU, GMP_RNDD);
+
+for(my $j = 0; $j < 4; $j++) {
+   for(my $i = 0; $i < 13; $i++) {
+      $ok .= Rmpfr_fits_UV_p($obj[$i], $rnd[$j]);
+      $ok .= Rmpfr_fits_IV_p($obj[$i], $rnd[$j]);
+   }
+}
+
+my $icheck = have_get_IV();
+my $ucheck = have_get_UV();
+
+if($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong()) {
+  warn "Skipping tests 40 and 41 as they fail on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
+  print "ok 40\n";
+  print "ok 41\n";
+}
+else {
+  if($ok eq $check) {print "ok 40\n"}
+  else {
+     warn "\nGot:      $ok\nExpected: $check\n";
+     print "not ok 40\n";
+  }
+
+  $ok = '';
+
+  if($ucheck) {
+    for(@rnd) {
+       if(Math::MPFR::_has_longlong()) {
+         # No mpfr_cmp_uj() is yet available
+         Rmpfr_set_default_rounding_mode($_);
+         if(!Rmpfr_cmp($obj[0], Math::MPFR->new(Rmpfr_get_UV($obj[0], $_)))) {$ok .= $_}
+         if(!Rmpfr_cmp($obj[2], Math::MPFR->new(Rmpfr_get_UV($obj[2], $_)))) {$ok .= $_}
+       }
+       else {
+         if(!Rmpfr_cmp_ui($obj[0], Rmpfr_get_UV($obj[0], $_))) {$ok .= $_}
+         if(!Rmpfr_cmp_ui($obj[2], Rmpfr_get_UV($obj[2], $_))) {$ok .= $_}
+       }
+    }
+
+    if($ok eq '00112233') {print "ok 41\n"}
+    else {
+      warn $ok, "\n";
+      print "not ok 41 \n";
+    }
+  }
+
+  else {
+    warn "Skipping test 41 - Rmpfr_get_UV() not implemented\n";
+    print "ok 41\n";
+  }
+}
+
+Rmpfr_set_default_rounding_mode(GMP_RNDN);
+
+$ok = '';
+
+if($icheck) {
+  for(@rnd) {
+     if(Math::MPFR::_has_longlong()) {
+       # No mpfr_cmp_sj is yet available
+       Rmpfr_set_default_rounding_mode($_);
+       if(!Rmpfr_cmp($obj[1], Math::MPFR->new(Rmpfr_get_IV($obj[1], $_)))) {$ok .= $_}
+       if(!Rmpfr_cmp($obj[3], Math::MPFR->new(Rmpfr_get_IV($obj[3], $_)))) {$ok .= $_}
+     }
+     else {
+       if(!Rmpfr_cmp_si($obj[1], Rmpfr_get_IV($obj[1], $_))) {$ok .= $_}
+       if(!Rmpfr_cmp_si($obj[3], Rmpfr_get_IV($obj[3], $_))) {$ok .= $_}
+     }
+  }
+
+  if($ok eq '00112233') {print "ok 42\n"}
+  else {
+    warn $ok, "\n";
+    print "not ok 42 \n";
+  }
+}
+
+else {
+  warn "Skipping test 42 - Rmpfr_get_IV() not implemented\n";
+  print "ok 42\n";
+}
+
+Rmpfr_set_default_rounding_mode(GMP_RNDN);
+
+my $double = 17.625;
+
+if($double == Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN)) {print "ok 43\n"}
+else {
+  warn "\nGot: ", Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN) , "\nExpected: $double\n";
+  print "not ok 43\n";
+}
+
+
+
+##########################################
+##########################################
+
+sub have_get_IV {
+    eval{Rmpfr_get_IV(Math::MPFR->new(0));};
+    if($@) {
+      return 0 if $@ =~ /not implemented/;
+    }
+
+    return 1;
+}
+
+sub have_get_UV {
+    eval{Rmpfr_get_UV(Math::MPFR->new(0));};
+    if($@) {
+      return 0 if $@ =~ /not implemented/;
+    }
+
+    return 1;
+}
