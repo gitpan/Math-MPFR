@@ -6,10 +6,13 @@ README
 CHANGES
 t/aa_basic.t
 t/bessel.t
+t/buildopt.t
 t/constants.t
 t/exceptions.t
 t/flags.t
 t/integer_string.t
+t/inits.t
+t/MPFR_RND.t
 t/nan_cmp.t
 t/not_zero.t
 t/new.t

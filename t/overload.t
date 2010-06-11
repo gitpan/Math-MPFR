@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..59\n";
+print "1..60\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -19,7 +19,7 @@ my $negi = -1236;
 my $posi = 1238;
 my($posd, $negd);
 
-if(defined($Config::Config{use64bitint})) {
+if(Math::MPFR::_has_longlong()) {
    use integer;
    $posd = (2 ** 41) + 11234;
    $negd = -((2 ** 43) - 111);
@@ -979,6 +979,30 @@ else {print "not ok 58\n"}
 
 $zero ? print "not ok 59\n" : print "ok 59\n";
 
+# testing overload_copy subroutine precision handling.
+# current default precision is 200.
+
+$ok = '';
+
+my $mpfr1 = Rmpfr_init2(100);
+Rmpfr_set_ui($mpfr1, 1234, GMP_RNDN);
+
+my $mpfr2 = $mpfr1;
+$ok .= 'a' if Rmpfr_get_prec($mpfr2) == 100;
+$mpfr2 *= 2;
+$ok .= 'b' if $mpfr2 == 2468 && $mpfr1 == 1234
+       && Rmpfr_get_prec($mpfr1) == 100
+       && Rmpfr_get_prec($mpfr2) == 100;
+
+my $mpfr3 = $mpfr1;
+$mpfr1 *= 2;
+
+$ok .= 'c' if $mpfr1 == 2468 && $mpfr3 == 1234
+       && Rmpfr_get_prec($mpfr1) == 100
+       && Rmpfr_get_prec($mpfr3) == 100;
+
+if($ok eq 'abc'){print "ok 60\n"}
+else {print "not ok 60 $ok\n"}
 
 sub adjust {
     if($_[0]) {

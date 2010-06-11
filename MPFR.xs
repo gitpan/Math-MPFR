@@ -13,13 +13,21 @@
 #include <gmp.h>
 #include <mpfr.h>
 
-// Squash some annoying compiler warnings (Microsoft compilers only).
+/* Squash some annoying compiler warnings (Microsoft compilers only). */
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
 #endif
 
 #ifdef OLDPERL
 #define SvUOK SvIsUV
+#endif
+
+/* May one day be removed from mpfr.h */
+#ifndef mp_rnd_t
+# define mp_rnd_t  mpfr_rnd_t
+#endif
+#ifndef mp_prec_t
+# define mp_prec_t mpfr_prec_t
 #endif
 
 #ifndef __gmpfr_default_rounding_mode
@@ -40,6 +48,9 @@ return 0;
 }
 
 void Rmpfr_set_default_rounding_mode(SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      mpfr_set_default_rounding_mode((mp_rnd_t)SvUV(round));    
 }
 
@@ -67,6 +78,16 @@ void Rmpfr_clear_mpfr(mpfr_t * p) {
 
 void Rmpfr_clear_ptr(mpfr_t * p) {
      Safefree(p);
+}
+
+void Rmpfr_clears(SV * p, ...) {
+     dXSARGS;
+     unsigned long i;
+     for(i = 0; i < items; i++) {
+        mpfr_clear(*(INT2PTR(mpfr_t *, SvIV(SvRV(ST(i))))));
+        Safefree(INT2PTR(mpfr_t *, SvIV(SvRV(ST(i)))));
+     }
+     XSRETURN(0);
 }
 
 SV * Rmpfr_init() {
@@ -135,6 +156,10 @@ void Rmpfr_init_set(mpfr_t * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -156,6 +181,10 @@ void Rmpfr_init_set_ui(SV * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not needed
 
@@ -179,6 +208,10 @@ void Rmpfr_init_set_si(SV * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -200,6 +233,10 @@ void Rmpfr_init_set_d(SV * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp =  mark; // not needed
 
@@ -224,6 +261,10 @@ void Rmpfr_init_set_ld(SV * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not needed
 
@@ -252,6 +293,10 @@ void Rmpfr_init_set_f(mpf_t * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; //not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -273,6 +318,10 @@ void Rmpfr_init_set_z(mpz_t * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not neededInline_Stack_Reset;
 
@@ -296,6 +345,10 @@ void Rmpfr_init_set_q(mpq_t * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -318,9 +371,13 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
-     if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpf_init_set str is out of allowable range");
+     if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set str is out of allowable range");
 
      New(1, mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str function");
@@ -341,6 +398,10 @@ void Rmpfr_init_set_nobless(mpfr_t * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not needed
 
@@ -364,6 +425,10 @@ void Rmpfr_init_set_ui_nobless(SV * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp  = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -386,6 +451,10 @@ void Rmpfr_init_set_si_nobless(SV * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -407,6 +476,10 @@ void Rmpfr_init_set_d_nobless(SV * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not needed
 
@@ -431,6 +504,10 @@ void Rmpfr_init_set_ld_nobless(SV * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp = mark; // not needed
 
@@ -459,6 +536,10 @@ void Rmpfr_init_set_f_nobless(mpf_t * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -480,6 +561,10 @@ void Rmpfr_init_set_z_nobless(mpz_t * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      // sp  = mark; //not needed
 
@@ -503,6 +588,10 @@ void Rmpfr_init_set_q_nobless(mpq_t * q, SV * round) {
      SV * obj_ref, * obj;
      int ret;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      // sp = mark; // not needed
 
      New(1, mpfr_t_obj, 1, mpfr_t);
@@ -525,6 +614,10 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set_str_nobless is out of allowable range");
 
      // sp = mark; // not needed
@@ -546,14 +639,16 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
 void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
      dXSARGS;
      char * out;
-     mp_exp_t ptr, *expptr;
+     mp_exp_t ptr;
      unsigned long b = (unsigned long)SvUV(base);
 
-     expptr = &ptr;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      if(b < 2 || b > 36) croak("Second argument supplied to Rmpfr_get_str() is not in acceptable range");
 
-     out = mpfr_get_str(0, expptr, b, (unsigned long)SvUV(n_digits), *p, (mp_rnd_t)SvUV(round));
+     out = mpfr_get_str(0, &ptr, b, (unsigned long)SvUV(n_digits), *p, (mp_rnd_t)SvUV(round));
 
      if(out == NULL) croak("An error occurred in mpfr_get_str()\n");
 
@@ -594,18 +689,30 @@ SV * Rmpfr_get_prec(mpfr_t * p) {
 }
 
 SV * Rmpfr_set(mpfr_t * p, mpfr_t * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_ui(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_ui(*p, (unsigned long)SvUV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_si(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_si(*p, (long)SvIV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_uj(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
      return newSViv(mpfr_set_uj(*p, SvUV(q), (mp_rnd_t)SvUV(round)));
@@ -618,6 +725,9 @@ SV * Rmpfr_set_uj(mpfr_t * p, SV * q, SV * round) {
 }
 
 SV * Rmpfr_set_sj(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
      return newSViv(mpfr_set_sj(*p, SvIV(q), (mp_rnd_t)SvUV(round)));
@@ -630,6 +740,9 @@ SV * Rmpfr_set_sj(mpfr_t * p, SV * q, SV * round) {
 }
 
 SV * Rmpfr_set_ld(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
      return newSViv(mpfr_set_ld(*p, SvNV(q), (mp_rnd_t)SvUV(round)));
@@ -642,22 +755,37 @@ SV * Rmpfr_set_ld(mpfr_t * p, SV * q, SV * round) {
 }
 
 SV * Rmpfr_set_d(mpfr_t * p, SV * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_d(*p, SvNV(q), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_z(mpfr_t * p, mpz_t * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_z(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_q(mpfr_t * p, mpq_t * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_q(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_f(mpfr_t * p, mpf_t * q, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_set_f(*p, *q, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_str(mpfr_t * p, SV * num, SV * base, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      int b = (int)SvIV(base);
      if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_set_str is out of allowable range");
      return newSViv(mpfr_set_str(*p, SvPV_nolen(num), b, (mp_rnd_t)SvUV(round)));
@@ -680,12 +808,18 @@ void Rmpfr_swap(mpfr_t *p, mpfr_t * q) {
 }
 
 SV * Rmpfr_get_d(mpfr_t * p, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVnv(mpfr_get_d(*p, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_d_2exp(SV * exp, mpfr_t * p, SV * round){
      long _exp;
      double ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      ret = mpfr_get_d_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
      sv_setuv(exp, _exp);
      return newSVnv(ret);
@@ -696,6 +830,9 @@ SV * Rmpfr_get_ld_2exp(SV * exp, mpfr_t * p, SV * round){
 #ifndef _MSC_VER
      long _exp;
      long double ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      ret = mpfr_get_ld_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
      sv_setuv(exp, _exp);
      return newSVnv(ret);
@@ -708,6 +845,9 @@ SV * Rmpfr_get_ld_2exp(SV * exp, mpfr_t * p, SV * round){
 }
 
 SV * Rmpfr_get_ld(mpfr_t * p, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
      return newSVnv(mpfr_get_ld(*p, (mp_rnd_t)SvUV(round)));
@@ -723,180 +863,315 @@ SV * Rmpfr_get_d1(mpfr_t * p) {
      return newSVnv(mpfr_get_d1(*p));
 }
 
-SV * Rmpfr_get_z_exp(mpz_t * z, mpfr_t * p){
+/* Alias for the perl function Rmpfr_get_z_exp
+*  (which will perhaps one day be removed). 
+*  The mpfr headers define 'mpfr_get_z_exp' to
+*  'mpfr_get_z_2exp' when that function is
+*  available. 
+*/
+SV * Rmpfr_get_z_2exp(mpz_t * z, mpfr_t * p){
      return newSViv(mpfr_get_z_exp(*z, *p));
 }
 
 SV * Rmpfr_add(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add_si(*a, *b, (int)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_add_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_add_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_sub(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_ui_sub(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_d_sub(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_d_sub(*a, (double)SvNV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_dim(mpfr_t * rop, mpfr_t * op1, mpfr_t * op2, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
          int ret = mpfr_dim( *rop, *op1, *op2, (mp_rnd_t)SvUV(round));
          return newSViv(ret);
 }
 
 SV * Rmpfr_div(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_d(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_d(*a, *b, (double)SvNV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_z(mpfr_t * a, mpfr_t * b, mpz_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_q(mpfr_t * a, mpfr_t * b, mpq_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_q(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_div(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_ui_div(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_d_div(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_d_div(*a, (double)SvNV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sqrt(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sqrt(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_rec_sqrt(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rec_sqrt(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cbrt(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_cbrt(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sqrt_ui(mpfr_t * a, SV * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sqrt_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow_ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_pow_ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_pow_ui(mpfr_t * a, SV * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_ui_pow_ui(*a, (unsigned long)SvUV(b), (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_ui_pow(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_ui_pow(*a, (unsigned long)SvUV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_pow_si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_pow(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_neg(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_neg(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_abs(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_abs(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2exp(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_2exp(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_2ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_2si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_2si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2exp(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_2exp(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2ui(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_2ui(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_2si(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_2si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
@@ -957,6 +1232,9 @@ SV * Rmpfr_number_p(mpfr_t * p) {
 }
 
 void Rmpfr_reldiff(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      mpfr_reldiff(*a, *b, *c, (mp_rnd_t)SvUV(round));
 }
 
@@ -993,106 +1271,184 @@ SV * Rmpfr_unordered_p(mpfr_t * a, mpfr_t * b) {
 }
 
 SV * Rmpfr_sin_cos(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sin_cos(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sinh_cosh(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sinh_cosh(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sin(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sin(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cos(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_cos(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_tan(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_tan(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_asin(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_asin(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_acos(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_acos(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_atan(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_atan(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sinh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sinh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cosh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_cosh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_tanh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_tanh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_asinh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_asinh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_acosh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_acosh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_atanh(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_atanh(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fac_ui(mpfr_t * a, SV * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_fac_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log1p(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_log1p(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_expm1(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_expm1(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log2(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_log2(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_log10(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_log10(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fma(mpfr_t * a, mpfr_t * b, mpfr_t * c, mpfr_t * d, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_fma(*a, *b, *c, *d, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fms(mpfr_t * a, mpfr_t * b, mpfr_t * c, mpfr_t * d, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_fms(*a, *b, *c, *d, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_agm(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_agm(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_hypot(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_hypot(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_log2(mpfr_t * p, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_const_log2(*p, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_pi(mpfr_t * p, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_const_pi(*p, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_euler(mpfr_t * p, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_const_euler(*p, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1101,6 +1457,9 @@ void Rmpfr_print_binary(mpfr_t * p) {
 }
 
 SV * Rmpfr_rint(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rint(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1131,6 +1490,10 @@ SV * Rmpfr_sub_one_ulp(SV * p, SV * round) {
 } */
 
 SV * Rmpfr_can_round(mpfr_t * p, SV * err, SV * round1, SV * round2, SV * prec) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round1) > 3 || (mp_rnd_t)SvUV(round2) > 3)
+      croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_can_round(*p, (mp_exp_t)SvIV(err), SvUV(round1), SvUV(round2), (mpfr_prec_t)SvUV(prec)));
 }
 
@@ -1151,6 +1514,9 @@ SV * Rmpfr_set_emax(SV * e) {
 }
 
 SV * Rmpfr_check_range(mpfr_t * p, SV * t, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_check_range(*p, (int)SvIV(t), (mp_rnd_t)SvUV(round)));
 }
 
@@ -1191,18 +1557,30 @@ SV * Rmpfr_inexflag_p() {
 }
 
 SV * Rmpfr_log(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_log(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_exp(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp2(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_exp2(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_exp10(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_exp10(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1220,7 +1598,11 @@ void Rmpfr_urandomb(SV * x, ...) {
 }
 
 void Rmpfr_random2(mpfr_t * p, SV * s, SV * exp) {
+#if MPFR_VERSION_MAJOR > 2
+     croak("Rmpfr_random2 no longer implemented. Use Rmpfr_urandom or Rmpfr_urandomb");
+#else
      mpfr_random2(*p, (int)SvIV(s), (mp_exp_t)SvIV(exp));
+#endif
 }
  
 SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
@@ -1233,6 +1615,9 @@ SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round)
 
 SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stdout);
@@ -1241,6 +1626,9 @@ SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
 
 SV * _TRmpfr_out_strS(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round, SV * suff) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
@@ -1251,6 +1639,9 @@ SV * _TRmpfr_out_strS(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round
 
 SV * _TRmpfr_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
@@ -1261,6 +1652,9 @@ SV * _TRmpfr_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, 
 
 SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round, SV * suff) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
@@ -1273,6 +1667,9 @@ SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p,
 
 SV * _Rmpfr_out_strS(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      printf("%s", SvPV_nolen(suff));
@@ -1282,6 +1679,9 @@ SV * _Rmpfr_out_strS(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
 
 SV * _Rmpfr_out_strP(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      printf("%s", SvPV_nolen(pre));
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
@@ -1291,6 +1691,9 @@ SV * _Rmpfr_out_strP(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round) {
 
 SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
      printf("%s", SvPV_nolen(pre));
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
@@ -1301,6 +1704,9 @@ SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV 
 
 SV * TRmpfr_inp_str(mpfr_t * p, FILE * stream, SV * base, SV * round) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_inp_str(*p, stream, (int)SvIV(base), (mp_rnd_t)SvUV(round));
      /* fflush(stream); */
@@ -1309,6 +1715,9 @@ SV * TRmpfr_inp_str(mpfr_t * p, FILE * stream, SV * base, SV * round) {
 
 SV * Rmpfr_inp_str(mpfr_t * p, SV * base, SV * round) {
      size_t ret;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
      ret = mpfr_inp_str(*p, NULL, (int)SvIV(base), (mp_rnd_t)SvUV(round));
      /* fflush(stdin); */
@@ -1316,40 +1725,67 @@ SV * Rmpfr_inp_str(mpfr_t * p, SV * base, SV * round) {
 }
 
 SV * Rmpfr_gamma(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_gamma(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_zeta(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_zeta(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_zeta_ui(mpfr_t * a, SV * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_zeta_ui(*a, (unsigned long)SvUV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_erf(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_erf(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_frac(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_frac(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_remainder(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_remainder(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_modf(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_modf(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fmod(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_fmod(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_remquo(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
      dXSARGS;
      long ret, q;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      ret = mpfr_remquo(*a, &q, *b, *c, (mp_rnd_t)SvUV(round)); 
      // sp  = mark; // not needed
      ST(0) = sv_2mortal(newSViv(q));
@@ -1375,10 +1811,16 @@ void Rmpfr_nextbelow(mpfr_t * p) {
 }
 
 SV * Rmpfr_min(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_min(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_max(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_max(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1395,10 +1837,16 @@ SV * Rmpfr_signbit(mpfr_t * op) {
 }
 
 SV * Rmpfr_setsign(mpfr_t * rop, mpfr_t * op, SV * sign, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_setsign(*rop, *op, SvIV(sign), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_copysign(mpfr_t * rop, mpfr_t * op1, mpfr_t * op2, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_copysign(*rop, *op1, *op2, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1430,6 +1878,9 @@ SV * Rmpfr_set_si_2exp(mpfr_t * a, SV * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_set_uj_2exp(mpfr_t * a, SV * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
      return newSViv(mpfr_set_uj_2exp(*a, SvUV(b), SvIV(c), (mp_rnd_t)SvUV(round)));
@@ -1442,6 +1893,9 @@ SV * Rmpfr_set_uj_2exp(mpfr_t * a, SV * b, SV * c, SV * round) {
 }
 
 SV * Rmpfr_set_sj_2exp(mpfr_t * a, SV * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
      return newSViv(mpfr_set_sj_2exp(*a, SvIV(b), SvIV(c), (mp_rnd_t)SvUV(round)));
@@ -1453,31 +1907,57 @@ SV * Rmpfr_set_sj_2exp(mpfr_t * a, SV * b, SV * c, SV * round) {
 #endif
 }
 
-void Rmpfr_get_z(mpz_t * a, mpfr_t * b, SV * round) {
+SV * Rmpfr_get_z(mpz_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+#if MPFR_VERSION_MAJOR < 3
      mpfr_get_z(*a, *b, (mp_rnd_t)SvUV(round));
+     return &PL_sv_undef;
+#else
+     return newSViv(mpfr_get_z(*a, *b, (mp_rnd_t)SvUV(round)));
+#endif
 }
 
 SV * Rmpfr_si_sub(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_si_sub(*a, (long)SvIV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sub_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sub_si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_mul_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_mul_si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_si_div(mpfr_t * a, SV * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_si_div(*a, (long)SvIV(b), *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_div_si(mpfr_t * a, mpfr_t * b, SV * c, SV * round){
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_div_si(*a, *b, (long)SvIV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sqr(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sqr(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1534,30 +2014,51 @@ SV * Rmpfr_erangeflag_p() {
 }
 
 SV * Rmpfr_rint_round(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rint_round(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_rint_trunc(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rint_trunc(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_rint_ceil(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rint_ceil(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_rint_floor(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_rint_floor(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_ui(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_get_ui(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_si(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_get_si(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_uj(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
      return newSVuv(mpfr_get_uj(*a, (mp_rnd_t)SvUV(round)));
 #else
@@ -1566,6 +2067,9 @@ SV * Rmpfr_get_uj(mpfr_t * a, SV * round) {
 }
 
 SV * Rmpfr_get_sj(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 #ifdef USE_64_BIT_INT
      return newSViv(mpfr_get_sj(*a, (mp_rnd_t)SvUV(round)));
 #else
@@ -1574,30 +2078,39 @@ SV * Rmpfr_get_sj(mpfr_t * a, SV * round) {
 }
 
 SV * Rmpfr_get_IV(mpfr_t * x, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(sizeof(IV) == sizeof(int)) return newSViv(mpfr_get_si(*x, (mp_rnd_t)SvUV(round)));
 #if defined USE_64_BIT_INT
 #ifndef _MSC_VER
      if(sizeof(IV) == sizeof(intmax_t)) return newSViv(mpfr_get_sj(*x, (mp_rnd_t)SvUV(round)));
 #else
-     if(sizeof(IV) == sizeof(signed _int64)) return newSViv(mpfr_get_sj(*x, (mp_rnd_t)SvUV(round)));
+     if(sizeof(IV) == sizeof(signed __int64)) return newSViv(mpfr_get_sj(*x, (mp_rnd_t)SvUV(round)));
 #endif
 #endif
      croak("Rmpfr_get_IV not implemented on this build of perl");
 }
 
 SV * Rmpfr_get_UV(mpfr_t * x, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(sizeof(UV) == sizeof(unsigned long)) return newSVuv(mpfr_get_ui(*x, (mp_rnd_t)SvUV(round)));
 #if defined USE_64_BIT_INT
 #ifndef _MSC_VER
      if(sizeof(UV) == sizeof(uintmax_t)) return newSVuv(mpfr_get_uj(*x, (mp_rnd_t)SvUV(round)));
 #else
-     if(sizeof(UV) == sizeof(unsigned _int64)) return newSVuv(mpfr_get_uj(*x, (mp_rnd_t)SvUV(round)));
+     if(sizeof(UV) == sizeof(unsigned __int64)) return newSVuv(mpfr_get_uj(*x, (mp_rnd_t)SvUV(round)));
 #endif
 #endif
      croak("Rmpfr_get_UV not implemented on this build of perl");
 }
 
 SV * Rmpfr_get_NV(mpfr_t * x, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      if(sizeof(NV) == sizeof(double)) return newSVnv(mpfr_get_d(*x, (mp_rnd_t)SvUV(round)));
 #if defined USE_LONG_DOUBLE
 #ifndef _MSC_VER
@@ -1608,40 +2121,68 @@ SV * Rmpfr_get_NV(mpfr_t * x, SV * round) {
 }
 
 SV * Rmpfr_fits_ulong_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_ulong_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_slong_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_slong_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_ushort_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_ushort_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_sshort_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_sshort_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_uint_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_uint_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_sint_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_sint_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_uintmax_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_uintmax_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_intmax_p(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSVuv(mpfr_fits_intmax_p(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_fits_IV_p(mpfr_t * x, SV * round) {
      unsigned long ret = 0, bits = sizeof(IV) * 8;
      mpfr_t high, low, copy;
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      if(sizeof(IV) == sizeof(long)) {
        if(mpfr_fits_slong_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
@@ -1660,7 +2201,7 @@ SV * Rmpfr_fits_IV_p(mpfr_t * x, SV * round) {
        return newSVuv(0);
      }
 #else
-     if(sizeof(IV) == sizeof(signed _int64)) {
+     if(sizeof(IV) == sizeof(signed __int64)) {
        if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
        return newSVuv(0);
      }
@@ -1692,6 +2233,10 @@ SV * Rmpfr_fits_UV_p(mpfr_t * x, SV * round) {
      unsigned long ret = 0, bits = sizeof(UV) * 8;
      mpfr_t high, copy;
 
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
+
      if(sizeof(UV) == sizeof(unsigned long)) {
        if(mpfr_fits_ulong_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
        return newSVuv(0);
@@ -1709,7 +2254,7 @@ SV * Rmpfr_fits_UV_p(mpfr_t * x, SV * round) {
        return newSVuv(0);
      }
 #else
-     if(sizeof(UV) == sizeof(unsigned _int64)) {
+     if(sizeof(UV) == sizeof(unsigned __int64)) {
        if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
        return newSVuv(0);
      }
@@ -1735,8 +2280,13 @@ SV * Rmpfr_fits_UV_p(mpfr_t * x, SV * round) {
 
 SV * Rmpfr_strtofr(mpfr_t * a, SV * str, SV * base, SV * round) {
      int b = (int)SvIV(base);
-     //char ** endptr;
+     /* char ** endptr; */
+#if MPFR_VERSION_MAJOR < 3
+     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
      if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
+#else
+     if(b < 0 || b > 62 || b == 1) croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
+#endif
      return newSViv(mpfr_strtofr(*a, SvPV_nolen(str), NULL, b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1761,101 +2311,168 @@ void Rmpfr_set_inexflag() {
 }
 
 SV * Rmpfr_erfc(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_erfc(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_j0(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_j0(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_j1(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_j1(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_jn(mpfr_t * a, SV * n, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_jn(*a, (long)SvIV(n), *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_y0(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_y0(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_y1(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_y1(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_yn(mpfr_t * a, SV * n, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_yn(*a, (long)SvIV(n), *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_atan2(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_atan2(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_pow_z(mpfr_t * a, mpfr_t * b, mpz_t * c,  SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_pow_z(*a, *b, *c, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_subnormalize(mpfr_t * a, SV * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_subnormalize(*a, (int)SvIV(b), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_const_catalan(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_const_catalan(*a, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sec(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sec(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_csc(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_csc(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_cot(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_cot(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_root(mpfr_t * a, mpfr_t * b, SV * c, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_root(*a, *b, (unsigned long)SvUV(c), (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_eint(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_eint(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_li2(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_li2(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_get_f(mpf_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_get_f(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_sech(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_sech(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_csch(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_csch(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_coth(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_coth(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_lngamma(mpfr_t * a, mpfr_t * b, SV * round) {
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      return newSViv(mpfr_lngamma(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
 void Rmpfr_lgamma(mpfr_t * a, mpfr_t * b, SV * round) {
      dXSARGS;
      int ret, signp;
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      ret = mpfr_lgamma(*a, &signp, *b, (mp_rnd_t)SvUV(round)); 
-     // sp = mark; // not needed
      ST(0) = sv_2mortal(newSViv(signp));
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
      XSRETURN(2);
 } 
 
@@ -1888,6 +2505,10 @@ SV * Rmpfr_sum(mpfr_t * rop, SV * avref, SV * len, SV * round) {
      SV ** elem;
      int ret, i;
      unsigned long s = (unsigned long)SvUV(len);
+
+#if MPFR_VERSION_MAJOR < 3
+    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
      New(42, p, s, mpfr_ptr);
      if(p == NULL) croak("Unable to allocate memory in Rmpfr_sum()"); 
@@ -2252,7 +2873,8 @@ SV * overload_copy(mpfr_t * p, SV * second, SV * third) {
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
 
-     mpfr_init_set(*mpfr_t_obj, *p, __gmpfr_default_rounding_mode);
+     mpfr_init2(*mpfr_t_obj, mpfr_get_prec(*p));
+     mpfr_set(*mpfr_t_obj, *p, __gmpfr_default_rounding_mode);
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
      return obj_ref;
@@ -2278,7 +2900,10 @@ SV * overload_gt(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(0);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(0);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2329,6 +2954,12 @@ SV * overload_gt(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(0);
+       }
+         
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2366,7 +2997,10 @@ SV * overload_gte(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(0);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(0);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2417,6 +3051,12 @@ SV * overload_gte(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(0);
+       }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2454,7 +3094,10 @@ SV * overload_lt(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(0);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(0);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2505,6 +3148,12 @@ SV * overload_lt(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(0);
+       }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2542,7 +3191,10 @@ SV * overload_lte(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(0);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(0);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2593,6 +3245,12 @@ SV * overload_lte(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(0);
+       }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2630,6 +3288,11 @@ SV * overload_lte(mpfr_t * a, SV * b, SV * third) {
 SV * overload_spaceship(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+
+     if(mpfr_nan_p(*a)) {
+       mpfr_set_erangeflag();
+       return &PL_sv_undef;
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2685,6 +3348,12 @@ SV * overload_spaceship(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+       mpfr_set_erangeflag();
+       return &PL_sv_undef;
+     }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2724,7 +3393,10 @@ SV * overload_equiv(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(0);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(0);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2770,6 +3442,12 @@ SV * overload_equiv(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(0);
+       }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -2805,7 +3483,10 @@ SV * overload_not_equiv(mpfr_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
 
-     if(mpfr_nan_p(*a)) return newSVuv(1);
+     if(mpfr_nan_p(*a)){
+       mpfr_set_erangeflag();
+       return newSVuv(1);
+     }
 
 #ifdef USE_64_BIT_INT
 #ifndef _MSC_VER
@@ -2851,6 +3532,12 @@ SV * overload_not_equiv(mpfr_t * a, SV * b, SV * third) {
 #endif
 
      if(SvNOK(b)) {
+
+       if(SvNV(b) != SvNV(b)) { /* it's a NaN */
+         mpfr_set_erangeflag();
+         return newSVuv(1);
+       }
+
 #ifdef USE_LONG_DOUBLE
 #ifndef _MSC_VER
        ret = mpfr_cmp_ld(*a, SvNV(b));
@@ -3898,9 +4585,47 @@ SV * wrap_mpfr_sprintf(char * stream, SV * a, SV * b) {
      croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
 }
 
+SV * wrap_mpfr_snprintf(char * stream, SV * bytes, SV * a, SV * b) {
+     int ret;
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_snprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvUV(b));
+       return newSViv(ret);
+     }
+
+     if(SvIOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvIV(b));
+       return newSViv(ret);
+     }
+
+     if(SvNOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNV(b));
+       return newSViv(ret);
+     }
+
+     if(SvPOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_snprintf");
+}
+
 SV * wrap_mpfr_printf_rnd(SV * a, SV * round, SV * b) {
      int ret;
-     if(SvUV(round) > 3)croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_printf", SvUV(round));
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_printf", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_printf", (mp_rnd_t)SvUV(round));
+#endif
      if(sv_isobject(b)) { 
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")){
          ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
@@ -3937,7 +4662,11 @@ SV * wrap_mpfr_printf_rnd(SV * a, SV * round, SV * b) {
 
 SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
      int ret;
-     if(SvUV(round) > 3)croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_fprintf", SvUV(round));
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_fprintf", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_fprintf", (mp_rnd_t)SvUV(round));
+#endif
      if(sv_isobject(b)) { 
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
@@ -3974,7 +4703,11 @@ SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
 
 SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
      int ret;
-     if(SvUV(round) > 3)croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_sprintf", SvUV(round));
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_sprintf", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_sprintf", (mp_rnd_t)SvUV(round));
+#endif
      if(sv_isobject(b)) { 
        if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
          ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
@@ -4006,6 +4739,127 @@ SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
 
      croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
 }
+
+SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * b) {
+     int ret;
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_snprintf", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_snprintf", (mp_rnd_t)SvUV(round));
+#endif
+     if(sv_isobject(b)) { 
+       if(strEQ(HvNAME(SvSTASH(SvRV(b))), "Math::MPFR")) {
+         ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_snprintf");
+     } 
+
+     if(SvUOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
+       return newSViv(ret);
+     }
+
+     if(SvIOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
+       return newSViv(ret);
+     }
+
+     if(SvNOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
+       return newSViv(ret);
+     }
+
+     if(SvPOK(b)) {
+       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_snprintf");
+
+}
+
+SV * Rmpfr_buildopt_tls_p() {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_buildopt_tls_p());
+#else
+     croak("Rmpfr_buildopt_tls_p not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_buildopt_decimal_p() {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_buildopt_decimal_p());
+#else
+     croak("Rmpfr_buildopt_decimal_p not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_regular_p(mpfr_t * a) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_regular_p(*a));
+#else
+     croak("Rmpfr_regular_p not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+void Rmpfr_set_zero(mpfr_t * a, SV * sign) {
+#if MPFR_VERSION_MAJOR >= 3
+     mpfr_set_zero(*a, (int)SvIV(sign));
+#else
+     croak("Rmpfr_set_zero not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_digamma(mpfr_t * rop, mpfr_t * op, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_digamma(*rop, *op, (mp_rnd_t)SvIV(round)));
+#else
+     croak("Rmpfr_digamma not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_ai(mpfr_t * rop, mpfr_t * op, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_ai(*rop, *op, (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_ai not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_get_flt(mpfr_t * a, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSVnv(mpfr_get_flt(*a, (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_get_flt not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_set_flt(mpfr_t * rop, SV * f, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_set_flt(*rop, (float)SvNV(f), (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_set_flt not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_urandom(mpfr_t * rop, gmp_randstate_t* state, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_urandom(*rop, *state, (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_urandom not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_set_z_2exp(mpfr_t * rop, mpz_t * op, SV * exp, SV * round) {
+#if MPFR_VERSION_MAJOR >= 3
+     return newSViv(mpfr_set_z_2exp(*rop, *op, (mpfr_exp_t)SvIV(exp), (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_set_z_2exp not implemented with this version of the mpfr library - we have %s but need at least 3.0.0", MPFR_VERSION_STRING);
+#endif
+}
+
 
 
 
@@ -4100,6 +4954,22 @@ Rmpfr_clear_ptr (p)
 	PPCODE:
 	temp = PL_markstack_ptr++;
 	Rmpfr_clear_ptr(p);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpfr_clears (p, ...)
+	SV *	p
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_clears(p);
 	if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
 	  PL_markstack_ptr = temp;
@@ -4673,7 +5543,7 @@ Rmpfr_get_d1 (p)
 	mpfr_t *	p
 
 SV *
-Rmpfr_get_z_exp (z, p)
+Rmpfr_get_z_2exp (z, p)
 	mpz_t *	z
 	mpfr_t *	p
 
@@ -5766,23 +6636,11 @@ Rmpfr_set_sj_2exp (a, b, c, round)
 	SV *	c
 	SV *	round
 
-void
+SV *
 Rmpfr_get_z (a, b, round)
 	mpz_t *	a
 	mpfr_t *	b
 	SV *	round
-	PREINIT:
-	I32* temp;
-	PPCODE:
-	temp = PL_markstack_ptr++;
-	Rmpfr_get_z(a, b, round);
-	if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-	  PL_markstack_ptr = temp;
-	  XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-	return; /* assume stack size is correct */
 
 SV *
 Rmpfr_si_sub (a, b, c, round)
@@ -6533,6 +7391,13 @@ wrap_mpfr_sprintf (stream, a, b)
 	SV *	b
 
 SV *
+wrap_mpfr_snprintf (stream, bytes, a, b)
+	char *	stream
+	SV *	bytes
+	SV *	a
+	SV *	b
+
+SV *
 wrap_mpfr_printf_rnd (a, round, b)
 	SV *	a
 	SV *	round
@@ -6551,4 +7416,75 @@ wrap_mpfr_sprintf_rnd (stream, a, round, b)
 	SV *	a
 	SV *	round
 	SV *	b
+
+SV *
+wrap_mpfr_snprintf_rnd (stream, bytes, a, round, b)
+	char *	stream
+	SV *	bytes
+	SV *	a
+	SV *	round
+	SV *	b
+
+SV *
+Rmpfr_buildopt_tls_p ()
+
+SV *
+Rmpfr_buildopt_decimal_p ()
+
+SV *
+Rmpfr_regular_p (a)
+	mpfr_t *	a
+
+void
+Rmpfr_set_zero (a, sign)
+	mpfr_t *	a
+	SV *	sign
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_set_zero(a, sign);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_digamma (rop, op, round)
+	mpfr_t *	rop
+	mpfr_t *	op
+	SV *	round
+
+SV *
+Rmpfr_ai (rop, op, round)
+	mpfr_t *	rop
+	mpfr_t *	op
+	SV *	round
+
+SV *
+Rmpfr_get_flt (a, round)
+	mpfr_t *	a
+	SV *	round
+
+SV *
+Rmpfr_set_flt (rop, f, round)
+	mpfr_t *	rop
+	SV *	f
+	SV *	round
+
+SV *
+Rmpfr_urandom (rop, state, round)
+	mpfr_t *	rop
+	gmp_randstate_t *	state
+	SV *	round
+
+SV *
+Rmpfr_set_z_2exp (rop, op, exp, round)
+	mpfr_t *	rop
+	mpz_t *	op
+	SV *	exp
+	SV *	round
 

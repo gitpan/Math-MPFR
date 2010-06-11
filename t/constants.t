@@ -11,13 +11,15 @@ print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 my $version = RMPFR_VERSION_NUM(MPFR_VERSION_MAJOR, MPFR_VERSION_MINOR, MPFR_VERSION_PATCHLEVEL);
 
 if($version == MPFR_VERSION) {print "ok 1\n"}
-else {print "not ok 1 $version ", MPFR_VERSION, "\n"}
+else {
+  print "not ok 1 $version ", MPFR_VERSION, "\n";
+}
 
 if(MPFR_VERSION_MAJOR >= 2) {print "ok 2\n"}
 else {print "not ok 2 MPFR_VERSION_MAJOR is ", MPFR_VERSION_MAJOR, "\n"}
 
-if(MPFR_VERSION_MINOR >= 2) {print "ok 3\n"}
-else {print "not ok 3 MPFR_VERSION_MINOR is ", MPFR_VERSION_MINOR, "\n"}
+if(MPFR_VERSION_MINOR >= 2 || MPFR_VERSION_MAJOR >= 3) {print "ok 3\n"}
+else {print "not ok 3 MPFR_VERSION_MINOR is ", MPFR_VERSION_MINOR, " MPFR_VERSION_MAJOR is ", MPFR_VERSION_MAJOR, "\n"}
 
 if(MPFR_VERSION_PATCHLEVEL >= 0) {print "ok 4\n"}
 else {print "not ok 4 MPFR_VERSION_PATCHLEVEL is ", MPFR_VERSION_PATCHLEVEL, "\n"}

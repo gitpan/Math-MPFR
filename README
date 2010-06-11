@@ -30,7 +30,7 @@ GMP source.
 Math::MPFR-1.04 to 1.07 require mpfr-2.1.x (or later).
 Math::MPFR-1.08 to Math::MPFR-1.11 require mpfr-2.2.x (or later).
 Math::MPFR-2.01 and 2.02 require mpfr-2.3.x (or later).
-Math::MPFR-2.03 requires mpfr-2.4.x.
+Math::MPFR-2.03 and 2.04 requires mpfr-2.4.x.
 
 You'll get errors if you try to build Math::MPFR against an
 insufficiently recent version of the mpfr library.
@@ -59,18 +59,16 @@ perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
 64-bit support
 ==============
 
-If your perl's Config reports that 'use64bitint' is defined, or that
-'use64bitall' is defined, or that 'usemorebits' is defined, or that
-'ivsize' is 8, then Math::MPFR will, by default, be built with access
+If your perl's Config reports that 'ivsize' is greater than or
+equal to 8, then Math::MPFR will, by default, be built with access
 to the mpfr_*_uj and mpfr_*_sj functions. Else, access to those 
 functions is, by default, denied. You can override the default by 
 opening up the Makefile.PL and uncommenting the appropriate line (just
 a few lines down from the top of the file ... the comments in that
 file should make it clear).
 
-Similarly, if your perl's Config reports that 'uselongdouble' is 
-defined, or that 'usemorebits' is defined, or that 'longdblsize' ==
-'doublesize', then Math::MPFR will, by default, be built with access
+Similarly, if your perl's Config reports that 'nvsize' is greater than
+8 then Math::MPFR will, by default, be built with access
 to the mpfr_*_ld functions. Else, access to those functions is, 
 by default, denied. Again, you can override the default by opening up the 
 Makefile.PL and uncommenting the appropriate line.

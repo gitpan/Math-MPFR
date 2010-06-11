@@ -16,18 +16,17 @@ my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 if($use_64_bit_int == -1) {}                                
 elsif($use_64_bit_int == 1) {$defines .= " -DUSE_64_BIT_INT"}
 else {
-  if($Config::Config{use64bitint} eq 'define' || 
-     $Config::Config{use64bitall} eq 'define' ||
-     $Config::Config{usemorebits} eq 'define' ||
-     $Config::Config{ivsize} == 8 ) {$defines .= " -DUSE_64_BIT_INT"}
+  unless($Config::Config{ivsize} < 8) {
+    $defines .= " -DUSE_64_BIT_INT";
+  }
 }
 
 if($use_long_double == -1) {}
 elsif($use_long_double == 1) {$defines .= " -DUSE_LONG_DOUBLE"}
 else {
-  if($Config::Config{uselongdouble} eq 'define' ||
-     $Config::Config{usemorebits} eq 'define' ||
-     $Config::Config{nvsize} > 8 ) {$defines .= " -DUSE_LONG_DOUBLE"}
+  if($Config::Config{nvsize} > 8 ) {
+    $defines .= " -DUSE_LONG_DOUBLE";
+  }
 }
 
 print "\nThis module requires the following C libraries:\n";
@@ -44,6 +43,8 @@ print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
 my %options = (       
   NAME => 'Math::MPFR',
+  AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
+  ABSTRACT => 'Perl interface to the MPFR (floating point) library',
   DEFINE   => $defines,
   LIBS => [
     '-lmpfr -lgmp'

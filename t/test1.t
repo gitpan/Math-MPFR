@@ -5,7 +5,7 @@ use Config;
 
 $| = 1;
 
-print "1..81\n";
+print "1..84\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -542,18 +542,25 @@ my @r3 = ();
 Rmpfr_set_default_prec(75);
 for(1..100) {push @r3, Rmpfr_init()}
 
-for(@r3) {Rmpfr_random2($_, 6, 2)}
+if(!(MPFR_VERSION_MAJOR > 2)) {
 
-my $dup_count = 0;
+  for(@r3) {Rmpfr_random2($_, 6, 2)}
 
-for(my $i = 0; $i < 100; $i++) {
-   for(my $j = $i + 1; $j < 100; $j++) {
-      if($r3[$i] == $r3[$j]) {$dup_count ++}
-      }
-   } 
+  my $dup_count = 0;
 
-if($dup_count < 6) {print "ok 53\n"}
-else {print "not ok 53\n"}
+  for(my $i = 0; $i < 100; $i++) {
+     for(my $j = $i + 1; $j < 100; $j++) {
+        if($r3[$i] == $r3[$j]) {$dup_count ++}
+        }
+     } 
+
+  if($dup_count < 6) {print "ok 53\n"}
+  else {print "not ok 53\n"}
+}
+else {
+  warn "Skipping test 53: Rmpfr_random2 no longer implemented\n";
+  print "ok 53\n";
+}
 
 Rmpfr_set_si($c, -123, GMP_RNDN);
 Rmpfr_set_si($check, -7, GMP_RNDN);
@@ -980,6 +987,83 @@ else {warn "81 p: $ac2\n"}
 
 if($ok eq 'abcdefghijklmnop'){print "ok 81\n"}
 else {print "not ok 81 $ok\n"}
+
+if(MPFR_VERSION_MAJOR >= 3) {
+  my $str = '';
+  for(1..21) {$str .= 1 + int(rand(10))}
+  my $state = Rgmp_randinit_lc_2exp_size(90);
+  Rgmp_randseed($state, $str);
+  my $rand = Math::MPFR->new();
+  Rmpfr_urandom($rand, $state, MPFR_RNDN);
+  if($rand < 1 && $rand > 0) {print "ok 82\n"}
+  else {
+    warn "82: \$rand: $rand\n";
+    print "not ok 82\n";
+  }
+}
+else {
+  my $str = '';
+  for(1..21) {$str .= 1 + int(rand(10))}
+  my $state = Rgmp_randinit_lc_2exp_size(90);
+  Rgmp_randseed($state, $str);
+  my $rand = Math::MPFR->new();
+  eval{Rmpfr_urandom($rand, $state, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_urandom not implemented/) {print "ok 82\n"}
+  else {
+    warn "82: \$\@: $@\n";
+    print "not ok 82\n";
+  }
+}
+
+if($have_mpz) {
+  my $z = Math::GMPz->new(5);
+  my $fr = Math::MPFR->new();
+  if(MPFR_VERSION_MAJOR >= 3) {
+    Rmpfr_set_z_2exp($fr, $z, -2, MPFR_RNDN);
+    if($fr == 1.25) {print "ok 83\n"}
+    else {
+      warn "83: \$fr: $fr\n";
+      print "not ok 83\n";
+    }
+  }
+  else {
+    eval{Rmpfr_set_z_2exp($fr, $z, -2, MPFR_RNDN);};
+    if($@ =~ /Rmpfr_set_z_2exp not implemented/) {print "ok 83\n"}
+    else {
+      warn "83: \$\@: $@\n";
+      print "not ok 83\n";
+    }
+  }
+}
+else {
+  warn "Skipping test 83: No Math::GMPz\n";
+  print "ok 83\n";
+}
+
+if($have_Math_GMP) {
+  my $z = Math::GMP->new(5);
+  my $fr = Math::MPFR->new();
+  if(MPFR_VERSION_MAJOR >= 3) {
+    Rmpfr_set_z_2exp($fr, $z, -2, MPFR_RNDN);
+    if($fr == 1.25) {print "ok 84\n"}
+    else {
+      warn "84: \$fr: $fr\n";
+      print "not ok 84\n";
+    }  
+  }
+  else {
+    eval{Rmpfr_set_z_2exp($fr, $z, -2, MPFR_RNDN);};
+    if($@ =~ /Rmpfr_set_z_2exp not implemented/) {print "ok 84\n"}
+    else {
+      warn "84: \$\@: $@\n";
+      print "not ok 84\n";
+    }
+  }
+}
+else {
+  warn "Skipping test 84: No Math::GMP\n";
+  print "ok 84\n";
+}
 
 # Run the following to test Rmpfr_inp_str
 # and Rmpfr_dump

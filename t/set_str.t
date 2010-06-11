@@ -160,6 +160,17 @@ if(!$z) {$ok .= 'g'}
 $ret = Rmpfr_strtofr($z, 'm11111111111.5s11111111111111', 0, GMP_RNDU);
 if(!$z) {$ok .= 'h'}
 
-if($ok eq 'abcdefgh') {print "ok 15\n"}
+eval {$ret = Rmpfr_strtofr($z, '11111111111.11111111111111', 60, GMP_RNDD);};
+
+if(MPFR_VERSION_MAJOR >= 3) {
+   unless($@) {$ok .= 'i'}
+   else {warn "15i: \$\@: $@\n"}
+}
+else {
+  if($@ =~ /3rd argument supplied to Rmpfr_strtofr/) {$ok .= 'i'}
+  else {warn "15i: \$\@: $@\n"} 
+}
+
+if($ok eq 'abcdefghi') {print "ok 15\n"}
 else {print "not ok 15 $ok\n"}
 

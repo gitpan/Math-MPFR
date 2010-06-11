@@ -105,7 +105,7 @@ Rmpfr_set_default_prec(100);
 my $f27 = Math::MPFR->new(36028797018964023);
 my $f28 = Math::MPFR->new('36028797018964023');
 
-if(defined($Config::Config{use64bitint})) {
+if(Math::MPFR::_has_longlong()) {
   if($f27 == $f28) {$ok .= 'i'}
 }
 else {

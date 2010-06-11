@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..7\n";
+print "1..8\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -242,4 +242,29 @@ if(Math::MPFR::_has_longdouble()) {
 else {
   warn "Skipping test 7 - no long double support\n";
   print "ok 7\n";
+}
+
+if(Math::MPFR::_has_longdouble()) {
+  # Check that the mpfr_get_ld() bug has been fixed (mpfr-2.4.2 and later only)
+  if(MPFR_VERSION > 132097) {
+    my $prec = Rmpfr_get_default_prec();
+    Rmpfr_set_default_prec(64);
+    my $bugtest = Math::MPFR->new(-12345);
+    Rmpfr_exp($bugtest, $bugtest, GMP_RNDN);
+    my $ld = Rmpfr_get_ld($bugtest, GMP_RNDN);
+    Rmpfr_set_default_prec($prec);
+    if($ld < 0.000000001 && $ld >= 0){print "ok 8\n"}
+    else {
+      warn "Got: $ld\n";
+      print "not ok 8\n";
+    }
+  }
+  else {
+    warn "Skipping test 8 - mpfr_get_ld bug with mpfr-2.4.1 and earlier will cause the test to fail\n";
+    print "ok 8\n";
+  }
+}
+else {
+  warn "Skipping test 8 - no long double support\n";
+  print "ok 8\n";
 }

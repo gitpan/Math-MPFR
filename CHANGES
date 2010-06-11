@@ -1,3 +1,26 @@
+3.0
+ - Corresponding to release of mpfr-3.0.0. (Still needs only 2.4.0,
+   but 3.0.0 needed to take advantage of all features.)
+ - Add MPFR_* rounding modes (including MPFR_RNDA for builds against
+   mpfr-3.0.0)
+ - Add Rmpfr_buildopt_tls_p() and Rmpfr_buildopt_decimal_p() (mpfr-3.0.0 only)
+ - Add the following functions, specific to mpfr-3.0.0: Rmpfr_regular_p,
+   Rmpfr_set_zero, Rmpfr_digamma, Rmpfr_ai, Rmpfr_set_flt, Rmpfr_get_flt,
+   Rmpfr_urandom and Rmpfr_set_z_2exp.
+ - Add Rmpfr_get_z_2exp (mpfr_get_z_exp is now renamed to mpfr_get_z_2exp).
+ - Add gmp_randstate_t* to the Math::MPFR typemap.
+ - Change handling of NaNs (wrt overloaded comparison operators).
+   The spaceship operator now returns undef when NaNs are involved
+   (more in keeping with perl behaviour), and the erange flag is now
+   set whenever a comparison involving NaNs is performed (more in
+   keeping with the mpfr library behaviour). This is irrespective
+   of whether the NaN is a Math::MPFR object or a perl NV.
+   The other comparison operators now also set the erange flag when
+   a NaN is involved (for compatibility with the mpfr library).
+ - Add Rmpfr_snprintf and Rmpfr_snprintf_ret.
+ - Add Rmpfr_inits, Rmpfr_inits2 and Rmpfr_clears functions.
+ - The overload_copy sub now preserves the precision of the copied
+   object (instead of taking on default precision).
 2.03
  - Needs version 2.4.0 (or later) of the mpfr library.
  - Add the following functions (new in mpfr-2.4.0):

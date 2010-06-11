@@ -42,11 +42,17 @@ if($have_mpz) {
   Rmpfr_clear_erangeflag();
   if(!Rmpfr_erangeflag_p()) {$ok .= 'b'}
   if(Rmpfr_cmp_z($mpfr1, $z) > 0) {$ok .= 'c'}
-  Rmpfr_get_z($z, $mpfr1, $rnd);
+  my $ret = Rmpfr_get_z($z, $mpfr1, $rnd);
+  if(MPFR_VERSION_MAJOR >= 3) {
+    if(defined($ret)) {$ok .= 'D'}
+  }
+  else {
+    if(!defined($ret)) {$ok .= 'D'}
+  }
   Rmpfr_trunc($mpfr1, $mpfr1);
   if(!Rmpfr_cmp_z($mpfr1, $z)) {$ok .= 'd'}
   Rmpfr_set_d($mpfr1, $double, $rnd); 
-  if($ok eq 'abcd') {print "ok 1\n"}
+  if($ok eq 'abcDd') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
 }
 else {

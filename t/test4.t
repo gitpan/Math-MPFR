@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..43\n";
+print "1..49\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -407,6 +407,107 @@ else {
   warn "\nGot: ", Rmpfr_get_NV(Math::MPFR->new($double), GMP_RNDN) , "\nExpected: $double\n";
   print "not ok 43\n";
 }
+
+$ok = '';
+
+if(MPFR_VERSION_MAJOR >= 3) {
+  if(Rmpfr_regular_p(Math::MPFR->new(17))) {$ok .= 'a'}
+  if(!Rmpfr_regular_p(Math::MPFR->new(0))) {$ok .= 'b'}
+  if(!Rmpfr_regular_p(Math::MPFR->new())) {$ok .= 'c'}
+  if(!Rmpfr_regular_p(Math::MPFR->new(-1) / Math::MPFR->new(0))) {$ok .= 'd'}
+  if(!Rmpfr_regular_p(Math::MPFR->new(1) / Math::MPFR->new(0))) {$ok .= 'e'}
+
+  if($ok eq 'abcde') {print "ok 44\n"}
+  else {
+    warn "44: \$ok: $ok\n";
+    print "not ok 44\n";
+  }
+
+  Rmpfr_set_zero($fma, -1);
+  if($fma == 0) {print "ok 45\n"}
+  else {
+    warn "45: \$fma: $fma\n";
+    print "not ok 45\n";
+  }
+
+  my $dig1 = Math::MPFR->new();
+  my $dig2 = Math::MPFR->new();
+  Rmpfr_digamma($dig1, Math::MPFR->new(2), MPFR_RNDN);
+  Rmpfr_digamma($dig2, Math::MPFR->new(3), MPFR_RNDN);
+  # Let's check the recurrence relation
+  my $diff = $dig2 - ($dig1 + 0.5);
+  if($diff < 0.00000000001 && $diff > -0.00000000001) {print "ok 46\n"}
+  else {
+    warn "46: \$diff: $diff\n";
+    print "not ok 1\n";
+  }
+
+  my $ai = Math::MPFR->new();
+  Rmpfr_ai($ai, 1 / Math::MPFR->new(0), MPFR_RNDN);
+  if($ai == 0) {print "ok 47\n"}
+  else {
+    warn "47: \$ai: $ai\n";
+    print "not ok 47\n";
+  }
+
+  my $flt = Rmpfr_get_flt(Math::MPFR->new(0.25), MPFR_RNDN);
+  if($flt == 0.25) {print "ok 48\n"}
+  else {
+    warn "48: \$flt: $flt\n";
+    print "not ok 48\n";
+  }
+
+  Rmpfr_set_flt($ai, 0.25, MPFR_RNDN);
+  if($ai == 0.25) {print "ok 49\n"}
+  else {
+    warn "49: \$ai: $ai\n";
+    print "not ok 49\n";
+  }
+}
+else {
+  eval{Rmpfr_regular_p(Math::MPFR->new())};
+  if($@ =~ /Rmpfr_regular_p not implemented/) {print "ok 44\n"}
+  else {
+    warn "44: \$\@: $@\n";
+    print "not ok 44\n";
+  }
+
+  eval{Rmpfr_set_zero($fma, -1);};
+  if($@ =~ /Rmpfr_set_zero not implemented/) {print "ok 45\n"}
+  else {
+    warn "45: \$\@: $@\n";
+    print "not ok 45\n";
+  }
+
+  eval{Rmpfr_digamma($fma, $fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_digamma not implemented/) {print "ok 46\n"}
+  else {
+    warn "46: \$\@: $@\n";
+    print "not ok 46\n";
+  }
+
+  eval{Rmpfr_ai($fma, $fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_ai not implemented/) {print "ok 47\n"}
+  else {
+    warn "47: \$\@: $@\n";
+    print "not ok 47\n";
+  }
+
+  eval{my $flt = Rmpfr_get_flt($fma, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_get_flt not implemented/) {print "ok 48\n"}
+  else {
+    warn "48: \$\@: $@\n";
+    print "not ok 48\n";
+  }
+
+  eval{Rmpfr_set_flt($fma, 0.3, MPFR_RNDN);};
+  if($@ =~ /Rmpfr_set_flt not implemented/) {print "ok 49\n"}
+  else {
+    warn "49: \$\@: $@\n";
+    print "not ok 49\n";
+  }
+}
+
 
 
 
