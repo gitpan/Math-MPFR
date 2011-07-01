@@ -109,7 +109,7 @@ Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_st
 TRmpfr_inp_str
 Rmpfr_integer_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
-Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
+Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min 
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
@@ -142,7 +142,7 @@ Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmp
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 );
 
-    $Math::MPFR::VERSION = '3.0';
+    $Math::MPFR::VERSION = '3.01';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -193,7 +193,7 @@ Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_st
 TRmpfr_inp_str
 Rmpfr_integer_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma 
-Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_max_prec Rmpfr_min 
+Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min 
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q 
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg 
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str 
@@ -531,8 +531,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    A bigfloat module utilising the MPFR library. Basically
    this module simply wraps the 'mpfr' floating point functions
-   provided by that library. See:
-   http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
+   provided by that library.
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpfr
    documentation.
@@ -756,13 +755,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    "$str" simply means a string of symbols that represent a number,
    eg '1234567890987654321234567@7' which might be a base 10 number,
-   or 'zsa34760sdfgq123r5@11' which would have to represent a base 36
-   number (because "z" is a valid digit only in base 36). Valid
-   bases for MPFR numbers are 2 to 36 (inclusive).
+   or 'zsa34760sdfgq123r5@11' which would have to represent at least
+   a base 36 number (because "z" is a valid digit only in bases 36
+   and above). Valid bases for MPFR numbers are 0 and 2 to 36 (2 to 62
+   if Math::MPFR has been built against mpfr-3.0.0 or later).
 
    "$rnd" is simply one of the 4 rounding mode values (discussed above).
 
-   "$p" is the (unsigned long) value for precision.
+   "$p" is the (signed int) value for precision.
 
    ##############
 
@@ -787,8 +787,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     precision of $rop is changed to $p.  The returned value is zero
     when the result is exact, positive when it is greater than the
     original value of $rop, and negative when it is smaller.  The
-    precision $p can be any integer between Rmpfr_min_prec() and
-    Rmpfr_max_prec().  
+    precision $p can be any integer between RMPFR_PREC_MIN and
+    RMPFR_PREC_MAX.  
 
    ##########
 
@@ -878,7 +878,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     mantissa.  All subsequent calls to `mpfr_init' will use this
     precision, but previously initialized variables are unaffected.
     This default precision is set to 53 bits initially.  The precision
-    can be any integer between Rmpfr_min_prec() and Rmpfr_max_prec().
+    can be any integer between RMPFR_PREC_MIN and RMPFR_PREC_MAX.
 
    $ui = Rmpfr_get_default_prec();
     Returns the default MPFR precision in bits.
@@ -898,7 +898,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     and set its value to NaN.  To change the precision of a
     variable which has already been initialized,
     use `Rmpfr_set_prec' instead.  The precision $p can be
-    any integer between Rmpfr_min_prec() andRmpfr_max_prec().
+    any integer between RMPFR_PREC_MIN and RMPFR_PREC_MAX.
 
    @rops = Rmpfr_inits($how_many);
    @rops = Rmpfr_inits_nobless($how_many);
@@ -906,21 +906,21 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     with a value of NaN, and with default precision.
     (These functions do not wrap mpfr_inits.)
 
-   @rops = Rmpfr_inits2($prec, $how_many);
-   @rops = Rmpfr_inits2_nobless($prec, $how_many);
+   @rops = Rmpfr_inits2($p, $how_many);
+   @rops = Rmpfr_inits2_nobless($p, $how_many);
     Returns an array of $how_many Math::MPFR objects - initialized,
-    with a value of NaN, and with precision of $prec.
+    with a value of NaN, and with precision of $p.
     (These functions do not wrap mpfr_inits2.)
     
 
    Rmpfr_set_prec($op, $p);
     Reset the precision of $op to be *exactly* $p bits.
     The previous value stored in $op is lost.  The precision
-    $p can be any integer between Rmpfr_min_prec() and
-    Rmpfr_max_prec(). If you want to keep the previous
+    $p can be any integer between RMPFR_PREC_MIN and
+    RMPFR_PREC_MAX. If you want to keep the previous
     value stored in $op, use 'Rmpfr_prec_round' instead.
 
-   $ui = Rmpfr_get_prec($op);
+   $si = Rmpfr_get_prec($op);
     Return the precision actually used for assignments of $op,
    i.e. the number of bits used to store its mantissa.
 
@@ -930,11 +930,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     enough so that the mantissa fits into the current allocated
     memory space for $rop. Otherwise an error will occur.
 
-   $minimum_precision = Rmpfr_min_prec();
-   $maximum_precision = Rmpfr_max_prec();
+   $min_prec = Rmpfr_min_prec($op);
+    $min_prec is set to the minimal number of bits required to store
+    the significand of $op, and 0 for special values, including 0.
+   (Warning: the returned value can be less than RMPFR_PREC_MIN.)
+
    $minimum_precision = RMPFR_PREC_MIN;
    $maximum_precision = RMPFR_PREC_MAX;
-    Returns the minimum/maximum allowed precision
+    Returns the minimum/maximum precision for Math::MPFR objects
+    allowed by the mpfr library being used.
 
    ##########
 
@@ -972,8 +976,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     the input 0 is converted to +0. ($z is a GMP mpz object.)
 
    $si = Rmpfr_set_str($rop, $str, $base, $rnd);
-    Set $rop to the value of $str in base $base (between 2 and
-    36), rounded in direction $rnd to the precision of $rop. 
+    Set $rop to the value of $str in base $base (0,2..36 or, if
+    Math::MPFR has been built against mpfr-3.0.0 or later, 0,2..62),
+    rounded in direction $rnd to the precision of $rop. 
     The exponent is read in decimal.  This function returns 0 if
     the entire string is a valid number in base $base. otherwise
     it returns -1. If $base is zero, the base is set according to 
@@ -1095,7 +1100,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     represents a numeric value, or an object (of type Math::GMPf,
     Math::GMPq, Math::GMPz, orMath::GMP) If $arg is a string, an
     optional additional argument that specifies the base of the
-    number can be supplied to new(). If $arg is a string and no 
+    number can be supplied to new(). Legal values for base are 0
+    and 2 to 36 (2 to 62 if Math::MPFR has been built against
+    mpfr-3.0.0 or later). If $arg is a string and no 
     additional argument is supplied, an attempt is made to deduce 
     base. See 'Rmpfr_set_str' above for an explanation of how
     that deduction is attempted. For finer grained control, use
@@ -1718,7 +1725,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $ui = Rmpfr_out_str([$prefix,] $op, $base, $digits, $round [, $suffix]);
     BEST TO USE TRmpfr_out_str INSTEAD
     Output $op to STDOUT, as a string of digits in base $base,
-    rounded in direction $round.  The base may vary from 2 to 36.
+    rounded in direction $round.  The base may vary from 2 to 36
+    (2 to 62 if Math::MPFR has been built against mpfr-3.0.0 or later).
     Print $digits significant digits exactly, or if $digits is 0,
     enough digits so that $op can be read back exactly
     (see Rmpfr_get_str). In addition to the significant
@@ -1751,7 +1759,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     exponent written in decimal for the specified base, and in base 16,
     `B' is the binary exponent written in decimal (i.e. it indicates
     the power of 2 by which the mantissa is to be scaled).
-    The argument $base may be in the range 2 to 36.
+    The argument $base may be in the range 2 to 36 (2 to 62 if Math::MPFR
+    has been built against mpfr-3.0.0 or later).
     Special values can be read as follows (the case does not matter):
     `@NaN@', `@Inf@', `+@Inf@' and `-@Inf@', possibly followed by
     other characters; if the base is smaller or equal to 16, the
@@ -1780,30 +1789,41 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    MISCELLANEOUS
 
    $MPFR_version = Rmpfr_get_version();
-    Returns the version of the MPFR library (eg 2.1.0) against
-    which Math::MPFR has been built.
+    Returns the version of the MPFR library (eg 2.1.0) being used by
+    Math::MPFR.
 
    $GMP_version = Math::MPFR::gmp_v();
-    Returns the version of the GMP library (eg. 4.1.3) against
-    which the MPFR library was built.
+    Returns the version of the gmp library (eg. 4.1.3) being used by
+    the mpfr library that's being used by Math::MPFR.
     The function is not exportable.
 
    $ui = MPFR_VERSION;
-    An integer whose value is dependent upon the 'major',
-    'minor' and 'patchlevel' values of the MPFR library
-    against which Math::MPFR has been built.
+    An integer whose value is dependent upon the 'major', 'minor' and
+    'patchlevel' values of the MPFR library against which Math::MPFR 
+    was built.
+    This value is from the mpfr.h that was in use when the compilation
+    of Math::MPFR took place.
 
    $ui = MPFR_VERSION_MAJOR;
     The 'x' in the 'x.y.z' of the MPFR library version.
+    This value is from the mpfr.h that was in use when the compilation
+    of Math::MPFR took place.
 
-   $ui =MPFR_VERSION_MINOR;
+   $ui = MPFR_VERSION_MINOR;
     The 'y' in the 'x.y.z' of the MPFR library version.
+    This value is from the mpfr.h that was in use when the compilation
+    of Math::MPFR took place.
 
    $ui = MPFR_VERSION_PATCHLEVEL;
     The 'z' in the 'x.y.z' of the MPFR library version.
+    This value is from the mpfr.h that was in use when the compilation
+    of Math::MPFR took place.
 
    $string = MPFR_VERSION_STRING;
-    $string is the same as returned by Rmpfr_get_version (above).
+    $string is set to the version of the MPFR library (eg 2.1.0)
+    against which Math::MPFR was built.
+    This value is from the mpfr.h that was in use when the compilation
+    of Math::MPFR took place.
 
    $ui = MPFR_VERSION_NUM($major, $minor, $patchlevel);
     Returns the value for MPFR_VERSION on "MPFR-$major.$minor.$patchlevel".
@@ -1927,6 +1947,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    RANDOM NUMBERS
 
    Rmpfr_urandomb(@r, $state);
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
     Each member of @r is a Math::MPFR object.
     $state is a reference to a gmp_randstate_t structure.
     Set each member of @r to a uniformly distributed random
@@ -1950,21 +1972,30 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     to be more likely to trigger corner-case bugs.  Negative
     random numbers are generated when $si is negative.
 
-   $si = Rmpfr_urandom ($rop, $state, $rnd); # mpfr-3.0.0 and later only
-    Generate a uniformly distributed random float.  The floating-point
-    number $rop can be seen as if a random real number is generated
-    according to the continuous uniform distribution on the interval
-    [0, 1] and then rounded in the direction RND.
+   $si = Rmpfr_urandom ($rop, $state, $rnd); # mpfr-3.0.0 and
+                                             # later only
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
+    Generate a uniformly distributed random float.  The
+    floating-point number $rop can be seen as if a random real
+    number is generated according to the continuous uniform
+    distribution on the interval[0, 1] and then rounded in the
+    direction RND.
     Before using this function you must first create $state by 
     calling one of the 3 Rgmp_randinit functions (below).
 
    $state = Rgmp_randinit_default();
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
     Initialise $state with a default algorithm. This will be
     a compromise between speed and randomness, and is 
     recommended for applications with no special requirements.
-    (The GMP function is documented in the GMP, not MPFR, docs.)
+    (This GMP function is documented in the Math::GMP* module
+    that was loaded)
 
    $state = Rgmp_randinit_lc_2exp($a, $c, $m2exp);
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
     This function is not tested in the test suite.
     Use with caution - I often select values here that cause
     Rmpf_urandomb() to behave non-randomly.    
@@ -1979,15 +2010,19 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
     integer. No other bases are allowed.
-    (The GMP function is documented in the GMP, not MPFR, docs.)
+    (This GMP function is documented in the Math::GMP* module
+    that was loaded)
 
    $state = Rgmp_randinit_lc_2exp_size($ui);
     Initialise state as per Rgmp_randinit_lc_2exp. The values
     for $a, $c. and $m2exp are selected from a table, chosen
     so that $ui bits (or more) of each X will be used.
-    (The GMP function is documented in the GMP, not MPFR, docs.)
+    (This GMP function is documented in the Math::GMP* module
+    that was loaded)
 
    Rgmp_randseed($state, $seed);
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $seed is the seed. It can be any one of Math::GMP, 
@@ -1996,13 +2031,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
     integer. No other bases are allowed.
-    (The GMP function is documented in the GMP, not MPFR, docs.)
+    (This GMP function is documented in the Math::GMP* module
+    that was loaded)
 
    Rgmp_randseed_ui($state, $ui);
+    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
+    is loaded.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $ui is the seed.
-    (The GMP function is documented in the GMP, not MPFR, docs.)
+    (This GMP function is documented in the Math::GMP* module
+    that was loaded)
 
    #########
 
@@ -2060,11 +2099,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     All comparisons ( < <= > >= == != <=> ) involving one or more
     NaNs will set the erange flag.
 
+    For the purposes of the overloaded 'not', '!' and 'bool'
+    operators, a "false" Math::MPFR object is one whose value is
+    either 0 (including -0) or NaN.
+    (A "true" Math::MPFR object is, of course, simply one that
+    is not "false".)
+
     The following operators are overloaded:
      + - * / ** sqrt (Return object has default precision)
      += -= *= /= **= (Precision remains unchanged)
      < <= > >= == != <=>
-     ! not
+     ! not bool
      abs atan2 cos sin log exp (Return object has default precision)
      int (On perl 5.8 only, NA on perl 5.6. The return object
           has default precision)
@@ -2217,7 +2262,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or 
     modify it under the same terms as Perl itself.
-    Copyright 2006-2008, 2009, 2010 Sisyphus
+    Copyright 2006-2008, 2009, 2010, 2011 Sisyphus
 
 =head1 AUTHOR
 

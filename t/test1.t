@@ -47,10 +47,22 @@ Rmpfr_set_default_prec(101);
 if(Rmpfr_get_default_prec() == 101) {print "ok 2\n"}
 else {print "not ok 2\n"}
 
-if(Rmpfr_min_prec() > 0 && Rmpfr_max_prec() > Rmpfr_min_prec()
-   && Rmpfr_min_prec() == RMPFR_PREC_MIN
-   && Rmpfr_max_prec() == RMPFR_PREC_MAX) {print "ok 3\n"}
-else {print "not ok 3\n"}
+if(Rmpfr_min_prec(Math::MPFR->new(0)) == 0) {$ok = 'a'}
+else {warn "3a: ", Rmpfr_min_prec(Math::MPFR->new(0)), "\n"}
+
+if(Rmpfr_min_prec(Math::MPFR->new(31)) == 5) {$ok .= 'b'}
+else {warn "3b: ", Rmpfr_min_prec(Math::MPFR->new(31)), "\n"}
+
+if(RMPFR_PREC_MAX > RMPFR_PREC_MIN) {$ok .= 'c'}
+else {warn "RMPFR_PREC_MAX: ", RMPFR_PREC_MAX, "\nRMPFR_PREC_MIN: ", RMPFR_PREC_MIN, "\n"}
+
+if($ok eq 'abc') {print "ok 3\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 3\n";
+}
+
+$ok = '';
 
 my $c = Rmpfr_init();
 my $c_ui = Rmpfr_init();

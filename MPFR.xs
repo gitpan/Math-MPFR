@@ -59,7 +59,7 @@ SV * Rmpfr_get_default_rounding_mode() {
 }
 
 SV * Rmpfr_prec_round(mpfr_t * p, SV * prec, SV * round) {
-     return newSViv(mpfr_prec_round(*p, (mpfr_prec_t)SvUV(prec), (mp_rnd_t)SvUV(round)));
+     return newSViv(mpfr_prec_round(*p, (mpfr_prec_t)SvIV(prec), (mp_rnd_t)SvUV(round)));
 }
 
 void DESTROY(mpfr_t * p) {
@@ -113,7 +113,7 @@ SV * Rmpfr_init2(SV * prec) {
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2 function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
-     mpfr_init2 (*mpfr_t_obj, (mpfr_prec_t)SvUV(prec));
+     mpfr_init2 (*mpfr_t_obj, (mpfr_prec_t)SvIV(prec));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
@@ -143,7 +143,7 @@ SV * Rmpfr_init2_nobless(SV * prec) {
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
-     mpfr_init2 (*mpfr_t_obj, (mpfr_prec_t)SvUV(prec));
+     mpfr_init2 (*mpfr_t_obj, (mpfr_prec_t)SvIV(prec));
 
      sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
      SvREADONLY_on(obj);
@@ -661,31 +661,27 @@ void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
 }
 
 void Rmpfr_set_default_prec(SV * prec) {
-     mpfr_set_default_prec((mpfr_prec_t)SvUV(prec));
+     mpfr_set_default_prec((mpfr_prec_t)SvIV(prec));
 } 
 
 SV * Rmpfr_get_default_prec() {
-     return newSVuv(mpfr_get_default_prec());
+     return newSViv(mpfr_get_default_prec());
 }
 
-SV * Rmpfr_min_prec() {
-     return newSVuv(MPFR_PREC_MIN);
-}
-
-SV * Rmpfr_max_prec() {
-     return newSVuv(MPFR_PREC_MAX);
+SV * Rmpfr_min_prec(mpfr_t * x) {
+     return newSViv((mpfr_prec_t)mpfr_min_prec(*x));
 }
 
 void Rmpfr_set_prec(mpfr_t * p, SV * prec) {
-     mpfr_set_prec(*p, (mpfr_prec_t)SvUV(prec));
+     mpfr_set_prec(*p, (mpfr_prec_t)SvIV(prec));
 }
 
 void Rmpfr_set_prec_raw(mpfr_t * p, SV * prec) {
-     mpfr_set_prec_raw(*p, (mpfr_prec_t)SvUV(prec));
+     mpfr_set_prec_raw(*p, (mpfr_prec_t)SvIV(prec));
 }
 
 SV * Rmpfr_get_prec(mpfr_t * p) {
-     return newSVuv(mpfr_get_prec(*p));
+     return newSViv(mpfr_get_prec(*p));
 }
 
 SV * Rmpfr_set(mpfr_t * p, mpfr_t * q, SV * round) {
@@ -1494,7 +1490,7 @@ SV * Rmpfr_can_round(mpfr_t * p, SV * err, SV * round1, SV * round2, SV * prec) 
     if((mp_rnd_t)SvUV(round1) > 3 || (mp_rnd_t)SvUV(round2) > 3)
       croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     return newSViv(mpfr_can_round(*p, (mp_exp_t)SvIV(err), SvUV(round1), SvUV(round2), (mpfr_prec_t)SvUV(prec)));
+     return newSViv(mpfr_can_round(*p, (mp_exp_t)SvIV(err), SvUV(round1), SvUV(round2), (mpfr_prec_t)SvIV(prec)));
 }
 
 SV * Rmpfr_get_emin() {
@@ -4472,11 +4468,11 @@ int _mpfr_longsize() {
 */
 
 SV * RMPFR_PREC_MAX() {
-     return newSVuv(MPFR_PREC_MAX);
+     return newSViv(MPFR_PREC_MAX);
 }
 
 SV * RMPFR_PREC_MIN() {
-     return newSVuv(MPFR_PREC_MIN);
+     return newSViv(MPFR_PREC_MIN);
 }
 
 SV * wrap_mpfr_printf(SV * a, SV * b) {
@@ -5339,10 +5335,8 @@ SV *
 Rmpfr_get_default_prec ()
 
 SV *
-Rmpfr_min_prec ()
-
-SV *
-Rmpfr_max_prec ()
+Rmpfr_min_prec (x)
+	mpfr_t *	x
 
 void
 Rmpfr_set_prec (p, prec)

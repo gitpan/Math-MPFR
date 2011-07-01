@@ -1,3 +1,9 @@
+3.01
+ - Remove the (outdated) link to http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
+   in the "DESCRIPTION" section of the documentation. (Thanks Hugh Myers.)
+ - In the documentation, elaborate on the way that Rmpfr_get-version() and 
+   MPFR_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+ - Correct Rmpfr_min_prec(), and remove Rmpfr_max_prec(). 
 3.0
  - Corresponding to release of mpfr-3.0.0. (Still needs only 2.4.0,
    but 3.0.0 needed to take advantage of all features.)
@@ -10,7 +16,7 @@
  - Add Rmpfr_get_z_2exp (mpfr_get_z_exp is now renamed to mpfr_get_z_2exp).
  - Add gmp_randstate_t* to the Math::MPFR typemap.
  - Change handling of NaNs (wrt overloaded comparison operators).
-   The spaceship operator now returns undef when NaNs are involved
+   The overloaded spaceship operator now returns undef when NaNs are involved
    (more in keeping with perl behaviour), and the erange flag is now
    set whenever a comparison involving NaNs is performed (more in
    keeping with the mpfr library behaviour). This is irrespective

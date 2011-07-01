@@ -41,7 +41,10 @@ my $f06 = new Math::MPFR($d);
 if($f06 == $d) {$ok .= 'h'}
 
 if($ok eq 'abcdefgh') {print "ok 1\n"}
-else {print "not ok 1 $ok\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 1\n";
+}
 
 #############################
 
@@ -72,7 +75,10 @@ my $f16 = Math::MPFR::new($d);
 if($f16 == $d) {$ok .= 'h'}
 
 if($ok eq 'abcdefgh') {print "ok 2\n"}
-else {print "not ok 2 $ok\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 2\n";
+}
 
 ################################
 
@@ -80,26 +86,35 @@ $ok = '';
 
 my $f20 = Math::MPFR->new();
 if(Rmpfr_nan_p($f20)) {$ok = 'a'}
+else {warn "3a: $f20\n"}
+
 Rmpfr_set_ui($f20, $ui, Rmpfr_get_default_rounding_mode());
 if($f20 == $ui) {$ok .= 'b'}
+else {warn "3b: $f20\n"}
 
 my $f21 = Math::MPFR->new($ui);
 if($f21 == $ui) {$ok .= 'c'}
+else {warn "3c: $f21\n"}
 
 my $f22 = Math::MPFR->new($si);
 if($f22 == $si) {$ok .= 'd'}
+else {warn "3d: $f22\n"}
 
 my $f23 = Math::MPFR->new($d);
 if($f23 == $d) {$ok .= 'e'}
+else {warn "3e: $f23\n"}
 
 my $f24 = Math::MPFR->new($str);
 if($f24 == $str) {$ok .= 'f'}
+else {warn "3f: $f24\n"}
 
 my $f25 = Math::MPFR->new($str, 10);
 if($f25 == $str) {$ok .= 'g'}
+else {warn "3g: $f25\n"}
 
 my $f26 = Math::MPFR->new($d);
 if($f26 == $d) {$ok .= 'h'}
+else {warn "3h: $f26\n"}
 
 Rmpfr_set_default_prec(100);
 my $f27 = Math::MPFR->new(36028797018964023);
@@ -107,13 +122,24 @@ my $f28 = Math::MPFR->new('36028797018964023');
 
 if(Math::MPFR::_has_longlong()) {
   if($f27 == $f28) {$ok .= 'i'}
+  else {warn "== : $f27 $f28\n"}
 }
 else {
-  if($f27 != $f28) {$ok .= 'i'}
+  if(Math::MPFR::_has_longdouble()) {
+    if($f27 == $f28) {$ok .= 'i'}
+    else {warn "== : $f27 $f28\n"}
+  }
+  else {
+    if($f27 != $f28) {$ok .= 'i'}
+    else {warn "!= : $f27 $f28\n"}
+  }
 }
 
 if($ok eq 'abcdefghi') {print "ok 3\n"}
-else {print "not ok 3 $ok\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 3\n";
+}
 
 #############################
 
@@ -143,7 +169,10 @@ eval{my $f36 = Math::MPFR->new("17", 42);};
 if($@ =~ /Invalid value for base/) {$ok .= 'g'}
 
 if($ok eq 'abcdefg') {print "ok 4\n"}
-else {print "not ok 4 $ok\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 4\n";
+}
 
 ###############################
 
@@ -169,7 +198,10 @@ if($gmpf) {
   my $z = Math::MPFR->new($x);
 
   if($y == $z && $z == 125.5) {print "ok 5\n"}
-  else {print "not ok 5 $y $z\n"}
+  else {
+    warn "\$y: $y\n\$z: $z\n";
+    print "not ok 5\n";
+  }
 }
 else {
   warn "Skipping test 5 - no Math::GMPf\n";
@@ -182,7 +214,10 @@ if($gmpq) {
   my $z = Math::MPFR->new($x);
 
   if($y == $z && $z == 125.5) {print "ok 6\n"}
-  else {print "not ok 6 $y $z\n"}
+  else {
+    warn "\$y: $y\n\$z: $z\n";
+    print "not ok 6\n";
+  }
 }
 else {
   warn "Skipping test 6 - no Math::GMPq\n";
@@ -195,7 +230,10 @@ if($gmpz) {
   my $z = Math::MPFR->new($x);
 
   if($y == $z && $z == 125) {print "ok 7\n"}
-  else {print "not ok 7 $y $z\n"}
+  else {
+    warn "\$y: $y\n\$z: $z\n";
+    print "not ok 7\n";
+  }
 }
 else {
   warn "Skipping test 7 - no Math::GMPz\n";
@@ -208,7 +246,10 @@ if($gmp) {
   my $z = Math::MPFR->new($x);
 
   if($y == $z && $z == 125) {print "ok 8\n"}
-  else {print "not ok 8 $y $z\n"}
+  else {
+    warn "\$y: $y\n\$z: $z\n";
+    print "not ok 8\n";
+  }
 }
 else {
   warn "Skipping test 8 - no Math::GMP\n";
@@ -220,5 +261,8 @@ my $y = Math::MPFR::new($x);
 my $z = Math::MPFR->new($x);
 
 if($y == $z && $z == 12345.5) {print "ok 9\n"}
-else {print "not ok 9 $y $z\n"}
+else {
+  warn "\$y: $y\n\$z: $z\n";
+  print "not ok 9\n";
+}
 
