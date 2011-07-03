@@ -47,11 +47,22 @@ Rmpfr_set_default_prec(101);
 if(Rmpfr_get_default_prec() == 101) {print "ok 2\n"}
 else {print "not ok 2\n"}
 
-if(Rmpfr_min_prec(Math::MPFR->new(0)) == 0) {$ok = 'a'}
-else {warn "3a: ", Rmpfr_min_prec(Math::MPFR->new(0)), "\n"}
+if(MPFR_VERSION_MAJOR >= 3) {
+  if(Rmpfr_min_prec(Math::MPFR->new(0)) == 0) {$ok = 'a'}
+  else {warn "3a: ", Rmpfr_min_prec(Math::MPFR->new(0)), "\n"}
 
-if(Rmpfr_min_prec(Math::MPFR->new(31)) == 5) {$ok .= 'b'}
-else {warn "3b: ", Rmpfr_min_prec(Math::MPFR->new(31)), "\n"}
+  if(Rmpfr_min_prec(Math::MPFR->new(31)) == 5) {$ok .= 'b'}
+  else {warn "3b: ", Rmpfr_min_prec(Math::MPFR->new(31)), "\n"}
+}
+else {
+  eval{Rmpfr_min_prec(Math::MPFR->new(0));};
+  if($@ =~ /not implemented for/) {$ok = 'a'}
+  else {warn "3a: ", $@ ? $@ : "\$\@ unexpectedly not set"}
+
+  eval{Rmpfr_min_prec(Math::MPFR->new(31));};
+  if($@ =~ /not implemented for/) {$ok .= 'b'}
+  else {warn "3b: ", $@ ? $@ : "\$\@ unexpectedly not set"}
+}
 
 if(RMPFR_PREC_MAX > RMPFR_PREC_MIN) {$ok .= 'c'}
 else {warn "RMPFR_PREC_MAX: ", RMPFR_PREC_MAX, "\nRMPFR_PREC_MIN: ", RMPFR_PREC_MIN, "\n"}

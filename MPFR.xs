@@ -669,7 +669,11 @@ SV * Rmpfr_get_default_prec() {
 }
 
 SV * Rmpfr_min_prec(mpfr_t * x) {
+#if MPFR_VERSION_MAJOR >= 3
      return newSViv((mpfr_prec_t)mpfr_min_prec(*x));
+#else
+     croak("Rmpfr_min_prec function not implemented for mpfr versions prior to version 3");
+#endif 
 }
 
 void Rmpfr_set_prec(mpfr_t * p, SV * prec) {

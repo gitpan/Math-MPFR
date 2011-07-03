@@ -142,7 +142,7 @@ Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmp
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 );
 
-    $Math::MPFR::VERSION = '3.01';
+    $Math::MPFR::VERSION = '3.02';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -931,6 +931,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     memory space for $rop. Otherwise an error will occur.
 
    $min_prec = Rmpfr_min_prec($op);
+    (This function is implemented only when Math::MPFR is built
+    against mpfr-3.0.0 or later. The mpfr_min_prec function was not
+    documented in earlier versions of mpfr, though I think it was
+    first included in mpfr-2.4.2.)
     $min_prec is set to the minimal number of bits required to store
     the significand of $op, and 0 for special values, including 0.
    (Warning: the returned value can be less than RMPFR_PREC_MIN.)
