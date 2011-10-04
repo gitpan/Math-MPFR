@@ -22,6 +22,14 @@
 #define SvUOK SvIsUV
 #endif
 
+#ifndef Newx
+#  define Newx(v,n,t) New(0,v,n,t)
+#endif
+
+#ifndef Newxz
+#  define Newxz(v,n,t) Newz(0,v,n,t)
+#endif
+
 /* May one day be removed from mpfr.h */
 #ifndef mp_rnd_t
 # define mp_rnd_t  mpfr_rnd_t
@@ -94,7 +102,7 @@ SV * Rmpfr_init() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -109,7 +117,7 @@ SV * Rmpfr_init2(SV * prec) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2 function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -124,7 +132,7 @@ SV * Rmpfr_init_nobless() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -139,7 +147,7 @@ SV * Rmpfr_init2_nobless(SV * prec) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init2_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -160,9 +168,9 @@ void Rmpfr_init_set(mpfr_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -172,7 +180,7 @@ void Rmpfr_init_set(mpfr_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -186,9 +194,9 @@ void Rmpfr_init_set_ui(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -198,7 +206,7 @@ void Rmpfr_init_set_ui(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -212,9 +220,9 @@ void Rmpfr_init_set_si(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -224,7 +232,7 @@ void Rmpfr_init_set_si(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -238,9 +246,9 @@ void Rmpfr_init_set_d(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp =  mark; // not needed
+     /* sp =  mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -250,7 +258,7 @@ void Rmpfr_init_set_d(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed;
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -266,9 +274,9 @@ void Rmpfr_init_set_ld(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -277,7 +285,7 @@ void Rmpfr_init_set_ld(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed;
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 #else
      croak("Rmpfr_init_set_ld() not implemented on this build of perl - use Rmpfr_init_set_d() instead");
@@ -297,9 +305,9 @@ void Rmpfr_init_set_f(mpf_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; //not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -309,7 +317,7 @@ void Rmpfr_init_set_f(mpf_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -323,9 +331,9 @@ void Rmpfr_init_set_z(mpz_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not neededInline_Stack_Reset;
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -335,7 +343,7 @@ void Rmpfr_init_set_z(mpz_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -349,9 +357,9 @@ void Rmpfr_init_set_q(mpq_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -361,7 +369,7 @@ void Rmpfr_init_set_q(mpq_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -375,11 +383,11 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set str is out of allowable range");
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -389,7 +397,7 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
 
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -403,9 +411,9 @@ void Rmpfr_init_set_nobless(mpfr_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -415,7 +423,7 @@ void Rmpfr_init_set_nobless(mpfr_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -429,9 +437,9 @@ void Rmpfr_init_set_ui_nobless(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp  = mark; // not needed
+     /* sp  = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_ui_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -441,7 +449,7 @@ void Rmpfr_init_set_ui_nobless(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -455,9 +463,9 @@ void Rmpfr_init_set_si_nobless(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_si_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -467,7 +475,7 @@ void Rmpfr_init_set_si_nobless(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -481,9 +489,9 @@ void Rmpfr_init_set_d_nobless(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -493,7 +501,7 @@ void Rmpfr_init_set_d_nobless(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -509,9 +517,9 @@ void Rmpfr_init_set_ld_nobless(SV * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_d_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -520,7 +528,7 @@ void Rmpfr_init_set_ld_nobless(SV * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 #else
      croak("Rmpfr_init_set_ld_nobless() not implemented on this build of perl - use Rmpfr_init_set_d_nobless() instead");
@@ -540,9 +548,9 @@ void Rmpfr_init_set_f_nobless(mpf_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_f_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -552,7 +560,7 @@ void Rmpfr_init_set_f_nobless(mpf_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1)  = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -566,9 +574,9 @@ void Rmpfr_init_set_z_nobless(mpz_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp  = mark; //not needed
+     /* sp  = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_z_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -578,7 +586,7 @@ void Rmpfr_init_set_z_nobless(mpz_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -592,9 +600,9 @@ void Rmpfr_init_set_q_nobless(mpq_t * q, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_q_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -604,7 +612,7 @@ void Rmpfr_init_set_q_nobless(mpq_t * q, SV * round) {
      SvREADONLY_on(obj);
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -620,9 +628,9 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set_str_nobless is out of allowable range");
 
-     // sp = mark; // not needed
+     /* sp = mark; *//* not needed */
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -632,7 +640,7 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
 
      ST(0) = sv_2mortal(obj_ref);
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -652,11 +660,11 @@ void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
 
      if(out == NULL) croak("An error occurred in mpfr_get_str()\n");
 
-     // sp  = mark; // not needed
+     /* sp  = mark; *//* not needed */
      ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
      ST(1) = sv_2mortal(newSViv(ptr));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 }
 
@@ -821,7 +829,7 @@ SV * Rmpfr_get_d_2exp(SV * exp, mpfr_t * p, SV * round){
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
      ret = mpfr_get_d_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
-     sv_setuv(exp, _exp);
+     sv_setiv(exp, _exp);
      return newSVnv(ret);
 }
 
@@ -834,7 +842,7 @@ SV * Rmpfr_get_ld_2exp(SV * exp, mpfr_t * p, SV * round){
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
      ret = mpfr_get_ld_2exp(&_exp, *p, (mp_rnd_t)SvUV(round));
-     sv_setuv(exp, _exp);
+     sv_setiv(exp, _exp);
      return newSVnv(ret);
 #else
      croak("Rmpfr_get_ld_2exp() not implemented on this build of perl - use Rmpfr_get_d_2exp() instead");
@@ -1787,10 +1795,10 @@ void Rmpfr_remquo(mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
      ret = mpfr_remquo(*a, &q, *b, *c, (mp_rnd_t)SvUV(round)); 
-     // sp  = mark; // not needed
+     /* sp  = mark; *//* not needed */
      ST(0) = sv_2mortal(newSViv(q));
      ST(1) = sv_2mortal(newSViv(ret));
-     // PUTBACK; // not needed
+     /* PUTBACK; *//* not needed */
      XSRETURN(2);
 } 
 
@@ -2510,7 +2518,7 @@ SV * Rmpfr_sum(mpfr_t * rop, SV * avref, SV * len, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     New(42, p, s, mpfr_ptr);
+     Newx(p, s, mpfr_ptr);
      if(p == NULL) croak("Unable to allocate memory in Rmpfr_sum()"); 
 
      for(i = 0; i < s; ++i) {
@@ -2530,7 +2538,7 @@ SV * overload_mul(mpfr_t * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_mul function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2611,7 +2619,7 @@ SV * overload_add(mpfr_t* a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_add function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2691,7 +2699,7 @@ SV * overload_sub(mpfr_t * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sub function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2779,7 +2787,7 @@ SV * overload_div(mpfr_t * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_div function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2868,7 +2876,7 @@ SV * overload_copy(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_copy function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -2884,7 +2892,7 @@ SV * overload_abs(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_abs function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3586,7 +3594,7 @@ SV * overload_sqrt(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sqrt function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3605,7 +3613,7 @@ SV * overload_pow(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_pow function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3694,7 +3702,7 @@ SV * overload_log(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_log function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3710,7 +3718,7 @@ SV * overload_exp(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_exp function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3726,7 +3734,7 @@ SV * overload_sin(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_sin function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3742,7 +3750,7 @@ SV * overload_cos(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_cos function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3758,7 +3766,7 @@ SV * overload_int(mpfr_t * p, SV * second, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_int function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3774,7 +3782,7 @@ SV * overload_atan2(mpfr_t * a, SV * b, SV * third) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfr_t_obj, 1, mpfr_t);
+     Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in overload_atan2 function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFR");
@@ -3903,7 +3911,7 @@ SV * Rgmp_randinit_default() {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
-     New(1, state, 1, gmp_randstate_t);
+     Newx(state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_default function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -3914,12 +3922,27 @@ SV * Rgmp_randinit_default() {
      return obj_ref;
 }
 
+SV * Rgmp_randinit_mt() {
+     gmp_randstate_t * rand_obj;
+     SV * obj_ref, * obj;
+
+     Newx(rand_obj, 1, gmp_randstate_t);
+     if(rand_obj == NULL) croak("Failed to allocate memory in Math::GMPz::Random::Rgmp_randinit_mt function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz::Random");
+     gmp_randinit_mt(*rand_obj);
+
+     sv_setiv(obj, INT2PTR(IV, rand_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
 SV * Rgmp_randinit_lc_2exp(SV * a, SV * c, SV * m2exp ) {
      gmp_randstate_t * state;
      mpz_t aa;
      SV * obj_ref, * obj;
 
-     New(1, state, 1, gmp_randstate_t);
+     Newx(state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -3950,7 +3973,7 @@ SV * Rgmp_randinit_lc_2exp_size(SV * size) {
 
      if(SvUV(size) > 128) croak("The argument supplied to Rgmp_randinit_lc_2exp_size function (%u) needs to be in the range [1..128]", SvUV(size));
 
-     New(1, state, 1, gmp_randstate_t);
+     Newx(state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp_size function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -4860,9 +4883,78 @@ SV * Rmpfr_set_z_2exp(mpfr_t * rop, mpz_t * op, SV * exp, SV * round) {
 #endif
 }
 
+SV * Rmpfr_buildopt_tune_case() {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     return newSVpv(mpfr_buildopt_tune_case(), 0);
+#else
+     croak("Rmpfr_buildopt_tune_case not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
 
+SV * Rmpfr_frexp(SV * exp, mpfr_t * rop, mpfr_t * op, SV * round) {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     mpfr_exp_t _exp;
+     int ret;
 
+     ret = mpfr_frexp(&_exp, *rop, *op, (mp_rnd_t)SvUV(round));
+     sv_setiv(exp, _exp);
+     return newSViv(ret);
+#else
+     croak("Rmpfr_frexp not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
 
+SV * Rmpfr_z_sub(mpfr_t * rop, mpz_t * op1, mpfr_t * op2, SV * round) {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     return newSViv(mpfr_z_sub(*rop, *op1, *op2, (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_z_sub not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_grandom(mpfr_t * rop1, mpfr_t * rop2, gmp_randstate_t * state, SV * round) {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     return newSViv(mpfr_grandom(*rop1, *rop2, *state, (mp_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_grandom not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+void Rmpfr_clear_divby0() {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     mpfr_clear_divby0();
+#else
+     croak("Rmpfr_clear_divby0 not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+void Rmpfr_set_divby0() {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     mpfr_set_divby0();
+#else
+     croak("Rmpfr_set_divby0 not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_divby0_p() {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     return newSViv(mpfr_divby0_p());
+#else
+     croak("Rmpfr_divby0_p not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_buildopt_gmpinternals_p() {
+#if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
+     return newSViv(mpfr_buildopt_gmpinternals_p());
+#else
+     croak("Rmpfr_buildopt_gmpinternals_p not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * get_xs_version() {
+     return newSVpv(XS_VERSION, 0);
+}
 
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
@@ -7266,6 +7358,9 @@ SV *
 Rgmp_randinit_default ()
 
 SV *
+Rgmp_randinit_mt ()
+
+SV *
 Rgmp_randinit_lc_2exp (a, c, m2exp)
 	SV *	a
 	SV *	c
@@ -7485,4 +7580,67 @@ Rmpfr_set_z_2exp (rop, op, exp, round)
 	mpz_t *	op
 	SV *	exp
 	SV *	round
+
+SV *
+Rmpfr_buildopt_tune_case ()
+
+SV *
+Rmpfr_frexp (exp, rop, op, round)
+	SV *	exp
+	mpfr_t *	rop
+	mpfr_t *	op
+	SV *	round
+
+SV *
+Rmpfr_z_sub (rop, op1, op2, round)
+	mpfr_t *	rop
+	mpz_t *	op1
+	mpfr_t *	op2
+	SV *	round
+
+SV *
+Rmpfr_grandom (rop1, rop2, state, round)
+	mpfr_t *	rop1
+	mpfr_t *	rop2
+	gmp_randstate_t *	state
+	SV *	round
+
+void
+Rmpfr_clear_divby0 ()
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_clear_divby0();
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+Rmpfr_set_divby0 ()
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_set_divby0();
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_divby0_p ()
+
+SV *
+Rmpfr_buildopt_gmpinternals_p ()
+
+SV *
+get_xs_version ()
 

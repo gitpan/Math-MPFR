@@ -68,7 +68,8 @@ MPFR_RNDN MPFR_RNDZ MPFR_RNDU MPFR_RNDD MPFR_RNDA
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM
 RMPFR_PREC_MIN RMPFR_PREC_MAX
-Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
+Rgmp_randclear Rgmp_randinit_mt
+Rgmp_randinit_default Rgmp_randinit_lc_2exp 
 Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
 Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
 Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z 
@@ -140,9 +141,11 @@ Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_sprintf_ret Rmpfr_snprintf Rmpfr_snprintf_ret
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
+Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
+Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 );
 
-    $Math::MPFR::VERSION = '3.02';
+    $Math::MPFR::VERSION = '3.10';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -152,7 +155,8 @@ MPFR_RNDN MPFR_RNDZ MPFR_RNDU MPFR_RNDD MPFR_RNDA
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING RMPFR_VERSION_NUM 
 RMPFR_PREC_MIN RMPFR_PREC_MAX
-Rgmp_randclear Rgmp_randinit_default Rgmp_randinit_lc_2exp 
+Rgmp_randclear Rgmp_randinit_mt
+Rgmp_randinit_default Rgmp_randinit_lc_2exp 
 Rgmp_randinit_lc_2exp_size Rgmp_randseed Rgmp_randseed_ui 
 Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_add Rmpfr_add_q
 Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z 
@@ -224,6 +228,8 @@ Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_sprintf_ret Rmpfr_snprintf Rmpfr_snprintf_ret
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
+Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
+Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 )]);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
@@ -842,24 +848,28 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    Rmpfr_set_nanflag();
    Rmpfr_set_inexflag();
    Rmpfr_set_erangeflag();
+   Rmpfr_set_divby0();     # mpfr-3.1.0 and later only
    Rmpfr_clear_underflow();
    Rmpfr_clear_overflow();
    Rmpfr_clear_nanflag();
    Rmpfr_clear_inexflag();
    Rmpfr_clear_erangeflag();
-    Set/clear the underflow, overflow, invalid, inexact and erange flags.
+   Rmpfr_clear_divby0();   # mpfr-3.1.0 and later only
+    Set/clear the underflow, overflow, invalid, inexact, erange and
+    divide-by-zero flags.
 
    Rmpfr_clear_flags();
     Clear all global flags (underflow, overflow, inexact, invalid,
-    and erange).
+    erange and divide-by-zero).
 
    $bool = Rmpfr_underflow_p();
    $bool = Rmpfr_overflow_p();
    $bool = Rmpfr_nanflag_p();
    $bool = Rmpfr_inexflag_p();
    $bool = Rmpfr_erangeflag_p();
-    Return the corresponding (underflow, overflow, invalid, inexact
-    or erange) flag, which is non-zero iff the flag is set.
+   $bool = Rmpfr_divby0_p();   # mpfr-3.1.0 and later only
+    Return the corresponding (underflow, overflow, invalid, inexact,
+    erange, divide-by-zero) flag, which is non-zero iff the flag is set.
 
    $si = Rmpfr_subnormalize ($op, $si, $rnd);
     See the MPFR documentation for mpfr_subnormalize().
@@ -932,9 +942,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $min_prec = Rmpfr_min_prec($op);
     (This function is implemented only when Math::MPFR is built
-    against mpfr-3.0.0 or later. The mpfr_min_prec function was not
-    documented in earlier versions of mpfr, though I think it was
-    first included in mpfr-2.4.2.)
+    against mpfr-3.0.0 or later. The mpfr_min_prec function was
+    not present in earlier versions of mpfr.)
     $min_prec is set to the minimal number of bits required to store
     the significand of $op, and 0 for special values, including 0.
    (Warning: the returned value can be less than RMPFR_PREC_MIN.)
@@ -1247,6 +1256,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     precision (resp. long-double precision) value is returned, and 
     $exp is undefined.
 
+   $si1 = Rmpfr_frexp($si2, $rop, $op, $rnd); # mpfr-3.1.0 and later only
+    Set $si and $rop such that 0.5<=abs($rop)<1 and $rop * (2 ** $exp)
+    equals $op rounded to the precision of $rop, using the given
+    rounding mode. If $op is zero, then $rop is set to zero (of the same
+    sign) and $exp is set to 0. If $op is  NaN or an infinity, then $rop
+    is set to the same value and the value of $exp is meaningless (and
+    should be ignored).
+
    ##########
 
    ARITHMETIC
@@ -1272,6 +1289,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_sub($rop, $op1, $op2, $rnd);
    $si = Rmpfr_sub_ui($rop, $op, $ui, $rnd);
    $si = Rmpfr_sub_z($rop, $op, $z, $rnd); # $z is a mpz object.
+   $si = Rmpfr_z_sub($rop, $z, $op, $rnd); # mpfr-3.1.0 and later only
    $si = Rmpfr_sub_q($rop, $op, $q, $rnd); # $q is a mpq object.
    $si = Rmpfr_ui_sub($rop, $ui, $op, $rnd);
    $si = Rmpfr_si_sub($rop, $si1, $op, $rnd);
@@ -1844,12 +1862,22 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $bool = Rmpfr_buildopt_tls_p(); # mpfr-3.0.0 and later only
     Return a non-zero value if mpfr was compiled as thread safe using
     compiler-level Thread Local Storage (that is mpfr was built with
-    the `--enable-thread-safe' configure option, return zero otherwise.
+    the `--enable-thread-safe' configure option), else return zero.
 
    $bool = Rmpfr_buildopt_decimal_p(); # mpfr-3.0.0 and later only
     Return a non-zero value if mpfr was compiled with decimal float
     support (that is mpfr was built with the `--enable-decimal-float'
     configure option), return zero otherwise.
+
+   $bool = Rmpfr_buildopt_gmpinternals_p(); # mpfr-3.1.0 and later only
+    Return a non-zero value if mpfr was compiled with gmp internals
+    (that is, mpfr was built with either '--with-gmp-build' or
+    '--enable-gmp-internals' configure option), return zero otherwise.
+
+   $str = Rmpfr_buildopt_tune_case(); # mpfr-3.1.0 and later only
+    Return a string saying which thresholds file has been used at
+    compile time.  This file is normally selected from the processor
+    type.
 
    $si = Rmpfr_rint($rop, $op, $rnd);
    $si = Rmpfr_ceil($rop, $op);
@@ -1978,28 +2006,36 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_urandom ($rop, $state, $rnd); # mpfr-3.0.0 and
                                              # later only
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     Generate a uniformly distributed random float.  The
     floating-point number $rop can be seen as if a random real
     number is generated according to the continuous uniform
     distribution on the interval[0, 1] and then rounded in the
     direction RND.
-    Before using this function you must first create $state by 
-    calling one of the 3 Rgmp_randinit functions (below).
+    Before using this function you must first create $state
+    by calling one of the Rgmp_randinit functions (below), then
+    seed $state by calling one of the Rgmp_randseed functions.
+
+   $si = Rmpfr_grandom($rop1, $rop2, $state, $rnd);
+    Available only with mpfr-3.1.0 and later.
+    Generate two random floats according to a standard normal
+    gaussian distribution. The floating-point numbers $rop1 and
+    $rop2 can be seen as if a random real number were generated
+    according to the standard normal gaussian distribution and
+    then rounded in the direction $rnd.
+    Before using this function you must first create $state
+    by calling one of the Rgmp_randinit functions (below), then
+    seed $state by calling one of the Rgmp_randseed functions.
 
    $state = Rgmp_randinit_default();
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     Initialise $state with a default algorithm. This will be
     a compromise between speed and randomness, and is 
     recommended for applications with no special requirements.
-    (This GMP function is documented in the Math::GMP* module
-    that was loaded)
+
+   $state = Rgmp_randinit_mt();
+    Initialize state for a Mersenne Twister algorithm. This
+    algorithm is fast and has good randomness properties.
 
    $state = Rgmp_randinit_lc_2exp($a, $c, $m2exp);
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     This function is not tested in the test suite.
     Use with caution - I often select values here that cause
     Rmpf_urandomb() to behave non-randomly.    
@@ -2014,19 +2050,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
     integer. No other bases are allowed.
-    (This GMP function is documented in the Math::GMP* module
-    that was loaded)
 
    $state = Rgmp_randinit_lc_2exp_size($ui);
     Initialise state as per Rgmp_randinit_lc_2exp. The values
     for $a, $c. and $m2exp are selected from a table, chosen
     so that $ui bits (or more) of each X will be used.
-    (This GMP function is documented in the Math::GMP* module
-    that was loaded)
 
    Rgmp_randseed($state, $seed);
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $seed is the seed. It can be any one of Math::GMP, 
@@ -2035,8 +2065,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
     integer. No other bases are allowed.
-    (This GMP function is documented in the Math::GMP* module
-    that was loaded)
 
    Rgmp_randseed_ui($state, $ui);
     Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
@@ -2044,8 +2072,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $ui is the seed.
-    (This GMP function is documented in the Math::GMP* module
-    that was loaded)
 
    #########
 

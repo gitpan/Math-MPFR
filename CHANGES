@@ -1,7 +1,15 @@
+3.10
+ - Add the following functions (conditional upon building against
+   mpfr-3.1.0 or later):
+   Rmpfr_set_divby0, Rmpfr_clear_divby0, Rmpfr_divby0_p, Rmpfr_buildopt_tune_case,
+   Rmpfr_frexp, Rmpfr_grandom, Rmpfr_z_sub, Rmpfr_buildopt_gmpinternals_p.
+ - Add Rgmp_randinit_mt.
+ - In Rmpfr_get_d_2exp and Rmpfr_get_ld_2exp, replace sv_setuv (was incorrect)
+   with sv_setiv.
+ - Replace New/Newz with Newx/Newxz on perls that support the new symbols (Newx/Newxz).
 3.02
  - Rmpfr_min_prec now available only when building against mpfr-3.0.0 or later. (The
-   mpfr_min_prec function was not documented for earlier versions, though it may well
-   have existed in 2.4.2.)
+   mpfr_min_prec function was not available until 3.0.0.)
 3.01
  - Remove the (outdated) link to http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
    in the "DESCRIPTION" section of the documentation. (Thanks Hugh Myers.)
