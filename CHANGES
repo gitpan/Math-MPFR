@@ -1,3 +1,6 @@
+3.11
+ - Add t/tls.t and t/tls_flags.t (to test the thread local storage capabilities,
+   where applicable).
 3.10
  - Add the following functions (conditional upon building against
    mpfr-3.1.0 or later):

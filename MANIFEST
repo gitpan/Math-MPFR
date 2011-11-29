@@ -31,6 +31,8 @@ t/test2.t
 t/test3.t
 t/test4.t
 t/sign.t
+t/tls.t
+t/tls_flags.t
 t/trig.t
 t/TRmpfr_out_str.t
 t/use64bitint.t
