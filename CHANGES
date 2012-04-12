@@ -1,3 +1,7 @@
+3.12
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
 3.11
  - Add t/tls.t and t/tls_flags.t (to test the thread local storage capabilities,
    where applicable).

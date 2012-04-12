@@ -46,7 +46,6 @@
     '!='   => \&overload_not_equiv,
     '!'    => \&overload_not,
     'bool' => \&overload_true,
-    'not'  => \&overload_not,
     '='    => \&overload_copy,
     'abs'  => \&overload_abs,
     '**'   => \&overload_pow,
@@ -145,7 +144,7 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 );
 
-    $Math::MPFR::VERSION = '3.11';
+    $Math::MPFR::VERSION = '3.12';
 
     DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
 
@@ -2139,7 +2138,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      + - * / ** sqrt (Return object has default precision)
      += -= *= /= **= (Precision remains unchanged)
      < <= > >= == != <=>
-     ! not bool
+     ! bool
      abs atan2 cos sin log exp (Return object has default precision)
      int (On perl 5.8 only, NA on perl 5.6. The return object
           has default precision)

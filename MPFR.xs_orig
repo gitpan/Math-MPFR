@@ -43,7 +43,7 @@
 #endif
 
 /* Has inttypes.h been included ? */
-int _has_inttypes(void) {
+int _has_inttypes() {
 #ifdef _MSC_VER
 return 0;
 #else
@@ -62,7 +62,7 @@ void Rmpfr_set_default_rounding_mode(SV * round) {
      mpfr_set_default_rounding_mode((mp_rnd_t)SvUV(round));    
 }
 
-SV * Rmpfr_get_default_rounding_mode(void) {
+SV * Rmpfr_get_default_rounding_mode() {
      return newSViv(__gmpfr_default_rounding_mode);
 }
 
@@ -98,7 +98,7 @@ void Rmpfr_clears(SV * p, ...) {
      XSRETURN(0);
 }
 
-SV * Rmpfr_init(void) {
+SV * Rmpfr_init() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
@@ -128,7 +128,7 @@ SV * Rmpfr_init2(SV * prec) {
      return obj_ref;
 }
 
-SV * Rmpfr_init_nobless(void) {
+SV * Rmpfr_init_nobless() {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
 
@@ -672,7 +672,7 @@ void Rmpfr_set_default_prec(SV * prec) {
      mpfr_set_default_prec((mpfr_prec_t)SvIV(prec));
 } 
 
-SV * Rmpfr_get_default_prec(void) {
+SV * Rmpfr_get_default_prec() {
      return newSViv(mpfr_get_default_prec());
 }
 
@@ -1505,11 +1505,11 @@ SV * Rmpfr_can_round(mpfr_t * p, SV * err, SV * round1, SV * round2, SV * prec) 
      return newSViv(mpfr_can_round(*p, (mp_exp_t)SvIV(err), SvUV(round1), SvUV(round2), (mpfr_prec_t)SvIV(prec)));
 }
 
-SV * Rmpfr_get_emin(void) {
+SV * Rmpfr_get_emin() {
      return newSViv(mpfr_get_emin());
 }
 
-SV * Rmpfr_get_emax(void) {
+SV * Rmpfr_get_emax() {
      return newSViv(mpfr_get_emax());
 }
 
@@ -1528,39 +1528,39 @@ SV * Rmpfr_check_range(mpfr_t * p, SV * t, SV * round) {
      return newSViv(mpfr_check_range(*p, (int)SvIV(t), (mp_rnd_t)SvUV(round)));
 }
 
-void Rmpfr_clear_underflow(void) {
+void Rmpfr_clear_underflow() {
      mpfr_clear_underflow();
 }
 
-void Rmpfr_clear_overflow(void) {
+void Rmpfr_clear_overflow() {
      mpfr_clear_overflow();
 }
 
-void Rmpfr_clear_nanflag(void) {
+void Rmpfr_clear_nanflag() {
      mpfr_clear_nanflag();
 }
 
-void Rmpfr_clear_inexflag(void) {
+void Rmpfr_clear_inexflag() {
      mpfr_clear_inexflag();
 }
 
-void Rmpfr_clear_flags(void) {
+void Rmpfr_clear_flags() {
      mpfr_clear_flags();
 }
 
-SV * Rmpfr_underflow_p(void) {
+SV * Rmpfr_underflow_p() {
      return newSViv(mpfr_underflow_p());
 }
 
-SV * Rmpfr_overflow_p(void) {
+SV * Rmpfr_overflow_p() {
      return newSViv(mpfr_overflow_p());
 }
 
-SV * Rmpfr_nanflag_p(void) {
+SV * Rmpfr_nanflag_p() {
      return newSViv(mpfr_nanflag_p());
 }
 
-SV * Rmpfr_inexflag_p(void) {
+SV * Rmpfr_inexflag_p() {
      return newSViv(mpfr_inexflag_p());
 }
 
@@ -1871,7 +1871,7 @@ void Rmpfr_dump(mpfr_t * a) { /* Once took a 'round' argument */
      mpfr_dump(*a);
 } 
 
-SV * gmp_v(void) {
+SV * gmp_v() {
      return newSVpv(gmp_version, 0);
 }
 
@@ -1985,39 +1985,39 @@ SV * Rmpfr_zero_p(mpfr_t * a) {
      return newSViv(mpfr_zero_p(*a));
 }
 
-void Rmpfr_free_cache(void) {
+void Rmpfr_free_cache() {
      mpfr_free_cache();
 }
 
-SV * Rmpfr_get_version(void) {
+SV * Rmpfr_get_version() {
      return newSVpv(mpfr_get_version(), 0);
 }
 
-SV * Rmpfr_get_patches(void) {
+SV * Rmpfr_get_patches() {
      return newSVpv(mpfr_get_patches(), 0);
 }
 
-SV * Rmpfr_get_emin_min(void) {
+SV * Rmpfr_get_emin_min() {
      return newSViv(mpfr_get_emin_min());
 }
 
-SV * Rmpfr_get_emin_max(void) {
+SV * Rmpfr_get_emin_max() {
      return newSViv(mpfr_get_emin_max());
 }
 
-SV * Rmpfr_get_emax_min(void) {
+SV * Rmpfr_get_emax_min() {
      return newSViv(mpfr_get_emax_min());
 }
 
-SV * Rmpfr_get_emax_max(void) {
+SV * Rmpfr_get_emax_max() {
      return newSViv(mpfr_get_emax_max());
 }
 
-void Rmpfr_clear_erangeflag(void) {
+void Rmpfr_clear_erangeflag() {
      mpfr_clear_erangeflag();
 }
 
-SV * Rmpfr_erangeflag_p(void) {
+SV * Rmpfr_erangeflag_p() {
      return newSViv(mpfr_erangeflag_p());
 }
 
@@ -2298,23 +2298,23 @@ SV * Rmpfr_strtofr(mpfr_t * a, SV * str, SV * base, SV * round) {
      return newSViv(mpfr_strtofr(*a, SvPV_nolen(str), NULL, b, (mp_rnd_t)SvUV(round)));
 }
 
-void Rmpfr_set_erangeflag(void) {
+void Rmpfr_set_erangeflag() {
      mpfr_set_erangeflag();
 }
 
-void Rmpfr_set_underflow(void) {
+void Rmpfr_set_underflow() {
      mpfr_set_underflow();
 }
 
-void Rmpfr_set_overflow(void) {
+void Rmpfr_set_overflow() {
      mpfr_set_overflow();
 }
 
-void Rmpfr_set_nanflag(void) {
+void Rmpfr_set_nanflag() {
      mpfr_set_nanflag();
 }
 
-void Rmpfr_set_inexflag(void) {
+void Rmpfr_set_inexflag() {
      mpfr_set_inexflag();
 }
 
@@ -2484,23 +2484,23 @@ void Rmpfr_lgamma(mpfr_t * a, mpfr_t * b, SV * round) {
      XSRETURN(2);
 } 
 
-SV * _MPFR_VERSION(void) {
+SV * _MPFR_VERSION() {
      return newSVuv(MPFR_VERSION);
 }
 
-SV * _MPFR_VERSION_MAJOR(void) {
+SV * _MPFR_VERSION_MAJOR() {
      return newSVuv(MPFR_VERSION_MAJOR);
 }
 
-SV * _MPFR_VERSION_MINOR(void) {
+SV * _MPFR_VERSION_MINOR() {
      return newSVuv(MPFR_VERSION_MINOR);
 }
   
-SV * _MPFR_VERSION_PATCHLEVEL(void) {
+SV * _MPFR_VERSION_PATCHLEVEL() {
      return newSVuv(MPFR_VERSION_PATCHLEVEL);
 }
 
-SV * _MPFR_VERSION_STRING(void) {
+SV * _MPFR_VERSION_STRING() {
      return newSVpv(MPFR_VERSION_STRING, 0);
 }
 
@@ -3907,7 +3907,7 @@ SV * overload_atan2(mpfr_t * a, SV * b, SV * third) {
 
 /* Finish typemapping */
 
-SV * Rgmp_randinit_default(void) {
+SV * Rgmp_randinit_default() {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
@@ -3922,7 +3922,7 @@ SV * Rgmp_randinit_default(void) {
      return obj_ref;
 }
 
-SV * Rgmp_randinit_mt(void) {
+SV * Rgmp_randinit_mt() {
      gmp_randstate_t * rand_obj;
      SV * obj_ref, * obj;
 
@@ -4463,7 +4463,7 @@ SV * _itsa(SV * a) {
      return newSVuv(0);
 }
 
-int _has_longlong(void) {
+int _has_longlong() {
 #ifdef USE_64_BIT_INT
     return 1;
 #else
@@ -4471,7 +4471,7 @@ int _has_longlong(void) {
 #endif
 }
 
-int _has_longdouble(void) {
+int _has_longdouble() {
 #ifdef USE_LONG_DOUBLE
     return 1;
 #else
@@ -4480,7 +4480,7 @@ int _has_longdouble(void) {
 }
 
 /*
-int _mpfr_longsize(void) {
+int _mpfr_longsize() {
     mpfr_t x, y;
 
     mpfr_init2(x, 100);
@@ -4494,11 +4494,11 @@ int _mpfr_longsize(void) {
 }
 */
 
-SV * RMPFR_PREC_MAX(void) {
+SV * RMPFR_PREC_MAX() {
      return newSViv(MPFR_PREC_MAX);
 }
 
-SV * RMPFR_PREC_MIN(void) {
+SV * RMPFR_PREC_MIN() {
      return newSViv(MPFR_PREC_MIN);
 }
 
@@ -4803,7 +4803,7 @@ SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * 
 
 }
 
-SV * Rmpfr_buildopt_tls_p(void) {
+SV * Rmpfr_buildopt_tls_p() {
 #if MPFR_VERSION_MAJOR >= 3
      return newSViv(mpfr_buildopt_tls_p());
 #else
@@ -4811,7 +4811,7 @@ SV * Rmpfr_buildopt_tls_p(void) {
 #endif
 }
 
-SV * Rmpfr_buildopt_decimal_p(void) {
+SV * Rmpfr_buildopt_decimal_p() {
 #if MPFR_VERSION_MAJOR >= 3
      return newSViv(mpfr_buildopt_decimal_p());
 #else
@@ -4883,7 +4883,7 @@ SV * Rmpfr_set_z_2exp(mpfr_t * rop, mpz_t * op, SV * exp, SV * round) {
 #endif
 }
 
-SV * Rmpfr_buildopt_tune_case(void) {
+SV * Rmpfr_buildopt_tune_case() {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      return newSVpv(mpfr_buildopt_tune_case(), 0);
 #else
@@ -4920,7 +4920,7 @@ SV * Rmpfr_grandom(mpfr_t * rop1, mpfr_t * rop2, gmp_randstate_t * state, SV * r
 #endif
 }
 
-void Rmpfr_clear_divby0(void) {
+void Rmpfr_clear_divby0() {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      mpfr_clear_divby0();
 #else
@@ -4928,7 +4928,7 @@ void Rmpfr_clear_divby0(void) {
 #endif
 }
 
-void Rmpfr_set_divby0(void) {
+void Rmpfr_set_divby0() {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      mpfr_set_divby0();
 #else
@@ -4936,7 +4936,7 @@ void Rmpfr_set_divby0(void) {
 #endif
 }
 
-SV * Rmpfr_divby0_p(void) {
+SV * Rmpfr_divby0_p() {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      return newSViv(mpfr_divby0_p());
 #else
@@ -4944,7 +4944,7 @@ SV * Rmpfr_divby0_p(void) {
 #endif
 }
 
-SV * Rmpfr_buildopt_gmpinternals_p(void) {
+SV * Rmpfr_buildopt_gmpinternals_p() {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
      return newSViv(mpfr_buildopt_gmpinternals_p());
 #else
@@ -4952,7 +4952,7 @@ SV * Rmpfr_buildopt_gmpinternals_p(void) {
 #endif
 }
 
-SV * get_xs_version(void) {
+SV * get_xs_version() {
      return newSVpv(XS_VERSION, 0);
 }
 
@@ -4964,7 +4964,6 @@ PROTOTYPES: DISABLE
 
 int
 _has_inttypes ()
-		
 
 void
 Rmpfr_set_default_rounding_mode (round)
@@ -4984,7 +4983,6 @@ Rmpfr_set_default_rounding_mode (round)
 
 SV *
 Rmpfr_get_default_rounding_mode ()
-		
 
 SV *
 Rmpfr_prec_round (p, prec, round)
@@ -5074,7 +5072,6 @@ Rmpfr_clears (p, ...)
 
 SV *
 Rmpfr_init ()
-		
 
 SV *
 Rmpfr_init2 (prec)
@@ -5082,7 +5079,6 @@ Rmpfr_init2 (prec)
 
 SV *
 Rmpfr_init_nobless ()
-		
 
 SV *
 Rmpfr_init2_nobless (prec)
@@ -5433,7 +5429,6 @@ Rmpfr_set_default_prec (prec)
 
 SV *
 Rmpfr_get_default_prec ()
-		
 
 SV *
 Rmpfr_min_prec (x)
@@ -6268,11 +6263,9 @@ Rmpfr_can_round (p, err, round1, round2, prec)
 
 SV *
 Rmpfr_get_emin ()
-		
 
 SV *
 Rmpfr_get_emax ()
-		
 
 SV *
 Rmpfr_set_emin (e)
@@ -6290,7 +6283,6 @@ Rmpfr_check_range (p, t, round)
 
 void
 Rmpfr_clear_underflow ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6306,7 +6298,6 @@ Rmpfr_clear_underflow ()
 
 void
 Rmpfr_clear_overflow ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6322,7 +6313,6 @@ Rmpfr_clear_overflow ()
 
 void
 Rmpfr_clear_nanflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6338,7 +6328,6 @@ Rmpfr_clear_nanflag ()
 
 void
 Rmpfr_clear_inexflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6354,7 +6343,6 @@ Rmpfr_clear_inexflag ()
 
 void
 Rmpfr_clear_flags ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6370,19 +6358,15 @@ Rmpfr_clear_flags ()
 
 SV *
 Rmpfr_underflow_p ()
-		
 
 SV *
 Rmpfr_overflow_p ()
-		
 
 SV *
 Rmpfr_nanflag_p ()
-		
 
 SV *
 Rmpfr_inexflag_p ()
-		
 
 SV *
 Rmpfr_log (a, b, round)
@@ -6713,7 +6697,6 @@ Rmpfr_dump (a)
 
 SV *
 gmp_v ()
-		
 
 SV *
 Rmpfr_set_ui_2exp (a, b, c, round)
@@ -6811,7 +6794,6 @@ Rmpfr_zero_p (a)
 
 void
 Rmpfr_free_cache ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6827,31 +6809,24 @@ Rmpfr_free_cache ()
 
 SV *
 Rmpfr_get_version ()
-		
 
 SV *
 Rmpfr_get_patches ()
-		
 
 SV *
 Rmpfr_get_emin_min ()
-		
 
 SV *
 Rmpfr_get_emin_max ()
-		
 
 SV *
 Rmpfr_get_emax_min ()
-		
 
 SV *
 Rmpfr_get_emax_max ()
-		
 
 void
 Rmpfr_clear_erangeflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -6867,7 +6842,6 @@ Rmpfr_clear_erangeflag ()
 
 SV *
 Rmpfr_erangeflag_p ()
-		
 
 SV *
 Rmpfr_rint_round (a, b, round)
@@ -6987,7 +6961,6 @@ Rmpfr_strtofr (a, str, base, round)
 
 void
 Rmpfr_set_erangeflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7003,7 +6976,6 @@ Rmpfr_set_erangeflag ()
 
 void
 Rmpfr_set_underflow ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7019,7 +6991,6 @@ Rmpfr_set_underflow ()
 
 void
 Rmpfr_set_overflow ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7035,7 +7006,6 @@ Rmpfr_set_overflow ()
 
 void
 Rmpfr_set_nanflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7051,7 +7021,6 @@ Rmpfr_set_nanflag ()
 
 void
 Rmpfr_set_inexflag ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7221,23 +7190,18 @@ Rmpfr_lgamma (a, b, round)
 
 SV *
 _MPFR_VERSION ()
-		
 
 SV *
 _MPFR_VERSION_MAJOR ()
-		
 
 SV *
 _MPFR_VERSION_MINOR ()
-		
 
 SV *
 _MPFR_VERSION_PATCHLEVEL ()
-		
 
 SV *
 _MPFR_VERSION_STRING ()
-		
 
 SV *
 RMPFR_VERSION_NUM (a, b, c)
@@ -7392,11 +7356,9 @@ overload_atan2 (a, b, third)
 
 SV *
 Rgmp_randinit_default ()
-		
 
 SV *
 Rgmp_randinit_mt ()
-		
 
 SV *
 Rgmp_randinit_lc_2exp (a, c, m2exp)
@@ -7494,19 +7456,15 @@ _itsa (a)
 
 int
 _has_longlong ()
-		
 
 int
 _has_longdouble ()
-		
 
 SV *
 RMPFR_PREC_MAX ()
-		
 
 SV *
 RMPFR_PREC_MIN ()
-		
 
 SV *
 wrap_mpfr_printf (a, b)
@@ -7562,11 +7520,9 @@ wrap_mpfr_snprintf_rnd (stream, bytes, a, round, b)
 
 SV *
 Rmpfr_buildopt_tls_p ()
-		
 
 SV *
 Rmpfr_buildopt_decimal_p ()
-		
 
 SV *
 Rmpfr_regular_p (a)
@@ -7627,7 +7583,6 @@ Rmpfr_set_z_2exp (rop, op, exp, round)
 
 SV *
 Rmpfr_buildopt_tune_case ()
-		
 
 SV *
 Rmpfr_frexp (exp, rop, op, round)
@@ -7652,7 +7607,6 @@ Rmpfr_grandom (rop1, rop2, state, round)
 
 void
 Rmpfr_clear_divby0 ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7668,7 +7622,6 @@ Rmpfr_clear_divby0 ()
 
 void
 Rmpfr_set_divby0 ()
-		
 	PREINIT:
 	I32* temp;
 	PPCODE:
@@ -7684,13 +7637,10 @@ Rmpfr_set_divby0 ()
 
 SV *
 Rmpfr_divby0_p ()
-		
 
 SV *
 Rmpfr_buildopt_gmpinternals_p ()
-		
 
 SV *
 get_xs_version ()
-		
 
