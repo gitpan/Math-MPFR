@@ -2,6 +2,10 @@ use ExtUtils::MakeMaker;
 use Config;
 #require 5.008008;
 
+our %args = map { split /\s*=\s*/ } @ARGV;
+our $LIBS = $args{ LIBS } || "-lmpfr -lgmp";
+our $INC = $args{ INC };
+
 $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
 $use_long_double = 0;# Let perl decide whether to include 'long double' support
 

@@ -1,3 +1,9 @@
+3.13
+ - Add Math::MPFR::V
+ - Add pre/post increment/decrement operations (overload_add and overload_inc)
+ - Allow (cross-class) overloading of basic math operations with Math::GMPz,
+   Math::GMPq and Math::GMPf objects.
+
 3.12
  - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
    warns that it's invalid.

@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..60\n";
+print "1..61\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -1003,6 +1003,28 @@ $ok .= 'c' if $mpfr1 == 2468 && $mpfr3 == 1234
 
 if($ok eq 'abc'){print "ok 60\n"}
 else {print "not ok 60 $ok\n"}
+
+$ok = '';
+
+$mpfr1 += 0.5;
+
+$mpfr1++;
+$ok .= 'a' if $mpfr1 == 2469.5;
+
+++$mpfr1;
+$ok .= 'b' if $mpfr1 == 2470.5;
+
+$mpfr1--;
+$ok .= 'c' if $mpfr1 == 2469.5;
+
+--$mpfr1;
+$ok .= 'd' if $mpfr1 == 2468.5;
+
+if($ok eq 'abcd') {print "ok 61\n"}
+else {
+  warn "\$ok: $ok\n";
+  print "not ok 61\n";
+}
 
 sub adjust {
     if($_[0]) {

@@ -28,6 +28,8 @@
                 RMPFR_PREC_MIN RMPFR_PREC_MAX);
 
     use overload
+    '++'   => \&overload_inc,
+    '--'   => \&overload_dec,
     '+'    => \&overload_add,
     '-'    => \&overload_sub,
     '*'    => \&overload_mul,
@@ -144,9 +146,10 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 );
 
-    $Math::MPFR::VERSION = '3.12';
+    our $VERSION = '3.13';
+    $VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
+    DynaLoader::bootstrap Math::MPFR $VERSION;
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
@@ -2136,7 +2139,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     The following operators are overloaded:
      + - * / ** sqrt (Return object has default precision)
-     += -= *= /= **= (Precision remains unchanged)
+     += -= *= /= **= ++ -- (Precision remains unchanged)
      < <= > >= == != <=>
      ! bool
      abs atan2 cos sin log exp (Return object has default precision)
@@ -2145,15 +2148,44 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      = (The copy has the same precision as the copied object.)
      ""
 
-    Attempting to use the overloaded operators with objects that
-    have been blessed into some package other than 'Math::MPFR'
-    will not (currently) work. It would be fun (and is tempting)
-    to implement cross-class overloading - but it could also
-    easily lead to user confusion and frustration, so I'll resist
-    the temptation until someone convinces me that I should do
-    otherwise.
-    The workaround is to convert this "foreign" object to a
-    format that *will* work with the overloaded operator.
+    As of version 3.13 of Math::MPFR, some cross-class overloading
+    is allowed.
+    Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
+    Math::GMPq or Math::GMPf object. Then it is now permissible to
+    do:
+     
+     $M + $G;
+     $M - $G;
+     $M * $G;
+     $M / $G;
+     $M ** $G;
+
+    In each of the above, a Math::MPFR object containing the result
+    of the operation is returned. It is also now permissible to do:
+
+     $M += $G;
+     $M -= $G;
+     $M *= $G;
+     $M /= $G;
+
+    If you have version 0.35 (or later) of Math::GMPz, Math::GMPq
+    and Math::GMPf, it is also permissible to do:
+
+     $G + $M;
+     $G - $M;
+     $G * $M;
+     $G / $M;
+     $G ** $M;
+
+    Again, each of those operations returns a Math::MPFR object
+    containing the result of the operation.
+    The following is still NOT ALLOWED, and will cause a fatal error:
+
+     $G += $M;
+     $G -= $M;
+     $G *= $M;
+     $G /= $M;
+     $G **= $M; 
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is
@@ -2188,8 +2220,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
        or '0X' it is regarded as a base 16 number. Otherwise it is
        regarded as a base 10 number.
 
-    5. If the variable is a Math::MPFR object then the value of that
-       object is used.
+    5. If the variable is a Math::MPFR, Math::GMPz, Math::GMPf, or
+       Math::GMPq object then the value of that object is used.
 
     6. If none of the above is true, then the second variable is
        deemed to be of an invalid type. The subroutine croaks with

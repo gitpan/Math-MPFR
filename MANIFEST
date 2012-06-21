@@ -4,8 +4,12 @@ MPFR.pm
 MPFR.xs
 README
 CHANGES
+V/V.xs
+V/V.pm
+V/Makefile.PL
 t/_1basic.t
 t/_2exp.t
+t/aa_v.t
 t/bessel.t
 t/buildopt.t
 t/constants.t
@@ -21,6 +25,7 @@ t/not_zero.t
 t/new.t
 t/out_str.t
 t/overload.t
+t/overload_cross_class.t
 t/pod.t
 t/printf.t
 t/remainder.t
