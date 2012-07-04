@@ -1,3 +1,7 @@
+3.14
+ - Fix pod. (The '±' symbol was causing pod.t failures.) Also took care of
+   some other typos/oversights in the documentation.
+
 3.13
  - Add Math::MPFR::V
  - Add pre/post increment/decrement operations (overload_add and overload_inc)
