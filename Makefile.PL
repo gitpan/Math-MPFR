@@ -15,6 +15,13 @@ $use_long_double = 0;# Let perl decide whether to include 'long double' support
 #$use_64_bit_int = 1; # Force inclusion of 64-bit 'long long' support
 #$use_long_double = 1;# Force inclusion of 'long double' support
 
+$have_decimal64 = 0;
+#$have_decimal64 = 1; # Force inclusion of _Decimal64 support
+                      # This will also define MPFR_WANT_DECIMAL_FLOATS
+
+my $d64_message = $have_decimal64 ? "Attempting to build with _Decimal64 support\n"
+                                  : "Building without _Decimal64 support\n";
+
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 if($use_64_bit_int == -1) {}                                
@@ -33,6 +40,8 @@ else {
   }
 }
 
+$defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if $have_decimal64;
+
 print "\nThis module requires the following C libraries:\n";
 print " gmp-4.2.0 (or later)\n mpfr-2.4.0 (or later)\n\n";
 $defines =~ /-DUSE_64_BIT_INT/ ? print "Building with 64-bit'long long' support\n" :
@@ -45,6 +54,9 @@ $defines =~ /-DUSE_LONG_DOUBLE/ ? print "Building with 'long double' support\n" 
 
 print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
+print "\n$d64_message";
+print "If this is wrong, see the \"Decimal64 conversion\" section in the README\n\n";
+
 my %options = (       
   NAME => 'Math::MPFR',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
@@ -56,6 +68,8 @@ my %options = (
   VERSION_FROM => 'MPFR.pm',
   clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt' },
 );
+
+$options{PREREQ_PM} = {'Math::Decimal64' => '0.01'} if $have_decimal64;
 
 WriteMakefile(%options);
 

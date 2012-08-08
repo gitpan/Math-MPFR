@@ -2485,7 +2485,11 @@ void Rmpfr_lgamma(mpfr_t * a, mpfr_t * b, SV * round) {
 } 
 
 SV * _MPFR_VERSION(void) {
+#if defined(MPFR_VERSION)
      return newSVuv(MPFR_VERSION);
+#else
+     return &PL_sv_undef;
+#endif
 }
 
 SV * _MPFR_VERSION_MAJOR(void) {
@@ -5134,6 +5138,65 @@ SV * _wrap_count(void) {
      return newSVuv(PL_sv_count);
 }
 
+/*
+int mpfr_set_decimal64 (mpfr_t rop, _Decimal64 op, mpfr_rnd_t rnd)
+*/
+
+SV * Rmpfr_set_decimal64(mpfr_t * rop, SV * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,1,0)))
+     croak("Perl interface to Rmpfr_set_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
+            MPFR_VERSION_STRING);
+#endif
+#ifdef MPFR_WANT_DECIMAL_FLOATS
+    if(mpfr_buildopt_gmpinternals_p()) {
+      if(sv_isobject(op)) {
+        if(strEQ(HvNAME(SvSTASH(SvRV(op))), "Math::Decimal64")) {
+          return newSViv(mpfr_set_decimal64(*rop, *(INT2PTR(_Decimal64 *, SvIV(SvRV(op)))), (mp_rnd_t)SvUV(rnd)));
+        }
+        croak("2nd arg (a %s object) supplied to Rmpfr_set_decimal64 needs to be a Math::Decimal64 object",
+               HvNAME(SvSTASH(SvRV(op))));
+      }
+      else croak("2nd arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_set_decimal64 is not an object");
+    }
+    else croak("The mpfr library needs to have been built using the '--with-gmp-build' configure option");
+#else
+    if(!mpfr_buildopt_gmpinternals_p()) croak("%s %s","The mpfr library needs to have been built using the '--with-gmp-build' configure option and",
+      "MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+    else croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#endif
+}
+
+void Rmpfr_get_decimal64(SV * rop, mpfr_t * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,1,0)))
+     croak("Perl interface to Rmpfr_set_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
+              MPFR_VERSION_STRING);
+#endif
+#ifdef MPFR_WANT_DECIMAL_FLOATS
+    if(mpfr_buildopt_gmpinternals_p()) {
+      if(sv_isobject(rop)) {
+        if(strEQ(HvNAME(SvSTASH(SvRV(rop))), "Math::Decimal64")) {
+          *(INT2PTR(_Decimal64 *, SvIV(SvRV(rop)))) = mpfr_get_decimal64(*op, (mp_rnd_t)SvUV(rnd));
+        }
+        else croak("1st arg (a %s object) supplied to Rmpfr_get_decimal64 needs to be a Math::Decimal64 object",
+                    HvNAME(SvSTASH(SvRV(rop))));
+      }
+      else croak("1st arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_set_decimal64 is not an object");
+    }
+    else croak("The mpfr library needs to have been built using the '--with-gmp-build' configure option");
+#else
+    if(!mpfr_buildopt_gmpinternals_p()) croak("%s %s", "The mpfr library needs to have been built using the '--with-gmp-build' configure option and",
+      "MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+    else croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#endif
+}
+
+int _MPFR_WANT_DECIMAL_FLOATS(void) {
+#ifdef MPFR_WANT_DECIMAL_FLOATS
+ return 1;
+#else
+ return 0;
+#endif
+}
 
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
@@ -7887,5 +7950,33 @@ overload_dec (p, second, third)
 
 SV *
 _wrap_count ()
+		
+
+SV *
+Rmpfr_set_decimal64 (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+
+void
+Rmpfr_get_decimal64 (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_get_decimal64(rop, op, rnd);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+int
+_MPFR_WANT_DECIMAL_FLOATS ()
 		
 

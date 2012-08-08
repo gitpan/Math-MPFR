@@ -24,13 +24,11 @@ http://gmplib.org
 
 For the MPFR library see:
 http://www.mpfr.org
-Do not use the (outdated) MPFR library source that ships with the
-GMP source.
 
-Math::MPFR-1.04 to 1.07 require mpfr-2.1.x (or later).
-Math::MPFR-1.08 to Math::MPFR-1.11 require mpfr-2.2.x (or later).
-Math::MPFR-2.01 and 2.02 require mpfr-2.3.x (or later).
-Math::MPFR-2.03 and 2.04 requires mpfr-2.4.x.
+Minimum required version of gmp is gmp-4.2.0.
+Minimum required version of mpfr is mpfr-2.4.0.
+Some features of Math::MPFR require later versions
+of the gmp and mpfr libraries.
 
 You'll get errors if you try to build Math::MPFR against an
 insufficiently recent version of the mpfr library.
@@ -55,9 +53,9 @@ you'll need to run:
 perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
  LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
 
-==============
-64-bit support
-==============
+==================================
+64-bit-int and long double support
+==================================
 
 If your perl's Config reports that 'ivsize' is greater than or
 equal to 8, then Math::MPFR will, by default, be built with access
@@ -80,15 +78,21 @@ default is something I probably ought to know about.
 
 I am contactable by email at sisyphus at(@) cpan dot (.) org.
 
-==========
-MS WINDOWS
-==========
-If building with an MSVC++ compiler against MinGW-built gmp and mpfr libs,
-you'll need to additionally link to MinGW's libgcc.a and libcoldname.a.
-First, create copies of the 4 '.a' files (named libgmp.lib, libmpfr.lib,
-libgcc.lib, libcoldname.lib) and then run:
+=========================================================
+Conversion between Math::Decimal64 and Math::MPFR objects
+=========================================================
 
-perl Makefile.pl INC="-IC:/path/to/gmp_includes -I/path/to/mpfr_includes" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -LC:/path/to/mpfr_lib -lmpfr -LC:/path/to/gmp_lib -lgmp"
+The functions Rmpfr_set_decimal64 and Rmpfr_get_decimal64 allow
+conversion between Math::Decimal64 (_Decimal64) and Math::MPFR (mpfr_t)
+objects.
+For this feature to be available you firstly need a compiler that has
+the _Decimal64 data type.
+Then you need to build and install Math::Decimal64.
+You'll also need to have the mpfr library (version 3.1.1 at least)
+configured to handle the _Decimal64-mpfr_t conversions. See the mpfr
+documentation for details of that aspect.
+If those pre-conditions are met, you'll also need to edit the Makefile.PL
+before building Math::MPFR and set its $have_decimal64 variable to 1.
 
-
-
+Alternatively, ensuring that Decimal64 support is *not* built can be
+ensured by leaving $have_decimal64 set to zero.

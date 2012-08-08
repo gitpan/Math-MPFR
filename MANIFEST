@@ -13,6 +13,7 @@ t/aa_v.t
 t/bessel.t
 t/buildopt.t
 t/constants.t
+t/decimal64_conv.t
 t/div_by_zero.t
 t/exceptions.t
 t/flags.t

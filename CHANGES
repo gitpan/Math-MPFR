@@ -1,3 +1,6 @@
+3.15
+ - Add _Decimal64-mpfr_t conversion
+
 3.14
  - Fix pod. (The '±' symbol was causing pod.t failures.) Also took care of
    some other typos/oversights in the documentation.
