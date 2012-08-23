@@ -91,8 +91,28 @@ Then you need to build and install Math::Decimal64.
 You'll also need to have the mpfr library (version 3.1.1 at least)
 configured to handle the _Decimal64-mpfr_t conversions. See the mpfr
 documentation for details of that aspect.
-If those pre-conditions are met, you'll also need to edit the Makefile.PL
-before building Math::MPFR and set its $have_decimal64 variable to 1.
 
-Alternatively, ensuring that Decimal64 support is *not* built can be
-ensured by leaving $have_decimal64 set to zero.
+If those pre-conditions are met, you also need to provide D64=1
+as a command line argument to 'perl Makefile.PL'. (Altenatively you
+could edit the Makefile.PL before building Math::MPFR and set its
+$have_decimal64 variable to 1.)
+
+Similarly, ensuring that Decimal64 support is *not* built in can be
+achieved by leaving $have_decimal64 set to zero.
+
+==========================================================
+Conversion between Math::LongDouble and Math::MPFR objects
+==========================================================
+
+There are 2 functions provided for conversion between Math::LongDouble
+and Math::MPFR objects:
+
+ Rmpfr_set_LD (assign the value of a Math::LongDouble object to a 
+               Math::MPFR object)
+ Rmpfr_get_LD (assign the value of a Math::MPFR object to a 
+               Math::Long Double object)
+
+If your perl's nvtype is long double, just use Rmpfr_set_ld and
+Rmpfr_get_ld instead.
+Math::LongDouble provides 'long double' support for perls whose
+nvtype is 'double'.

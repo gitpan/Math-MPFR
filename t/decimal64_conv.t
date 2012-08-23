@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-my $t = 7;
+my $t = 17;
 print "1..$t\n";
 
 eval {require Math::Decimal64; Math::Decimal64->import (qw(:all));};
@@ -115,6 +115,79 @@ if($proceed) {
   else {
     warn "\$rop: $rop\n";
     print "not ok 7\n";
+  }
+
+  my $bigpos = Math::MPFR->new('1@385');
+  my $bigneg = $bigpos * -1;
+
+  Rmpfr_get_decimal64($rop, $bigpos, MPFR_RNDN);
+  if(is_InfD64($rop) > 0) {print "ok 8\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 8\n";
+  }
+
+  Rmpfr_get_decimal64($rop, $bigneg, MPFR_RNDN);
+  if(is_InfD64($rop) < 0) {print "ok 9\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 9\n";
+  }
+
+  Rmpfr_get_decimal64($rop, $bigpos, MPFR_RNDZ);
+  if($rop == Math::Decimal64->new('9999999999999999','369')) {print "ok 10\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 10\n";
+  }
+
+  if($rop == Math::Decimal64->new('9999999999999999','369')) {print "ok 11\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 11\n";
+  }
+
+  if($rop == Math::Decimal64::DEC64_MAX()) {print "ok 12\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 12\n";
+  }
+
+  my $littlepos = Math::MPFR->new('1@-399');
+  my $littleneg = $littlepos * -1;
+
+  Rmpfr_get_decimal64($rop, $littlepos, MPFR_RNDZ);
+  if(is_ZeroD64($rop) > 0) {print "ok 13\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 13\n";
+  }
+
+  Rmpfr_get_decimal64($rop, $littleneg, MPFR_RNDZ);
+  if(is_ZeroD64($rop) < 0) {print "ok 14\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 14\n";
+  }
+
+  Rmpfr_get_decimal64($rop, $littlepos, MPFR_RNDA);
+  if($rop == Math::Decimal64->new(1, -398)) {print "ok 15\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 15\n";
+  }
+
+  Rmpfr_get_decimal64($rop, $littleneg, MPFR_RNDA);
+  if($rop == Math::Decimal64->new(-1, -398)) {print "ok 16\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 16\n";
+  }
+
+  if($rop == Math::Decimal64::DEC64_MIN() * Math::Decimal64::UnityD64(-1)) {print "ok 17\n"}
+  else {
+    warn "\n\$rop: $rop\n";
+    print "not ok 17\n";
   }
 }
 else {

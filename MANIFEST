@@ -13,6 +13,7 @@ t/aa_v.t
 t/bessel.t
 t/buildopt.t
 t/constants.t
+t/D64_LD.t
 t/decimal64_conv.t
 t/div_by_zero.t
 t/exceptions.t
@@ -20,6 +21,7 @@ t/flags.t
 t/grandom.t
 t/integer_string.t
 t/inits.t
+t/LongDouble.t
 t/MPFR_RND.t
 t/nan_cmp.t
 t/not_zero.t

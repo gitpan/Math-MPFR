@@ -2,6 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
 #include <stdio.h>
 
 #if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
@@ -12,6 +16,12 @@
 
 #include <gmp.h>
 #include <mpfr.h>
+
+#if defined(MPFR_VERSION_MAJOR) && MPFR_VERSION_MAJOR >= 3
+#define MAXIMUM_ALLOWABLE_BASE 62
+#else
+#define MAXIMUM_ALLOWABLE_BASE 36
+#endif
 
 /* Squash some annoying compiler warnings (Microsoft compilers only). */
 #ifdef _MSC_VER
@@ -385,7 +395,8 @@ void Rmpfr_init_set_str(SV * q, SV * base, SV * round) {
 
      /* sp = mark; *//* not needed */
 
-     if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set str is out of allowable range");
+     if(ret < 0 || ret > MAXIMUM_ALLOWABLE_BASE || ret == 1)
+        croak("2nd argument supplied to Rmpfr_init_set str is out of allowable range");
 
      Newx(mpfr_t_obj, 1, mpfr_t);
      if(mpfr_t_obj == NULL) croak("Failed to allocate memory in Rmpfr_init_set_str function");
@@ -626,7 +637,8 @@ void Rmpfr_init_set_str_nobless(SV * q, SV * base, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfr_init_set_str_nobless is out of allowable range");
+     if(ret < 0 || ret > MAXIMUM_ALLOWABLE_BASE || ret == 1)
+        croak("2nd argument supplied to Rmpfr_init_set_str_nobless is out of allowable range");
 
      /* sp = mark; *//* not needed */
 
@@ -654,7 +666,8 @@ void Rmpfr_deref2(mpfr_t * p, SV * base, SV * n_digits, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
-     if(b < 2 || b > 36) croak("Second argument supplied to Rmpfr_get_str() is not in acceptable range");
+     if(b < 2 || b > MAXIMUM_ALLOWABLE_BASE)
+        croak("Second argument supplied to Rmpfr_get_str() is not in acceptable range");
 
      out = mpfr_get_str(0, &ptr, b, (unsigned long)SvUV(n_digits), *p, (mp_rnd_t)SvUV(round));
 
@@ -795,7 +808,8 @@ SV * Rmpfr_set_str(mpfr_t * p, SV * num, SV * base, SV * round) {
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
      int b = (int)SvIV(base);
-     if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_set_str is out of allowable range");
+     if(b < 0 || b > MAXIMUM_ALLOWABLE_BASE || b == 1)
+        croak("3rd argument supplied to Rmpfr_set_str is out of allowable range");
      return newSViv(mpfr_set_str(*p, SvPV_nolen(num), b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -1615,7 +1629,9 @@ void Rmpfr_random2(mpfr_t * p, SV * s, SV * exp) {
  
 SV * _TRmpfr_out_str(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round) {
      size_t ret;
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      return newSVuv(ret);
@@ -1626,7 +1642,9 @@ SV * _Rmpfr_out_str(mpfr_t * p, SV * base, SV * dig, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stdout);
      return newSVuv(ret);
@@ -1637,7 +1655,9 @@ SV * _TRmpfr_out_strS(FILE * stream, SV * base, SV * dig, mpfr_t * p, SV * round
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+       croak("2nd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+       MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stream);
      fprintf(stream, "%s", SvPV_nolen(suff));
@@ -1650,7 +1670,9 @@ SV * _TRmpfr_out_strP(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p, 
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
      ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
@@ -1663,7 +1685,9 @@ SV * _TRmpfr_out_strPS(SV * pre, FILE * stream, SV * base, SV * dig, mpfr_t * p,
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("3rd argument supplied to TRmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      fprintf(stream, "%s", SvPV_nolen(pre));
      fflush(stream);
      ret = mpfr_out_str(stream, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
@@ -1678,7 +1702,9 @@ SV * _Rmpfr_out_strS(mpfr_t * p, SV * base, SV * dig, SV * round, SV * suff) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+       croak("2nd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+       MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      printf("%s", SvPV_nolen(suff));
      fflush(stdout);
@@ -1690,7 +1716,9 @@ SV * _Rmpfr_out_strP(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      printf("%s", SvPV_nolen(pre));
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      fflush(stdout);
@@ -1702,7 +1730,9 @@ SV * _Rmpfr_out_strPS(SV * pre, mpfr_t * p, SV * base, SV * dig, SV * round, SV 
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+       croak("3rd argument supplied to Rmpfr_out_str is out of allowable range (must be between 2 and %d inclusive)",
+       MAXIMUM_ALLOWABLE_BASE);
      printf("%s", SvPV_nolen(pre));
      ret = mpfr_out_str(NULL, (int)SvIV(base), (size_t)SvUV(dig), *p, (mp_rnd_t)SvUV(round));
      printf("%s", SvPV_nolen(suff));
@@ -1715,7 +1745,9 @@ SV * TRmpfr_inp_str(mpfr_t * p, FILE * stream, SV * base, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("3rd argument supplied to TRmpfr_inp_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_inp_str(*p, stream, (int)SvIV(base), (mp_rnd_t)SvUV(round));
      /* fflush(stream); */
      return newSVuv(ret);
@@ -1726,7 +1758,9 @@ SV * Rmpfr_inp_str(mpfr_t * p, SV * base, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
-     if(SvIV(base) < 2 || SvIV(base) > 36) croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and 36 inclusive)");
+     if(SvIV(base) < 2 || SvIV(base) > MAXIMUM_ALLOWABLE_BASE)
+        croak("2nd argument supplied to Rmpfr_inp_str is out of allowable range (must be between 2 and %d inclusive)",
+        MAXIMUM_ALLOWABLE_BASE);
      ret = mpfr_inp_str(*p, NULL, (int)SvIV(base), (mp_rnd_t)SvUV(round));
      /* fflush(stdin); */
      return newSVuv(ret);
@@ -2291,7 +2325,8 @@ SV * Rmpfr_strtofr(mpfr_t * a, SV * str, SV * base, SV * round) {
      /* char ** endptr; */
 #if MPFR_VERSION_MAJOR < 3
      if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
-     if(b < 0 || b > 36 || b == 1) croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
+     if(b < 0 || b > MAXIMUM_ALLOWABLE_BASE || b == 1)
+        croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
 #else
      if(b < 0 || b > 62 || b == 1) croak("3rd argument supplied to Rmpfr_strtofr is out of allowable range");
 #endif
@@ -5138,6 +5173,17 @@ SV * _wrap_count(void) {
      return newSVuv(PL_sv_count);
 }
 
+SV * Rmpfr_set_LD(mpfr_t * rop, SV * op, SV *rnd) {
+     if(sv_isobject(op)) {
+       if(strEQ(HvNAME(SvSTASH(SvRV(op))), "Math::LongDouble")) {
+         return newSViv(mpfr_set_ld(*rop, *(INT2PTR(long double *, SvIV(SvRV(op)))), (mp_rnd_t)SvUV(rnd)));
+       }
+       croak("2nd arg (a %s object) supplied to Rmpfr_set_LD needs to be a Math::LongDouble object",
+              HvNAME(SvSTASH(SvRV(op))));
+     }
+     else croak("2nd arg (which needs to be a Math::LongDouble object) supplied to Rmpfr_set_LD is not an object");
+}
+
 /*
 int mpfr_set_decimal64 (mpfr_t rop, _Decimal64 op, mpfr_rnd_t rnd)
 */
@@ -5166,6 +5212,17 @@ SV * Rmpfr_set_decimal64(mpfr_t * rop, SV * op, SV * rnd) {
 #endif
 }
 
+void Rmpfr_get_LD(SV * rop, mpfr_t * op, SV * rnd) {
+     if(sv_isobject(rop)) {
+       if(strEQ(HvNAME(SvSTASH(SvRV(rop))), "Math::LongDouble")) {
+         *(INT2PTR(long double *, SvIV(SvRV(rop)))) = mpfr_get_ld(*op, (mp_rnd_t)SvUV(rnd));
+       }
+       else croak("1st arg (a %s object) supplied to Rmpfr_get_decimal64 needs to be a Math::LongDouble object",
+                  HvNAME(SvSTASH(SvRV(rop))));
+     }
+     else croak("1st arg (which needs to be a Math::LongDouble object) supplied to Rmpfr_get_LD is not an object");
+}
+
 void Rmpfr_get_decimal64(SV * rop, mpfr_t * op, SV * rnd) {
 #if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,1,0)))
      croak("Perl interface to Rmpfr_set_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
@@ -5180,7 +5237,7 @@ void Rmpfr_get_decimal64(SV * rop, mpfr_t * op, SV * rnd) {
         else croak("1st arg (a %s object) supplied to Rmpfr_get_decimal64 needs to be a Math::Decimal64 object",
                     HvNAME(SvSTASH(SvRV(rop))));
       }
-      else croak("1st arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_set_decimal64 is not an object");
+      else croak("1st arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_get_decimal64 is not an object");
     }
     else croak("The mpfr library needs to have been built using the '--with-gmp-build' configure option");
 #else
@@ -5197,6 +5254,11 @@ int _MPFR_WANT_DECIMAL_FLOATS(void) {
  return 0;
 #endif
 }
+
+SV * _max_base(void) {
+    return newSViv(MAXIMUM_ALLOWABLE_BASE);
+}
+
 
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
@@ -7953,10 +8015,34 @@ _wrap_count ()
 		
 
 SV *
+Rmpfr_set_LD (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+
+SV *
 Rmpfr_set_decimal64 (rop, op, rnd)
 	mpfr_t *	rop
 	SV *	op
 	SV *	rnd
+
+void
+Rmpfr_get_LD (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_get_LD(rop, op, rnd);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
 
 void
 Rmpfr_get_decimal64 (rop, op, rnd)
@@ -7978,5 +8064,9 @@ Rmpfr_get_decimal64 (rop, op, rnd)
 
 int
 _MPFR_WANT_DECIMAL_FLOATS ()
+		
+
+SV *
+_max_base ()
 		
 

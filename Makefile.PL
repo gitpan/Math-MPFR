@@ -16,6 +16,9 @@ $use_long_double = 0;# Let perl decide whether to include 'long double' support
 #$use_long_double = 1;# Force inclusion of 'long double' support
 
 $have_decimal64 = 0;
+for(@ARGV) {
+  $have_decimal64 = 1 if $_ eq 'D64=1';
+}
 #$have_decimal64 = 1; # Force inclusion of _Decimal64 support
                       # This will also define MPFR_WANT_DECIMAL_FLOATS
 

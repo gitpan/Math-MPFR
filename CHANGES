@@ -1,3 +1,8 @@
+3.16
+ - Add Rmpfr_set_LD() and Rmpfr_get_LD(). These provide access to the 
+   'long double' data type (for perls whose nvtype is double) via the
+   Math::LongDouble module.
+
 3.15
  - Add _Decimal64-mpfr_t conversion
 
