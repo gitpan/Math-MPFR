@@ -23,3 +23,21 @@ else {
   warn "MPFR Library version: ", Math::MPFR::V::Rmpfr_get_version(), "\n";
   print "ok 1\n";
 }
+
+my($h_major, $h_minor) = (Math::MPFR::V::_MPFR_VERSION_MAJOR(), Math::MPFR::V::_MPFR_VERSION_MINOR());
+
+if(($h_major < 2) ||
+   ($h_major == 2 && $h_minor < 4)) {
+   warn "\n\n      Your MPFR Header version is outdated and unsupported.\n",
+        "      REMAINING TEST SUITE WILL POSSIBLY FAIL !!!!\n";
+}
+
+my @lv = split /\./, Math::MPFR::V::Rmpfr_get_version();
+
+#warn "$lv[0] $lv[1]\n";
+
+if(($lv[0] < 2) ||
+   ($lv[0] == 2 && $lv[1] < 4)) {
+   warn "\n\n      Your MPFR Library version is outdated and unsupported.\n",
+        "      REMAINING TEST SUITE SHOULD INEVITABLY FAIL !!!!\n";
+}

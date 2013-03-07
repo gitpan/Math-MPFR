@@ -147,7 +147,7 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 );
 
-    our $VERSION = '3.16';
+    our $VERSION = '3.17';
     $VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;

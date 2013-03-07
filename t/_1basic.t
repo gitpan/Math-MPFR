@@ -8,7 +8,7 @@ print STDERR "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print STDERR "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print STDERR "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
-if($Math::MPFR::VERSION eq '3.16') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '3.17') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
 if($Math::MPFR::VERSION eq Math::MPFR::get_xs_version()) {print "ok 2\n"}

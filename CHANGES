@@ -1,3 +1,8 @@
+3.17
+ - Apply patch to MPFR.xs from Daniel Kahn Gillmor that eliminates
+   "null argument where non-null required" warnings.
+ - Fix typo in croak() message in MPFR.xs (also caught by Daniel).
+
 3.16
  - Add Rmpfr_set_LD() and Rmpfr_get_LD(). These provide access to the 
    'long double' data type (for perls whose nvtype is double) via the

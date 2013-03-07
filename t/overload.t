@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..61\n";
+print "1..63\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -1025,6 +1025,15 @@ else {
   warn "\$ok: $ok\n";
   print "not ok 61\n";
 }
+
+my $unblessed = Rmpfr_init_nobless();
+my $blessed = Rmpfr_init();
+
+if(Math::MPFR::_isobject($blessed)) { print "ok 62\n"}
+else {print "not ok 62\n"}
+
+unless(Math::MPFR::_isobject($unblessed)) { print "ok 63\n"}
+else {print "not ok 63\n"}
 
 sub adjust {
     if($_[0]) {
