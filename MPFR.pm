@@ -1,6 +1,7 @@
     package Math::MPFR;
     use strict;
     use warnings;
+    use Math::MPFR::Prec;
 
     use constant  GMP_RNDN       => 0;
     use constant  GMP_RNDZ       => 1;
@@ -145,9 +146,10 @@ Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmp
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
+prec_cast
 );
 
-    our $VERSION = '3.17';
+    our $VERSION = '3.18';
     $VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -234,6 +236,7 @@ Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmp
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
+prec_cast
 )]);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
@@ -520,6 +523,7 @@ sub MPFR_VERSION_PATCHLEVEL {return _MPFR_VERSION_PATCHLEVEL()}
 sub MPFR_VERSION_STRING {return _MPFR_VERSION_STRING()}
 
 *Rmpfr_get_z_exp = \&Rmpfr_get_z_2exp;
+*prec_cast       = \&Math::MPFR::Prec::prec_cast;
 
 1;
 
@@ -545,8 +549,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    Operator overloading is also available.
    The following documentation heavily plagiarises the mpfr
    documentation.
-   See also the Math::MPFR test suite for some examples of
-   usage.
+   See also the Math::MPFR test suite for some examples of usage.
 
 =head1 SYNOPSIS
 
@@ -1198,14 +1201,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     support mpfr_get_uj and mpfr_get_sj functions - which may happen,
     for example, with libraries built with Microsoft Compilers.)
 
-   $bool = Rmpfr_fits_ushort_p($op, $rnd); # fits in unsigned long
-   $bool = Rmpfr_fits_sshort_p($op, $rnd); # fits in signed long
-   $bool = Rmpfr_fits_uint_p($op, $rnd); # fits in unsigned long
-   $bool = Rmpfr_fits_sint_p($op, $rnd); # fits in signed long
+   $bool = Rmpfr_fits_ushort_p($op, $rnd); # fits in unsigned short
+   $bool = Rmpfr_fits_sshort_p($op, $rnd); # fits in signed short
+   $bool = Rmpfr_fits_uint_p($op, $rnd); # fits in unsigned int
+   $bool = Rmpfr_fits_sint_p($op, $rnd); # fits in signed int
    $bool = Rmpfr_fits_ulong_p($op, $rnd); # fits in unsigned long
    $bool = Rmpfr_fits_slong_p($op, $rnd); # fits in signed long
-   $bool = Rmpfr_fits_uintmax_p($op, $rnd); # fits in unsigned long
-   $bool = Rmpfr_fits_intmax_p($op, $rnd); # fits in signed long
+   $bool = Rmpfr_fits_uintmax_p($op, $rnd); # fits in uintmax_t
+   $bool = Rmpfr_fits_intmax_p($op, $rnd); # fits in intmax_t
    $bool = Rmpfr_fits_IV_p($op, $rnd); # fits in perl IV
    $bool = Rmpfr_fits_UV_p($op, $rnd); # fits in perl UV
     Return non-zero if $op would fit in the respective data
@@ -2251,6 +2254,30 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    FORMATTED OUTPUT
 
+   NOTE: When using the 'P' (precision) type specifier, instead of
+         providing $prec to the 'P' specifier, it's now advisable
+         to provide prec_cast($prec). The 'P' specifier expects an
+         mp_prec_t but, prior to 3.18, we could pass it only an IV.
+         This didn't work on at least some big-endian machines if
+         the size of the IV was greater than the size of the
+         mp_prec_t.
+         The Math::MPFR::Prec package (which is part of this
+         distribution) exists solely to provide the prec_cast sub.
+         And the prec_cast sub's return value should be passed *only*
+         to the 'P' type specifier. Nothing else will understand it.
+         Passing it to something other than the 'P' specifier may
+         produce a garbage result - might even cause a segfault.
+
+   prec_cast($prec);
+
+    Ensures that the 'P' type specifier will provide correct results.
+    In Math::MPFR versions prior to 3.18 we could do only (eg) :
+       Rmpfr_printf("%Pu\n", Rmpfr_get_prec($op));
+    But that didn't work correctly for all architectures. As of 3.18,
+    that can be rewritten as:
+       Rmpfr_printf("%Pu\n", prec_cast(Rmpfr_get_prec($op)));
+    which should work on all architectures.
+
    Rmpfr_printf($format_string, [$rnd,] $var);
 
     This function (unlike the MPFR counterpart) is limited to taking
@@ -2260,7 +2287,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_printf("hello world\n", 0);
-    See the mpfr documentation for details re the formatting options.
+    NOTE: The rounding argument $rnd can be provided *only* if $var is a
+          Math::MPFR object. To do otherwise is a fatal error.
+    See the mpfr documentation for details re the formatting options:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
     Note: Courtesy of operator overloading, you can also use perl's
     printf() function with Math::MPFR objects.
 
@@ -2273,7 +2303,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_fprintf($fh, "hello world\n", 0);
-    See the mpfr documentation for details re the formatting options.
+    NOTE: The rounding argument $rnd can be provided *only* if $var is a
+          Math::MPFR object. To do otherwise is a fatal error.
+    See the mpfr documentation for details re the formatting options:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
    Rmpfr_sprintf($buffer, $format_string, [$rnd,] $var);
 
@@ -2288,7 +2321,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_sprintf($buffer, "hello world", 0);
-    See the mpfr documentation for details re the formatting options.
+    NOTE: The rounding argument $rnd can be provided *only* if $var is a
+          Math::MPFR object. To do otherwise is a fatal error.
+    See the mpfr documentation for details re the formatting options:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
     Note: Courtesy of operator overloading, you can also use perl's
     sprintf() function with Math::MPFR objects.
 
@@ -2298,9 +2334,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     storing it in $buffer. $buffer needs to be large enough to 
     accommodate the formatted string. The length of $buffer will be
     unaltered.
-    See the mpfr documentation for details re the formatting options.
+    See the mpfr documentation for details re the formatting options:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
     Note: Courtesy of operator overloading, you can also use perl's
-    sprintf() function with Math::MPFR objects.
+          sprintf() function with Math::MPFR objects, but this is largely
+          untested.
 
    Rmpfr_snprintf($buffer, $bytes, $format_string, [$rnd,] $var);
 
@@ -2315,7 +2353,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_snprintf($buffer, 12, "hello world", 0);
-    See the mpfr documentation for further details.
+    NOTE: The rounding argument $rnd can be provided *only* if $var is a
+          Math::MPFR object. To do otherwise is a fatal error.
+    See the mpfr documentation for further details:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
    $string = Rmpfr_snprintf_ret($buffer, $bytes, $format_string, [$rnd,] $var);
 
@@ -2323,6 +2364,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     storing it in $buffer. $buffer needs to be large enough to 
     accommodate the formatted string. The length of $buffer will be
     unaltered.
+    See the mpfr documentation for details re the formatting options:
+    http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
    #####################
 
@@ -2343,7 +2386,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or 
     modify it under the same terms as Perl itself.
-    Copyright 2006-2008, 2009-2012 Sisyphus
+    Copyright 2006-2013 Sisyphus
 
 =head1 AUTHOR
 

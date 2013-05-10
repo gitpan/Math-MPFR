@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use Config;
 use Math::MPFR qw(:mpfr);
 
 print "1..4\n";
@@ -8,7 +9,12 @@ print STDERR "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print STDERR "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print STDERR "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
-if($Math::MPFR::VERSION eq '3.17') {print "ok 1\n"}
+if   (pack("L", 305419897) eq pack("N", 305419897)) {warn "# Machine appears to be big-endian\n"}
+elsif(pack("L", 305419897) eq pack("V", 305419897)) {warn "# Machine appears to be little-endian\n"}
+
+warn "# Byte Order: ", $Config{byteorder}, "\n";
+
+if($Math::MPFR::VERSION eq '3.18') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
 if($Math::MPFR::VERSION eq Math::MPFR::get_xs_version()) {print "ok 2\n"}

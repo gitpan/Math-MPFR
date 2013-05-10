@@ -285,7 +285,7 @@ else {print "not ok 39\n"}
 
 my $bits = $Config{ivsize} * 8;
 Rmpfr_set_default_prec($bits + 5);
-my $check = '10111101111110100101110101101111011111101001011101011011110110110010010111010110111101111110100100110101';
+my $check = '10111101111110100101110101101111011111101001011111011011110110110010010111110110111101111110100100110101';
 my $shigh;
 $ok = '';
 
@@ -314,6 +314,10 @@ Math::MPFR->new($ulow) + Math::MPFR->new(0.467),
 Math::MPFR->new($ulow) - Math::MPFR->new(0.6),
 Math::MPFR->new(-1),
 );
+
+#for(my $i = 0; $i < @obj; $i++) {
+#  if($obj[$i] <= 0 && $obj[$i] > -1.0){print "$i: $obj[$i]\n"}
+#}
 
 my @rnd = (GMP_RNDN, GMP_RNDZ, GMP_RNDU, GMP_RNDD);
 

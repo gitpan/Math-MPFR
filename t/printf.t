@@ -3,7 +3,7 @@ use strict;
 use Math::BigInt;
 use Math::MPFR qw(:mpfr);
 
-print "1..4\n";
+print "1..5\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -49,7 +49,7 @@ $ok .= 'p' if "For some more testing: 1234567.625000000000000000000000000000\n" 
 $ok .= 'q' if "For some more testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret($buf, "For some more testing: %.30RNf\n", $mpfr1);
 $ok .= 'r' if "For some more testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret($buf, "For some more testing: %.30R*f\n", GMP_RNDN, $mpfr1);
 
-Rmpfr_sprintf ($buf, "%Pu\n", Rmpfr_get_prec($mpfr1));
+Rmpfr_sprintf ($buf, "%Pu\n", prec_cast(Rmpfr_get_prec($mpfr1)));
 
 if($buf == 80) {$ok .= 's'}
 else {warn "1s: $buf\n"}
@@ -206,4 +206,27 @@ if($buf eq '12345') {$ok .= 'c'}
 else {warn "4c: $buf\n"}
 
 if($ok eq 'abc') {print "ok 4\n"}
-else {print "not ok 4\n"}
+else {
+  warn "4: \$ok: $ok\n";
+  print "not ok 4\n";
+}
+
+$ok = '';
+
+eval{Rmpfr_fprintf(\*STDOUT, "%Pu\n", GMP_RNDN, 123);};
+if($@ =~ /In Rmpfr_fprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'a'}
+else {warn "\n5a: \$\@: $@\n"}
+
+eval{Rmpfr_sprintf ($buf, "%Pu\n", GMP_RNDN, 123);};
+if($@ =~ /In Rmpfr_sprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'b'}
+else {warn "\n5b: \$\@: $@\n"}
+
+eval{Rmpfr_snprintf ($buf, 10, "%Pu\n", GMP_RNDN, 123);};
+if($@ =~ /In Rmpfr_snprintf: The rounding argument is specific to Math::MPFR objects/) {$ok .= 'c'}
+else {warn "\n5c: \$\@: $@\n"}
+
+if($ok eq 'abc') {print "ok 5\n"}
+else {
+  warn "5: \$ok: $ok\n";
+  print "not ok 5\n";
+}

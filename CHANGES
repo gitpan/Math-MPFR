@@ -1,3 +1,17 @@
+3.18
+ - Depending upon the rounding mode values, the mpfr library may incorrectly return
+   false for mpfr_fits_u*_p(x) for -1.0 < x < 0.0 or for -0.5 < x <0.0. (This
+   should be fixed in versions of mpfr later than 3.1.2.)
+   Have the Rmpfr_fits_u*_p() functions return  correct result irrespective of the
+   version of mpfr being used - and have the Math:MPFR test suite test for this.
+ - The 'P' type specifier (precision) wasn't working correctly on big-endian machines
+   when mp_prec_t size is less than IV size. Add a prec_cast function to fix this.
+ - Add an _mp_sizes function (not exportable) that returns the sizes of mpfr_exp_t,
+   mpfr_prec_t and mpfr_rnd_t.
+ - Add Math::MPFR::_ivsize (not exportable).
+ - Add Math::MPFR::_nvsize (not exportable).
+ - Correct the Rmpfr_*printf functions so that they croak with an appropriate error
+   message if a rounding arg is supplied but the last arg is not a Math::MPFR object.
 3.17
  - Apply patch to MPFR.xs from Daniel Kahn Gillmor that eliminates
    "null argument where non-null required" warnings.

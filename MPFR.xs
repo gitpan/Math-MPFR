@@ -2,14 +2,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
 #include <stdio.h>
 
 #if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
@@ -26,6 +18,9 @@
 #else
 #define MAXIMUM_ALLOWABLE_BASE 36
 #endif
+
+#define NEG_ZERO_BUG 196866 /* A bug affecting mpfr_fits_u*_p functions */
+                            /* Fixed in mpfr after MPFR_VERSION 196866  */
 
 /* Squash some annoying compiler warnings (Microsoft compilers only). */
 #ifdef _MSC_VER
@@ -2170,7 +2165,19 @@ SV * Rmpfr_fits_ulong_p(mpfr_t * a, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
      return newSVuv(mpfr_fits_ulong_p(*a, (mp_rnd_t)SvUV(round)));
+#else
+     if((mp_rnd_t)SvUV(round) < 3) {
+       if((mp_rnd_t)SvUV(round) == 0) {
+         if((mpfr_cmp_d(*a, -0.5) >= 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+       else {
+         if((mpfr_cmp_d(*a, -1.0) > 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+     }
+     return newSVuv(mpfr_fits_ulong_p(*a, (mp_rnd_t)SvUV(round)));  
+#endif
 }
 
 SV * Rmpfr_fits_slong_p(mpfr_t * a, SV * round) {
@@ -2184,7 +2191,19 @@ SV * Rmpfr_fits_ushort_p(mpfr_t * a, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
      return newSVuv(mpfr_fits_ushort_p(*a, (mp_rnd_t)SvUV(round)));
+#else
+     if((mp_rnd_t)SvUV(round) < 3) {
+       if((mp_rnd_t)SvUV(round) == 0) {
+         if((mpfr_cmp_d(*a, -0.5) >= 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+       else {
+         if((mpfr_cmp_d(*a, -1.0) > 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+     }
+     return newSVuv(mpfr_fits_ushort_p(*a, (mp_rnd_t)SvUV(round)));  
+#endif
 }
 
 SV * Rmpfr_fits_sshort_p(mpfr_t * a, SV * round) {
@@ -2198,7 +2217,19 @@ SV * Rmpfr_fits_uint_p(mpfr_t * a, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
      return newSVuv(mpfr_fits_uint_p(*a, (mp_rnd_t)SvUV(round)));
+#else
+     if((mp_rnd_t)SvUV(round) < 3) {
+       if((mp_rnd_t)SvUV(round) == 0) {
+         if((mpfr_cmp_d(*a, -0.5) >= 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+       else {
+         if((mpfr_cmp_d(*a, -1.0) > 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+     }
+     return newSVuv(mpfr_fits_uint_p(*a, (mp_rnd_t)SvUV(round)));  
+#endif
 }
 
 SV * Rmpfr_fits_sint_p(mpfr_t * a, SV * round) {
@@ -2212,7 +2243,19 @@ SV * Rmpfr_fits_uintmax_p(mpfr_t * a, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
      return newSVuv(mpfr_fits_uintmax_p(*a, (mp_rnd_t)SvUV(round)));
+#else
+     if((mp_rnd_t)SvUV(round) < 3) {
+       if((mp_rnd_t)SvUV(round) == 0) {
+         if((mpfr_cmp_d(*a, -0.5) >= 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+       else {
+         if((mpfr_cmp_d(*a, -1.0) > 0) && (mpfr_cmp_d(*a, 0.0) <= 0)) return newSVuv(1);
+       }
+     }
+     return newSVuv(mpfr_fits_uintmax_p(*a, (mp_rnd_t)SvUV(round)));  
+#endif
 }
 
 SV * Rmpfr_fits_intmax_p(mpfr_t * a, SV * round) {
@@ -2284,28 +2327,72 @@ SV * Rmpfr_fits_UV_p(mpfr_t * x, SV * round) {
 #endif
 
      if(sizeof(UV) == sizeof(unsigned long)) {
-       if(mpfr_fits_ulong_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
-       return newSVuv(0);
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
+       return newSVuv(mpfr_fits_ulong_p(*x, (mp_rnd_t)SvUV(round)));
+#else /* MPFR_VERSION unsatisfied */
+       if((mp_rnd_t)SvUV(round) < 3) {
+         if((mp_rnd_t)SvUV(round) == 0) {
+           if((mpfr_cmp_d(*x, -0.5) >= 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+         else {
+           if((mpfr_cmp_d(*x, -1.0) > 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+       }
+       return newSVuv(mpfr_fits_ulong_p(*x, (mp_rnd_t)SvUV(round)));  
+#endif /* MPFR_VERSION */
      }
 
      if(sizeof(UV) == sizeof(unsigned int)) {
-       if(mpfr_fits_uint_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
-       return newSVuv(0);
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
+       return newSVuv(mpfr_fits_uint_p(*x, (mp_rnd_t)SvUV(round)));
+#else /* MPFR_VERSION unsatisfied */
+       if((mp_rnd_t)SvUV(round) < 3) {
+         if((mp_rnd_t)SvUV(round) == 0) {
+           if((mpfr_cmp_d(*x, -0.5) >= 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+         else {
+           if((mpfr_cmp_d(*x, -1.0) > 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+       }
+       return newSVuv(mpfr_fits_uint_p(*x, (mp_rnd_t)SvUV(round)));  
+#endif /* MPFR_VERSION */
      }
 
 #if defined USE_64_BIT_INT || defined USE_LONG_DOUBLE
 #ifndef _MSC_VER
      if(sizeof(UV) == sizeof(uintmax_t)) {
-       if(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
-       return newSVuv(0);
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
+       return newSVuv(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round)));
+#else /* MPFR_VERSION unsatisfied */
+       if((mp_rnd_t)SvUV(round) < 3) {
+         if((mp_rnd_t)SvUV(round) == 0) {
+           if((mpfr_cmp_d(*x, -0.5) >= 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+         else {
+           if((mpfr_cmp_d(*x, -1.0) > 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+       }
+       return newSVuv(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round)));  
+#endif /* MPFR_VERSION */
      }
-#else
+#else /* _MSC_VER defined */
      if(sizeof(UV) == sizeof(unsigned __int64)) {
-       if(mpfr_fits_intmax_p(*x, (mp_rnd_t)SvUV(round))) return newSVuv(1);
-       return newSVuv(0);
+#if defined(MPFR_VERSION) && MPFR_VERSION > NEG_ZERO_BUG
+       return newSVuv(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round)));
+#else /* MPFR_VERSION unsatisfied */
+       if((mp_rnd_t)SvUV(round) < 3) {
+         if((mp_rnd_t)SvUV(round) == 0) {
+           if((mpfr_cmp_d(*x, -0.5) >= 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+         else {
+           if((mpfr_cmp_d(*x, -1.0) > 0) && (mpfr_cmp_d(*x, 0.0) <= 0)) return newSVuv(1);
+         }
+       }
+       return newSVuv(mpfr_fits_uintmax_p(*x, (mp_rnd_t)SvUV(round)));  
+#endif /* MPFR_VERSION */
      }
-#endif
-#endif
+#endif /* MSC_VER */
+#endif /* USE_64_BIT_INT */
 
      mpfr_init2(high, bits + 1);
      mpfr_init2(copy, bits);
@@ -4756,6 +4843,12 @@ SV * wrap_mpfr_printf(SV * a, SV * b) {
          fflush(stdout);
          return newSViv(ret);
        }
+
+       if(strEQ(h, "Math::MPFR::Prec")){
+         ret = mpfr_printf(SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         fflush(stdout);
+         return newSViv(ret);
+       }
    
        croak("Unrecognised object supplied as argument to Rmpfr_printf");
      } 
@@ -4791,6 +4884,12 @@ SV * wrap_mpfr_fprintf(FILE * stream, SV * a, SV * b) {
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_fprintf(stream, SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         fflush(stream);
+         return newSViv(ret);
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         ret = mpfr_fprintf(stream, SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
          fflush(stream);
          return newSViv(ret);
        }
@@ -4832,6 +4931,11 @@ SV * wrap_mpfr_sprintf(char * stream, SV * a, SV * b) {
          return newSViv(ret);
        }
 
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         ret = mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
        croak("Unrecognised object supplied as argument to Rmpfr_sprintf");
      } 
 
@@ -4865,6 +4969,11 @@ SV * wrap_mpfr_snprintf(char * stream, SV * bytes, SV * a, SV * b) {
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         return newSViv(ret);
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
          return newSViv(ret);
        }
 
@@ -4910,31 +5019,14 @@ SV * wrap_mpfr_printf_rnd(SV * a, SV * round, SV * b) {
          return newSViv(ret);
        }
    
+       if(strEQ(h, "Math::MPFR::Prec")){
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_printf()");
+       }
+
        croak("Unrecognised object supplied as argument to Rmpfr_printf");
      } 
 
-     if(SvUOK(b)) {
-       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
-       fflush(stdout);
-       return newSViv(ret);
-     }
-     if(SvIOK(b)) {
-       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
-       fflush(stdout);
-       return newSViv(ret);
-     }
-     if(SvNOK(b)) {
-       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
-       fflush(stdout);
-       return newSViv(ret);
-     }
-     if(SvPOK(b)) {
-       ret = mpfr_printf(SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
-       fflush(stdout);
-       return newSViv(ret);
-     }
-  
-     croak("Unrecognised type supplied as argument to Rmpfr_printf");
+     croak("In Rmpfr_printf: The rounding argument is specific to Math::MPFR objects");
 }
 
 SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
@@ -4952,32 +5044,15 @@ SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
          fflush(stream);
          return newSViv(ret);
        }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_fprintf()");
+       }
  
        croak("Unrecognised object supplied as argument to Rmpfr_fprintf");
      } 
 
-     if(SvUOK(b)) {
-       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
-       fflush(stream);
-       return newSViv(ret);
-     }
-     if(SvIOK(b)) {
-       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
-       fflush(stream);
-       return newSViv(ret);
-     }
-     if(SvNOK(b)) {
-       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
-       fflush(stream);
-       return newSViv(ret);
-     }
-     if(SvPOK(b)) {
-       ret = mpfr_fprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
-       fflush(stream);
-       return newSViv(ret);
-     }
-
-     croak("Unrecognised type supplied as argument to Rmpfr_fprintf");
+     croak("In Rmpfr_fprintf: The rounding argument is specific to Math::MPFR objects");
 }
 
 SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
@@ -4995,30 +5070,14 @@ SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
          return newSViv(ret);
        }
 
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_sprintf()");
+       }
+
        croak("Unrecognised object supplied as argument to Rmpfr_sprintf");
      } 
 
-     if(SvUOK(b)) {
-       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
-       return newSViv(ret);
-     }
-
-     if(SvIOK(b)) {
-       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
-       return newSViv(ret);
-     }
-
-     if(SvNOK(b)) {
-       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
-       return newSViv(ret);
-     }
-
-     if(SvPOK(b)) {
-       ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
-       return newSViv(ret);
-     }
-
-     croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
+     croak("In Rmpfr_sprintf: The rounding argument is specific to Math::MPFR objects");
 }
 
 SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * b) {
@@ -5036,31 +5095,14 @@ SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * 
          return newSViv(ret);
        }
 
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_snprintf()");
+       }
+
        croak("Unrecognised object supplied as argument to Rmpfr_snprintf");
      } 
 
-     if(SvUOK(b)) {
-       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvUV(b));
-       return newSViv(ret);
-     }
-
-     if(SvIOK(b)) {
-       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvIV(b));
-       return newSViv(ret);
-     }
-
-     if(SvNOK(b)) {
-       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvNV(b));
-       return newSViv(ret);
-     }
-
-     if(SvPOK(b)) {
-       ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), SvPV_nolen(b));
-       return newSViv(ret);
-     }
-
-     croak("Unrecognised type supplied as argument to Rmpfr_snprintf");
-
+     croak("In Rmpfr_snprintf: The rounding argument is specific to Math::MPFR objects");
 }
 
 SV * Rmpfr_buildopt_tls_p(void) {
@@ -5331,6 +5373,23 @@ int _isobject(SV * x) {
    return 0;
 }
 
+void _mp_sizes(void) {
+     dXSARGS;
+
+     XPUSHs(sv_2mortal(newSVuv(sizeof(mpfr_exp_t))));
+     XPUSHs(sv_2mortal(newSVuv(sizeof(mpfr_prec_t))));
+     XPUSHs(sv_2mortal(newSVuv(sizeof(mpfr_rnd_t))));
+
+     XSRETURN(3);
+}
+
+SV * _ivsize(void) {
+     return newSVuv(sizeof(IV));
+}
+
+SV * _nvsize(void) {
+     return newSVuv(sizeof(NV));
+}
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
 
@@ -8144,4 +8203,28 @@ _max_base ()
 int
 _isobject (x)
 	SV *	x
+
+void
+_mp_sizes ()
+		
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	_mp_sizes();
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+_ivsize ()
+		
+
+SV *
+_nvsize ()
+		
 
