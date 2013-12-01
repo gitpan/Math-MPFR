@@ -2,26 +2,19 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-my $t = 17;
+my $t = 21;
 print "1..$t\n";
 
 eval {require Math::Decimal64; Math::Decimal64->import (qw(:all));};
 
 my $why;
-if($@) {$why = "Couldn't load Math::Decimal64\n"}
-else {$why = "Math::MPFR not built for _Decimal64\n"}
+if($@) {
+  $why = "Couldn't load Math::Decimal64\n";
+  warn "\n Skipping all tests: $why: $@\n";
+  print "ok $_\n" for 1..$t;
+}
 
-my $proceed = 0;
-
-if(!$@ &&
-   $Math::MPFR::VERSION > 3.14 &&
-   ((Math::MPFR::MPFR_VERSION_MAJOR() == 3 &&
-     Math::MPFR::MPFR_VERSION_MINOR() >= 1) || Math::MPFR::MPFR_VERSION_MAJOR() > 3) &&
-   Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS() &&
-   Rmpfr_buildopt_decimal_p()
-  ) {$proceed = 1}
-
-#warn "\$proceed: $proceed\n";
+my $proceed = Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS();
 
 if($proceed) {
   Rmpfr_set_default_prec(54); # Using complementary Rounding Modes needs prec of 54.
@@ -47,7 +40,7 @@ if($proceed) {
 
   $ok = 1;
 
-  Rmpfr_set_default_prec(53); # Round to nearest only needs prec only of 53.
+  Rmpfr_set_default_prec(55);
   for $it(1 .. 10000) {
     my $nv = rand(1024) / (1 + rand(1024));
     my $d64_1 = NVtoD64($nv);
@@ -63,7 +56,7 @@ if($proceed) {
   if($ok) {print "ok 2\n"}
   else {print "not ok 2\n"}
 
-  my $nanD64   = NaND64(1);
+  my $nanD64   = NaND64();
   my $pinfD64  = InfD64(1);
   my $ninfD64  = InfD64(-1);
   my $zeroD64  = ZeroD64(1);
@@ -189,9 +182,47 @@ if($proceed) {
     warn "\n\$rop: $rop\n";
     print "not ok 17\n";
   }
+
+  my $fr_d64 = Rmpfr_init2(55);
+  my $d64_1 = MEtoD64('1', -298);
+  my $d64_2 = Math::Decimal64->new();
+  Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
+  Rmpfr_get_decimal64($d64_2, $fr_d64, MPFR_RNDN);
+  if($d64_1 == $d64_2) {print "ok 18\n"}
+  else {
+    warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
+    print "not ok 18\n";
+  }  
+
+  $d64_1 = NVtoD64(1e-298);
+  Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
+  Rmpfr_get_decimal64($d64_2, $fr_d64, MPFR_RNDN);
+  if($d64_1 == $d64_2) {print "ok 19\n"}
+  else {
+    warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
+    print "not ok 19\n";
+  } 
+
+  $d64_1 = MEtoD64('1', -360);
+  Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
+  Rmpfr_get_decimal64($d64_2, $fr_d64, MPFR_RNDN);
+  if($d64_1 == $d64_2) {print "ok 20\n"}
+  else {
+    warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
+    print "not ok 20\n";
+  } 
+
+  $d64_1 = NVtoD64(1e-360);
+  Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
+  Rmpfr_get_decimal64($d64_2, $fr_d64, MPFR_RNDN);
+  if($d64_1 == $d64_2) {print "ok 21\n"}
+  else {
+    warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
+    print "not ok 21\n";
+  } 
 }
 else {
-  warn "Skipping all tests - $why";
+  warn "Skipping all tests - Math::MPFR not built for Decimal64 support";
   print "ok $_\n" for 1..$t;
 }
 

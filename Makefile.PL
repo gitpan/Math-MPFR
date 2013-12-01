@@ -25,6 +25,16 @@ for(@ARGV) {
 my $d64_message = $have_decimal64 ? "Attempting to build with _Decimal64 support\n"
                                   : "Building without _Decimal64 support\n";
 
+$have_float128 = 0;
+for(@ARGV) {
+  $have_float128 = 1 if $_ eq 'F128=1';
+}
+#$have_float128 = 1; # Force inclusion of __float128 support
+                      # This will also define MPFR_WANT_FLOAT128
+
+my $float128_message = $have_float128 ? "Attempting to build with __float128 support\n"
+                                  : "Building without __float128 support\n";
+
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 if($use_64_bit_int == -1) {}                                
@@ -44,6 +54,7 @@ else {
 }
 
 $defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if $have_decimal64;
+$defines .= " -DMPFR_WANT_FLOAT128" if $have_float128;
 
 print "\nThis module requires the following C libraries:\n";
 print " gmp-4.2.0 (or later)\n mpfr-2.4.0 (or later)\n\n";
@@ -59,6 +70,9 @@ print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
 print "\n$d64_message";
 print "If this is wrong, see the \"Decimal64 conversion\" section in the README\n\n";
+
+print "\n$float128_message";
+print "If this is wrong, see the \"Float128 conversion\" section in the README\n\n";
 
 my %options = (       
   NAME => 'Math::MPFR',

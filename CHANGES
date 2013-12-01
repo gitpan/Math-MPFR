@@ -1,3 +1,20 @@
+3.20
+ - Rewrite _wrap_mpfr_sprintf(), _wrap_mpfr_snprintf(), _wrap_mpfr_sprintf_rnd()
+   and _wrap_mpfr_snprintf_rnd(). Their first arg has been changed from a char*
+   to an SV*, and they take an additional argument that specifies the size of
+   the buffer (1st arg) into which the resultant string is written.
+ - Change Rmpfr_sprintf_ret() and Rmpfr_snprintf_ret(). The first arg (buffer)
+   has been removed, and an additional argument that specifies the size of the
+   buffer into which the resultant string is written needs to be provided.
+ - Fix spelling error in doc. Thanks Salvatore Bonaccorso. (Ticket #89710)
+ - Add Rmpfr_set_float128 and Rmpfr_get_float128. These provide access to the 
+   '__float128' data type (for compilers that support the type) via the
+   Math::Float128 module.
+ - Simplify querying of Decimal64 support in the mpfr library being used
+ - Add MPFR_DBL_DIG, MPFR_LDBL_DIG, mpfr_max_orig_len, mpfr_min_inter_prec,
+    mpfr_min_inter_base and mpfr_max_orig_base.
+ - Have lngamma(-0) be +Inf instead of NaN. (Bug in mpfr 3.1.2 and earlier.)
+
 3.18
  - Depending upon the rounding mode values, the mpfr library may incorrectly return
    false for mpfr_fits_u*_p(x) for -1.0 < x < 0.0 or for -0.5 < x <0.0. (This
@@ -12,6 +29,7 @@
  - Add Math::MPFR::_nvsize (not exportable).
  - Correct the Rmpfr_*printf functions so that they croak with an appropriate error
    message if a rounding arg is supplied but the last arg is not a Math::MPFR object.
+
 3.17
  - Apply patch to MPFR.xs from Daniel Kahn Gillmor that eliminates
    "null argument where non-null required" warnings.

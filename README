@@ -88,7 +88,7 @@ objects.
 For this feature to be available you firstly need a compiler that has
 the _Decimal64 data type.
 Then you need to build and install Math::Decimal64.
-You'll also need to have the mpfr library (version 3.1.1 at least)
+You'll also need to have the mpfr library (version 3.2.0 at least)
 configured to handle the _Decimal64-mpfr_t conversions. See the mpfr
 documentation for details of that aspect.
 
@@ -99,6 +99,28 @@ $have_decimal64 variable to 1.)
 
 Similarly, ensuring that Decimal64 support is *not* built in can be
 achieved by leaving $have_decimal64 set to zero.
+
+=========================================================
+Conversion between Math::Float128 and Math::MPFR objects
+=========================================================
+
+The functions Rmpfr_set_float128 and Rmpfr_get_float128 allow
+conversion between Math::Float128 (__float128) and Math::MPFR (mpfr_t)
+objects.
+For this feature to be available you firstly need a compiler that has
+the __float128 data type.
+Then you need to build and install Math::Float128.
+You'll also need to have the mpfr library (version 3.1.1 at least)
+configured to handle the __float128-mpfr_t conversions. See the mpfr
+documentation for details of that aspect.
+
+If those pre-conditions are met, you also need to provide F128=1
+as a command line argument to 'perl Makefile.PL'. (Altenatively you
+could edit the Makefile.PL before building Math::MPFR and set its
+$have_float128 variable to 1.)
+
+Similarly, ensuring that __float128 support is *not* built in can be
+achieved by leaving $have_float128 set to zero.
 
 ==========================================================
 Conversion between Math::LongDouble and Math::MPFR objects

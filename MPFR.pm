@@ -1,6 +1,7 @@
     package Math::MPFR;
     use strict;
     use warnings;
+    use POSIX;
     use Math::MPFR::Prec;
 
     use constant  GMP_RNDN       => 0;
@@ -26,7 +27,8 @@
 
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
                 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
-                RMPFR_PREC_MIN RMPFR_PREC_MAX);
+                RMPFR_PREC_MIN RMPFR_PREC_MAX
+                MPFR_DBL_DIG MPFR_LDBL_DIG);
 
     use overload
     '++'   => \&overload_inc,
@@ -127,7 +129,7 @@ Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
 Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj 
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_decimal64 Rmpfr_get_decimal64 
+Rmpfr_set_decimal64 Rmpfr_get_decimal64 Rmpfr_set_float128 Rmpfr_get_float128
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
 Rmpfr_sin_cos Rmpfr_sinh_cosh 
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
@@ -147,9 +149,11 @@ Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 prec_cast
+MPFR_DBL_DIG MPFR_LDBL_DIG
+mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 );
 
-    our $VERSION = '3.18';
+    our $VERSION = '3.19';
     $VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -217,7 +221,7 @@ Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
 Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj 
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_decimal64 Rmpfr_get_decimal64
+Rmpfr_set_decimal64 Rmpfr_get_decimal64 Rmpfr_set_float128 Rmpfr_get_float128
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin 
 Rmpfr_sin_cos Rmpfr_sinh_cosh
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub 
@@ -237,7 +241,12 @@ Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 prec_cast
+MPFR_DBL_DIG MPFR_LDBL_DIG
+mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 )]);
+
+$Math::MPFR::WARN = 1; # Enable warning in Rmpfr_init_set_* functions.
+                       # Set to 0 to disable the warning.
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -452,36 +461,38 @@ sub Rmpfr_fprintf {
 
 sub Rmpfr_sprintf {
     my $len;
-    if(@_ == 4){$len = wrap_mpfr_sprintf_rnd(@_)}
-    else {die "Rmpfr_sprintf must take 3 or 4 arguments: buffer, format string, [rounding,], and variable" if @_ != 3;
-    $len = wrap_mpfr_sprintf(@_)}
-    $_[0] = substr($_[0], 0, $len);
+    if(@_ == 5){
+      $len = wrap_mpfr_sprintf_rnd(@_);
+      return $len;
+    }
+    die "Rmpfr_sprintf must take 4 or 5 arguments: buffer, format string, [rounding,], variable and buffer size" if @_ != 4;
+    $len = wrap_mpfr_sprintf(@_);
     return $len;
 }
 
 sub Rmpfr_sprintf_ret {
     my $len;
-    if(@_ == 4){$len = wrap_mpfr_sprintf_rnd(@_)}
-    else {die "Rmpfr_sprintf must take 3 or 4 arguments: buffer, format string, [rounding,], and variable" if @_ != 3;
-    $len = wrap_mpfr_sprintf(@_)}
-    return substr($_[0], 0, $len);
+    if(@_ == 4){return wrap_mpfr_sprintf_rnd_ret(@_)}
+    else {die "Rmpfr_sprintf must take 3 or 4 arguments: format string, [rounding,], variable and buffer size" if @_ != 3}
+    return wrap_mpfr_sprintf_ret(@_);
 }
 
 sub Rmpfr_snprintf {
     my $len;
-    if(@_ == 5){$len = wrap_mpfr_snprintf_rnd(@_)}
-    else {die "Rmpfr_snprintf must take 4 or 5 arguments: buffer, bytes written, format string, [rounding,], and variable" if @_ != 4;
-    $len = wrap_mpfr_snprintf(@_)}
-    $_[0] = substr($_[0], 0, $_[1] - 1);
+    if(@_ == 6){
+      $len = wrap_mpfr_snprintf_rnd(@_);
+      return $len;
+    }
+    die "Rmpfr_snprintf must take 5 or 6 arguments: buffer, bytes written, format string, [rounding,], variable and buffer size" if @_ != 5;
+    $len = wrap_mpfr_snprintf(@_);
     return $len;
 }
 
 sub Rmpfr_snprintf_ret {
     my $len;
-    if(@_ == 5){$len = wrap_mpfr_snprintf_rnd(@_)}
-    else {die "Rmpfr_snprintf must take 4 or 5 arguments: buffer, bytes written, format string, [rounding,], and variable" if @_ != 4;
-    $len = wrap_mpfr_snprintf(@_)}
-    return substr($_[0], 0, $_[1] - 1);
+    if(@_ == 5){return wrap_mpfr_snprintf_rnd_ret(@_)}
+    else {die "Rmpfr_snprintf must take 4 or 5 arguments: bytes written, format string, [rounding,], variable and buffer size" if @_ != 4}
+    return wrap_mpfr_snprintf_ret(@_);
 }
 
 sub Rmpfr_inits {
@@ -521,9 +532,43 @@ sub MPFR_VERSION_MAJOR {return _MPFR_VERSION_MAJOR()}
 sub MPFR_VERSION_MINOR {return _MPFR_VERSION_MINOR()}
 sub MPFR_VERSION_PATCHLEVEL {return _MPFR_VERSION_PATCHLEVEL()}
 sub MPFR_VERSION_STRING {return _MPFR_VERSION_STRING()}
+sub MPFR_DBL_DIG {return _DBL_DIG()}
+sub MPFR_LDBL_DIG {return _LDBL_DIG()}
 
-*Rmpfr_get_z_exp = \&Rmpfr_get_z_2exp;
-*prec_cast       = \&Math::MPFR::Prec::prec_cast;
+sub mpfr_min_inter_prec {
+    die "Wrong number of args to minimum_intermediate_prec()" if @_ != 3;
+    my $orig_base = shift;
+    my $orig_length = shift;
+    my $to_base = shift;
+    return ceil(1 + ($orig_length * log($orig_base) / log($to_base)));
+}
+
+sub mpfr_min_inter_base {
+    die "Wrong number of args to minimum_intermediate_base()" if @_ != 3;
+    my $orig_base = shift;
+    my $orig_length = shift;
+    my $to_prec = shift;
+    return ceil(exp($orig_length * log($orig_base) / ($to_prec - 1)));
+}
+
+sub mpfr_max_orig_len {
+    die "Wrong number of args to maximum_orig_length()" if @_ != 3;
+    my $orig_base = shift;
+    my $to_base = shift;
+    my $to_prec = shift;
+    return floor(1 / (log($orig_base) / log($to_base) / ($to_prec - 1)));
+}
+
+sub mpfr_max_orig_base {
+    die "Wrong number of args to maximum_orig_base()" if @_ != 3;
+    my $orig_length = shift;
+    my $to_base = shift;
+    my $to_prec = shift;
+    return floor(exp(1 / ($orig_length / log($to_base) / ($to_prec -1))));
+}
+
+*Rmpfr_get_z_exp            = \&Rmpfr_get_z_2exp;
+*prec_cast                  = \&Math::MPFR::Prec::prec_cast;
 
 1;
 
@@ -538,7 +583,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    This module needs the MPFR and GMP C libraries. (Install GMP
    first as it is a pre-requisite for MPFR.)
 
-   The GMP library is availble from http://gmplib.org
+   The GMP library is available from http://gmplib.org
    The MPFR library is available from http://www.mpfr.org/
 
 =head1 DESCRIPTION
@@ -979,6 +1024,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_decimal64($rop, $d64, $rnd) # mpfr-3.1.1 and later
                                                # only. $d64 is a
                                                # Math::Decimal64 object 
+   $si = Rmpfr_set_float128($rop, $f128, $rnd) # mpfr-3.2.0 and later
+                                               # only. $f128 is a
+                                               # Math::Float128 object 
     Set the value of $rop from 2nd arg, rounded to the precision of
     $rop towards the given direction $rnd.  Please note that even a 
     'long int' may have to be rounded if the destination precision
@@ -1137,6 +1185,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     that deduction is attempted. For finer grained control, use
     one of the 'Rmpfr_init_set_*' functions documented immediately
     below.
+    Note that these functions return a list of 2 values.
 
    ($rop, $si) = Rmpfr_init_set($op, $rnd);
    ($rop, $si) = Rmpfr_init_set_nobless($op, $rnd);
@@ -1236,9 +1285,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    Rmpfr_get_decimal64($d64, $op, $rnd); # mpfr-3.1.1 and later.
                                          # $d64 is a Math::Decimal64
                                          # object.
+   Rmpfr_get_float128($f128, $op, $rnd); # mpfr-3.2.0 and later.
+                                         # $f128 is a Math::Float128
+                                         # object.
     Convert $op to a 'double' a 'long double' an 'NV', a float, a
-    Math::LongDouble object or a Math::Decimal64 object using the
-    rounding mode $rnd.
+    Math::LongDouble object, a Math::Decimal64 object, or a
+    Math::Float128 object using the rounding mode $rnd.
 
     NOTE: If your perl's nvtype is 'long double' use Rmpfr_get_ld(), but
     if your perl's nvtype is 'double' and you want to get a value whose
@@ -2004,8 +2056,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    RANDOM NUMBERS
 
    Rmpfr_urandomb(@r, $state);
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     Each member of @r is a Math::MPFR object.
     $state is a reference to a gmp_randstate_t structure.
     Set each member of @r to a uniformly distributed random
@@ -2013,14 +2063,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Before using this function you must first create $state
     by calling one of the 3 Rgmp_randinit functions, then
     seed $state by calling one of the 2 Rgmp_randseed functions.
-    The memory associated with $state will not be freed until
-    either you call Rgmp_randclear, or the program ends.
+    The memory associated with $state will be freed automatically
+    when $state goes out of scope.
 
    Rmpfr_random2($rop, $si, $ui); # not implemented in
                                   # mpfr-3.0.0 and later
     Attempting to use this function when Math::MPFR has been
-    built against mpfr-3.0.0 will cause the program to die, with
-    an appropriate error message.
+    built against mpfr-3.0.0 (or later) will cause the program
+    to die, with an appropriate error message.
     Generate a random float of at most abs($si) limbs, with long
     strings of zeros and ones in the binary representation.
     The exponent of the number is in the interval -$ui to
@@ -2085,15 +2135,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $seed is the seed. It can be any one of Math::GMP, 
-    or Math::GMPz objects. Or it can be a string.
+    or Math::GMPz objects. Or it can be a string of digits.
     If it is a string of hex digits it must be prefixed with
     either OX or Ox. If it is a string of octal digits it must
     be prefixed with 'O'. Else it is assumed to be a decimal
     integer. No other bases are allowed.
 
    Rgmp_randseed_ui($state, $ui);
-    Requires that one of Math::GMPz, Math::GMPq or Math::GMPf
-    is loaded.
     $state is a reference to a gmp_randstate_t strucure (the
     return value of one of the Rgmp_randinit functions).
     $ui is the seed.
@@ -2202,6 +2250,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     Again, each of those operations returns a Math::MPFR object
     containing the result of the operation.
+    Each operation is conducted using current default rounding mode
+    and, if there's a need for the operation to create a Math::MPFR
+    object, the created object will be given current default precision.
+
     The following is still NOT ALLOWED, and will cause a fatal error:
 
      $G += $M;
@@ -2291,8 +2343,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
           Math::MPFR object. To do otherwise is a fatal error.
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
-    Note: Courtesy of operator overloading, you can also use perl's
-    printf() function with Math::MPFR objects.
 
    Rmpfr_fprintf($fh, $format_string, [$rnd,] $var);
 
@@ -2308,73 +2358,150 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
-   Rmpfr_sprintf($buffer, $format_string, [$rnd,] $var);
+   Rmpfr_sprintf($buffer, $format_string, [$rnd,] $var, $buflen);
 
     This function (unlike the MPFR counterpart) is limited to taking
-    3 or 4 arguments - the buffer, the format string, optionally a
-    rounding argument, and the variable to be formatted. $buffer must be
-    large enough to accommodate the formatted string, and is truncated
-    to the length of that formatted string. If you prefer to have the
-    resultant string returned (rather than stored in $buffer), use
-    Rmpfrf_sprintf_ret instead - which will also leave the length of
-    $buffer unaltered. 
-    If there's no variable to be formatted, just add a '0' as the final
-    argument. ie this will work fine:
-     Rmpfr_sprintf($buffer, "hello world", 0);
+    4 or 5 arguments - the buffer, the format string, optionally a
+    rounding argument, the variable to be formatted and the size of the
+    buffer ($buflen) into which the result will be written. $buflen
+    must specify a size (characters) that is at least large enough to
+    accommodate the formatted string (including the terminating NULL).
+    If you prefer to have the resultant string returned (rather than
+    stored in $buffer), use Rmpfrf_sprintf_ret instead.
+    If there's no variable to be formatted, just insert a '0' as the
+    value for $var. ie this will work fine:
+     Rmpfr_sprintf($buffer, "hello world", 0, $buflen);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
-    Note: Courtesy of operator overloading, you can also use perl's
-    sprintf() function with Math::MPFR objects.
 
-   $string = Rmpfr_sprintf_ret($buffer, $format_string, [$rnd,] $var);
+   $string = Rmpfr_sprintf_ret($format_string, [$rnd,] $var, $buflen);
 
     As for Rmpfr_sprintf, but returns the formatted string, rather than
-    storing it in $buffer. $buffer needs to be large enough to 
-    accommodate the formatted string. The length of $buffer will be
-    unaltered.
+    storing it in $buffer.  $buflen must specify a size (characters)
+    that is at least large enough to accommodate the formatted string
+    (including the terminating NULL).
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
-    Note: Courtesy of operator overloading, you can also use perl's
-          sprintf() function with Math::MPFR objects, but this is largely
-          untested.
 
-   Rmpfr_snprintf($buffer, $bytes, $format_string, [$rnd,] $var);
+   Rmpfr_snprintf($buffer, $bytes, $format_string, [$rnd,] $var, $buflen);
 
     This function (unlike the MPFR counterpart) is limited to taking
-    4 or 5 arguments - the buffer, the number of bytes to be written,
-    the format string, optionally a rounding argument, and the variable
-    to be formatted. $buffer must be large enough to accommodate the 
-    formatted string, and is truncated to the length of that formatted
-    string. If you prefer to have the resultant string returned (rather
-    than stored in $buffer), use Rmpfrf_sprintf_ret instead - which will
-    also leave the length of $buffer unaltered. 
-    If there's no variable to be formatted, just add a '0' as the final
-    argument. ie this will work fine:
-     Rmpfr_snprintf($buffer, 12, "hello world", 0);
+    5 or 6 arguments - the buffer, the number of bytes to be written,
+    the format string, optionally a rounding argument, the variable
+    to be formatted and the size of the buffer ($buflen).  $buflen must
+    specify a size (characters) that is at least large enough to
+    accommodate the formatted string (including the terminating NULL).
+    If you prefer to have the resultant string returned (rather than
+    stored in $buffer), use Rmpfrf_sprintf_ret instead. 
+    If there's no variable to be formatted, just insert a '0' as the 
+    value for $arg. ie this will work fine:
+     Rmpfr_snprintf($buffer, 12, "hello world", 0, $buflen);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
     See the mpfr documentation for further details:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
-   $string = Rmpfr_snprintf_ret($buffer, $bytes, $format_string, [$rnd,] $var);
+   $string = Rmpfr_snprintf_ret($bytes, $format_string, [$rnd,] $var, $buflen);
 
     As for Rmpfr_snprintf, but returns the formatted string, rather than
-    storing it in $buffer. $buffer needs to be large enough to 
-    accommodate the formatted string. The length of $buffer will be
-    unaltered.
+    storing it in $buffer.  $buflen must specify a size (characters) that
+    is at least large enough to accommodate the formatted string
+    (including the terminating NULL).
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
    #####################
 
+   BASE CONVERSIONS
+
+   $DBL_DIG  = MPFR_DBL_DIG;  # Will be 0 if float.h doesn't define
+                              # DBL_DIG.
+
+   $LDBL_DIG = MPFR_LDBL_DIG; # Will be 0 if float.h doesn't define
+                              # LDBL_DIG.
+
+   $min_prec = mpfr_min_inter_prec($orig_base, $orig_length, $to_base);
+   $max_len  = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
+   $min_base = mpfr_min_inter_base($orig_base, $orig_length, $to_prec);
+   $max_base = mpfr_max_orig_base($orig_length, $to_base, $to_prec);
+
+   The last 4 of the above functions establish the relationship between
+   $orig_base, $orig_length, $to_base and $to_prec.
+   Given any 3 of those 4, there's a function there to determine the
+   value of the 4th.
+
+   Let's say we have some base 10 floating point numbers comprising 16
+   significant digits, and we want to convert those numbers to a base 2
+   data type (say, 'long double').
+   If we then convert the value of that long double to a 16-digit base 10
+   float are we guaranteed of getting the original value back ?
+   It all depends upon the precision of the 'long double' type, and the
+   min_inter_prec() subroutine will tell you what the minimum
+   required precision is (in order to be sure of getting the original
+   value back). We have:
+
+    $min_prec = mpfr_min_inter_prec($orig_base, $orig_length, $to_base);
+
+   In our example case that becomes:
+
+    $min_prec = mpfr_min_inter_prec(10, 16, 2);
+
+   which will set $min_prec to 55.
+   That is, so long as the long double type has a precision of at least 55
+   bits, you can pass 16-digit, base 10, floating point values to it and
+   back again, and be assured of retrieving the original value.
+   (Naturally, this is assuming absence of buggy behaviour, and correct
+   rounding practice.)
+
+   Similarly, you might like to know the maximum significant number of
+   base 10 digits that can be specified, when assigning to (say) a
+   53-bit double. We have:
+
+    $max_len = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
+
+   For this second example that becomes:
+
+    $max_len = mpfr_max_orig_len(10, 2, 53);
+
+   which will set $max_len to 15.
+
+   That is, so long as your base 10 float consists of no more than 15
+   siginificant digits, you can pass it to a 53-bit double and back again,
+   and be assured of retrieving the original value.
+   (Again, we assume absence of bugs and correct rounding practice.)
+
+   It is to be expected that
+    mpfr_max_orig_len(10, 2, $double_prec)
+    and
+    mpfr_max_orig_len(10, 2, $long_double_prec)
+   will (resp.) return the same values as MPFR_DBL_DIG and MPFR_LDBL_DIG.
+   ($double_prec is the precision, in bits, of the C 'double' type,
+   and $long_double_prec is the precision, in bits, of the C 'long double'
+   type.) 
+
+   The last 2 of the above subroutines (ie mpfr_min_inter_base and
+   mpfr_max_orig_base) are provided mainly for completeness.
+   Normally, there wouldn't be a need to use these last 2 forms ... but
+   who knows ...
+
+   The above examples demonstrate usage in relation to conversion between
+   bases 2 and 10. The functions apply just as well to conversions between
+   bases of any values.
+
+   The Math::LongDouble module provides 4 identical functions, prefixed
+   with 'ld_' instead of 'mpfr_' (to avoid name clashes).
+   Similarly, it provides constants (prefixed with 'LD_' instead of
+   'MPFR_') that reflect the values of float.h's DBL_DIG and LDBL_DIG.
+
+   #####################
+
 =head1 BUGS
 
-    You can get segfaults if you pass the wrong type of
-    argument to the functions - so if you get a segfault, the
-    first thing to do is to check that the argument types 
-    you have supplied are appropriate.
+    You can get segfaults if you pass the wrong type of argument to the
+    functions - so if you get a segfault, the first thing to do is to
+    check that the argument types you have supplied are appropriate.
 
 =head1 ACKNOWLEDGEMENTS
 

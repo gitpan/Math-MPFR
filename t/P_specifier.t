@@ -66,8 +66,8 @@ else {
   print "ok 2\n";
 }
 
-my $buf = ' ' x 200;
-Rmpfr_sprintf ($buf, "%Pu\n", prec_cast($prec));
+my $buf;
+Rmpfr_sprintf ($buf, "%Pu\n", prec_cast($prec), 200);
 
 if($buf == 100009) {print "ok 3\n"}
 else {
@@ -75,15 +75,14 @@ else {
   print "not ok 3\n";
 }
 
-eval{Rmpfr_sprintf ($buf, "%Pu\n", GMP_RNDN, prec_cast($prec));};
+eval{Rmpfr_sprintf ($buf, "%Pu\n", GMP_RNDN, prec_cast($prec), 100);};
 if($@ =~ /You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_sprintf\(\)/) {print "ok 4\n"}
 else {
   warn "4: \$\@: $@\n";
   print "not ok 4\n";
 }
 
-$buf = ' ' x 200;
-Rmpfr_snprintf ($buf, $bytes, "%Pu\n", prec_cast($prec));
+Rmpfr_snprintf ($buf, $bytes, "%Pu\n", prec_cast($prec), 200);
 
 chomp $buf;
 
@@ -93,7 +92,7 @@ else {
   print "not ok 5\n";
 }
 
-eval{Rmpfr_snprintf ($buf, $bytes, "%Pu\n", GMP_RNDN, prec_cast($prec));};
+eval{Rmpfr_snprintf ($buf, $bytes, "%Pu\n", GMP_RNDN, prec_cast($prec), 10);};
 if($@ =~ /You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_snprintf\(\)/) {print "ok 6\n"}
 else {
   warn "6: \$\@: $@\n";

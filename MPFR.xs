@@ -10,8 +10,20 @@
 #endif
 #endif
 
+
 #include <gmp.h>
 #include <mpfr.h>
+#include <float.h>
+
+#ifdef MPFR_WANT_FLOAT128
+#include <quadmath.h>
+#ifdef __MINGW64__
+typedef __float128 float128 __attribute__ ((aligned(8)));
+#else
+typedef __float128 float128;
+#endif
+#endif
+
 
 #if defined(MPFR_VERSION_MAJOR) && MPFR_VERSION_MAJOR >= 3
 #define MAXIMUM_ALLOWABLE_BASE 62
@@ -19,10 +31,18 @@
 #define MAXIMUM_ALLOWABLE_BASE 36
 #endif
 
-#define NEG_ZERO_BUG 196866 /* A bug affecting mpfr_fits_u*_p functions */
-                            /* Fixed in mpfr after MPFR_VERSION 196866  */
+#define NEG_ZERO_BUG 196866 /* A bug affecting mpfr_fits_u*_p functions         */
+                            /* Fixed in mpfr after MPFR_VERSION 196866 (3.1.2)  */
+                            /* For earlier versions of mpfr, we fix this bug in */
+                            /* our own code                                     */
+
+#define LNGAMMA_BUG 196866  /* lngamma(-0) set to NaN instead of +Inf           */
+                            /* Fixed in mpfr after MPFR_VERSION 196866 (3.1.2)  */
+                            /* For earlier versions of mpfr, we fix this bug in */
+                            /* our own code                                     */
 
 /* Squash some annoying compiler warnings (Microsoft compilers only). */
+
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
 #endif
@@ -172,9 +192,18 @@ void Rmpfr_init_set(mpfr_t * q, SV * round) {
      mpfr_t * mpfr_t_obj;
      SV * obj_ref, * obj;
      int ret;
-
+/*
+     if(GIMME_V != G_ARRAY && SvIV(get_sv("Math::MPFR::WARN", 0))) {
+         warn("You are discarding the Math::MPFR object that Rmpfr_init_set() has created.");
+         warn("%s%s%s%s",
+              "This is probably NOT what you want !!\n",
+              "Refer to the Rmpfr_init_set documentation in the\n",
+              "'COMBINED INITIALIZATION AND ASSIGNMENT' section.\n",
+              "(You can disable this warning by setting $Math::MPFR::WARN to 0.)");
+     }   
+*/  
 #if MPFR_VERSION_MAJOR < 3
-    if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
 
      /* sp = mark; *//* not needed */
@@ -2595,6 +2624,12 @@ SV * Rmpfr_lngamma(mpfr_t * a, mpfr_t * b, SV * round) {
 #if MPFR_VERSION_MAJOR < 3
     if((mp_rnd_t)SvUV(round) > 3) croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
 #endif
+#if !defined(MPFR_VERSION) || (defined(MPFR_VERSION) && MPFR_VERSION <= LNGAMMA_BUG)
+     if(mpfr_zero_p(*b)) {
+       mpfr_set_inf(*a, 1);
+       return newSViv(0);
+     }
+#endif
      return newSViv(mpfr_lngamma(*a, *b, (mp_rnd_t)SvUV(round)));
 }
 
@@ -4145,7 +4180,7 @@ SV * overload_atan2(mpfr_t * a, SV * b, SV * third) {
 
 /* Finish typemapping */
 
-SV * Rgmp_randinit_default(void) {
+SV * Rgmp_randinit_default_nobless(void) {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
@@ -4160,14 +4195,14 @@ SV * Rgmp_randinit_default(void) {
      return obj_ref;
 }
 
-SV * Rgmp_randinit_mt(void) {
+SV * Rgmp_randinit_mt_nobless(void) {
      gmp_randstate_t * rand_obj;
      SV * obj_ref, * obj;
 
      Newx(rand_obj, 1, gmp_randstate_t);
      if(rand_obj == NULL) croak("Failed to allocate memory in Math::GMPz::Random::Rgmp_randinit_mt function");
      obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz::Random");
+     obj = newSVrv(obj_ref, NULL);
      gmp_randinit_mt(*rand_obj);
 
      sv_setiv(obj, INT2PTR(IV, rand_obj));
@@ -4175,7 +4210,7 @@ SV * Rgmp_randinit_mt(void) {
      return obj_ref;
 }
 
-SV * Rgmp_randinit_lc_2exp(SV * a, SV * c, SV * m2exp ) {
+SV * Rgmp_randinit_lc_2exp_nobless(SV * a, SV * c, SV * m2exp ) {
      gmp_randstate_t * state;
      mpz_t aa;
      SV * obj_ref, * obj;
@@ -4207,7 +4242,7 @@ SV * Rgmp_randinit_lc_2exp(SV * a, SV * c, SV * m2exp ) {
      return obj_ref;
 }
 
-SV * Rgmp_randinit_lc_2exp_size(SV * size) {
+SV * Rgmp_randinit_lc_2exp_size_nobless(SV * size) {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
@@ -4921,18 +4956,26 @@ SV * wrap_mpfr_fprintf(FILE * stream, SV * a, SV * b) {
      croak("Unrecognised type supplied as argument to Rmpfr_fprintf");
 }
 
-SV * wrap_mpfr_sprintf(char * stream, SV * a, SV * b) {
+SV * wrap_mpfr_sprintf(SV * s, SV * a, SV * b, int buflen) {
      int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
      if(sv_isobject(b)) { 
        const char* h = HvNAME(SvSTASH(SvRV(b)));
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
        if(strEQ(h, "Math::MPFR::Prec")) {
          ret = mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
@@ -4941,39 +4984,112 @@ SV * wrap_mpfr_sprintf(char * stream, SV * a, SV * b) {
 
      if(SvUOK(b)) {
        ret = mpfr_sprintf(stream, SvPV_nolen(a), SvUV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvIOK(b)) {
        ret = mpfr_sprintf(stream, SvPV_nolen(a), SvIV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvNOK(b)) {
        ret = mpfr_sprintf(stream, SvPV_nolen(a), SvNV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvPOK(b)) {
        ret = mpfr_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      croak("Unrecognised type supplied as argument to Rmpfr_sprintf");
 }
 
-SV * wrap_mpfr_snprintf(char * stream, SV * bytes, SV * a, SV * b) {
+SV * wrap_mpfr_sprintf_ret(SV * a, SV * b, int buflen) {
+     SV * ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+     if(sv_isobject(b)) { 
+       const char* h = HvNAME(SvSTASH(SvRV(b)));
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         mpfr_sprintf(stream, SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_sprintf_ret");
+     } 
+
+     if(SvUOK(b)) {
+       mpfr_sprintf(stream, SvPV_nolen(a), SvUV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvIOK(b)) {
+       mpfr_sprintf(stream, SvPV_nolen(a), SvIV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvNOK(b)) {
+       mpfr_sprintf(stream, SvPV_nolen(a), SvNV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvPOK(b)) {
+       mpfr_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_sprintf_ret");
+}
+
+SV * wrap_mpfr_snprintf(SV * s, SV * bytes, SV * a, SV * b, int buflen) {
      int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
      if(sv_isobject(b)) { 
        const char* h = HvNAME(SvSTASH(SvRV(b)));
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
        if(strEQ(h, "Math::MPFR::Prec")) {
          ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
@@ -4982,25 +5098,90 @@ SV * wrap_mpfr_snprintf(char * stream, SV * bytes, SV * a, SV * b) {
 
      if(SvUOK(b)) {
        ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvUV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvIOK(b)) {
        ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvIV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvNOK(b)) {
        ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNV(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      if(SvPOK(b)) {
        ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
        return newSViv(ret);
      }
 
      croak("Unrecognised type supplied as argument to Rmpfr_snprintf");
+}
+
+SV * wrap_mpfr_snprintf_ret(SV * bytes, SV * a, SV * b, int buflen) {
+     SV * ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+     if(sv_isobject(b)) { 
+       const char* h = HvNAME(SvSTASH(SvRV(b)));
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), *(INT2PTR(mp_prec_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_snprintf_ret");
+     } 
+
+     if(SvUOK(b)) {
+       mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvUV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvIOK(b)) {
+       mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvIV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvNOK(b)) {
+       mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNV(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     if(SvPOK(b)) {
+       mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
+       ret = newSVpv(stream, 0);
+       Safefree(stream);
+       return ret;
+     }
+
+     croak("Unrecognised type supplied as argument to Rmpfr_snprintf_ret");
 }
 
 SV * wrap_mpfr_printf_rnd(SV * a, SV * round, SV * b) {
@@ -5055,8 +5236,12 @@ SV * wrap_mpfr_fprintf_rnd(FILE * stream, SV * a, SV * round, SV * b) {
      croak("In Rmpfr_fprintf: The rounding argument is specific to Math::MPFR objects");
 }
 
-SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
+SV * wrap_mpfr_sprintf_rnd(SV * s, SV * a, SV * round, SV * b, int buflen) {
      int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
 #if MPFR_VERSION_MAJOR >= 3
      if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_sprintf", (mp_rnd_t)SvUV(round));
 #else
@@ -5067,6 +5252,8 @@ SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
@@ -5080,8 +5267,43 @@ SV * wrap_mpfr_sprintf_rnd(char * stream, SV * a, SV * round, SV * b) {
      croak("In Rmpfr_sprintf: The rounding argument is specific to Math::MPFR objects");
 }
 
-SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * b) {
+SV * wrap_mpfr_sprintf_rnd_ret(SV * a, SV * round, SV * b, int buflen) {
+     SV * ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_sprintf_ret", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 2nd argument (rounding value) of %u passed to Rmpfr_sprintf_ret", (mp_rnd_t)SvUV(round));
+#endif
+     if(sv_isobject(b)) { 
+       const char* h = HvNAME(SvSTASH(SvRV(b)));
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpfr_sprintf(stream, SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_sprintf_ret()");
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_sprintf_ret");
+     } 
+
+     croak("In Rmpfr_sprintf_ret: The rounding argument is specific to Math::MPFR objects");
+}
+
+SV * wrap_mpfr_snprintf_rnd(SV * s, SV * bytes, SV * a, SV * round, SV * b, int buflen) {
      int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
 #if MPFR_VERSION_MAJOR >= 3
      if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_snprintf", (mp_rnd_t)SvUV(round));
 #else
@@ -5092,6 +5314,8 @@ SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * 
 
        if(strEQ(h, "Math::MPFR")) {
          ret = mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         sv_setpv(s, stream);
+         Safefree(stream);
          return newSViv(ret);
        }
 
@@ -5103,6 +5327,37 @@ SV * wrap_mpfr_snprintf_rnd(char * stream, SV * bytes, SV * a, SV * round, SV * 
      } 
 
      croak("In Rmpfr_snprintf: The rounding argument is specific to Math::MPFR objects");
+}
+
+SV * wrap_mpfr_snprintf_rnd_ret(SV * bytes, SV * a, SV * round, SV * b, int buflen) {
+     SV * ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+#if MPFR_VERSION_MAJOR >= 3
+     if((mp_rnd_t)SvUV(round) > 4) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_snprintf_ret", (mp_rnd_t)SvUV(round));
+#else
+     if((mp_rnd_t)SvUV(round) > 3) croak("Invalid 3rd argument (rounding value) of %u passed to Rmpfr_snprintf_ret", (mp_rnd_t)SvUV(round));
+#endif
+     if(sv_isobject(b)) { 
+       const char* h = HvNAME(SvSTASH(SvRV(b)));
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpfr_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), (mp_rnd_t)SvUV(round), *(INT2PTR(mpfr_t *, SvIV(SvRV(b)))));
+         ret = newSVpv(stream, 0);
+         Safefree(stream);
+         return ret;
+       }
+
+       if(strEQ(h, "Math::MPFR::Prec")) {
+         croak("You've provided both a rounding arg and a Math::MPFR::Prec object to Rmpfr_snprintf_ret()");
+       }
+
+       croak("Unrecognised object supplied as argument to Rmpfr_snprintf_ret");
+     } 
+
+     croak("In Rmpfr_snprintf_ret: The rounding argument is specific to Math::MPFR objects");
 }
 
 SV * Rmpfr_buildopt_tls_p(void) {
@@ -5254,7 +5509,7 @@ SV * Rmpfr_buildopt_gmpinternals_p(void) {
 #endif
 }
 
-SV * get_xs_version(void) {
+SV * _get_xs_version(void) {
      return newSVpv(XS_VERSION, 0);
 }
 
@@ -5296,24 +5551,27 @@ SV * Rmpfr_set_decimal64(mpfr_t * rop, SV * op, SV * rnd) {
      croak("Perl interface to Rmpfr_set_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
             MPFR_VERSION_STRING);
 #endif
-#ifdef MPFR_WANT_DECIMAL_FLOATS
-    if(mpfr_buildopt_gmpinternals_p()) {
-      if(sv_isobject(op)) {
-        const char* h = HvNAME(SvSTASH(SvRV(op)));
 
-        if(strEQ(h, "Math::Decimal64")) {
-          return newSViv(mpfr_set_decimal64(*rop, *(INT2PTR(_Decimal64 *, SvIV(SvRV(op)))), (mp_rnd_t)SvUV(rnd)));
-        }
-        croak("2nd arg (a %s object) supplied to Rmpfr_set_decimal64 needs to be a Math::Decimal64 object",
+/*
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h - this is done by
+ defining it at the 'Makefile.PL' step - see the Makefile.PL
+*/
+
+#ifdef MPFR_WANT_DECIMAL_FLOATS
+    if(sv_isobject(op)) {
+      const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+      if(strEQ(h, "Math::Decimal64"))
+        return newSViv(mpfr_set_decimal64(*rop, *(INT2PTR(_Decimal64 *, SvIV(SvRV(op)))), (mp_rnd_t)SvUV(rnd)));
+       croak("2nd arg (a %s object) supplied to Rmpfr_set_decimal64 needs to be a Math::Decimal64 object",
                HvNAME(SvSTASH(SvRV(op))));
-      }
-      else croak("2nd arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_set_decimal64 is not an object");
     }
-    else croak("The mpfr library needs to have been built using the '--with-gmp-build' configure option");
+    else croak("2nd arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_set_decimal64 is not an object");
+
 #else
-    if(!mpfr_buildopt_gmpinternals_p()) croak("%s %s","The mpfr library needs to have been built using the '--with-gmp-build' configure option and",
-      "MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
-    else croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
+    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
 #endif
 }
 
@@ -5332,32 +5590,44 @@ void Rmpfr_get_LD(SV * rop, mpfr_t * op, SV * rnd) {
 
 void Rmpfr_get_decimal64(SV * rop, mpfr_t * op, SV * rnd) {
 #if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,1,0)))
-     croak("Perl interface to Rmpfr_set_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
+     croak("Perl interface to Rmpfr_get_decimal64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
               MPFR_VERSION_STRING);
 #endif
-#ifdef MPFR_WANT_DECIMAL_FLOATS
-    if(mpfr_buildopt_gmpinternals_p()) {
-      if(sv_isobject(rop)) {
-        const char* h = HvNAME(SvSTASH(SvRV(rop)));
 
-        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(rop)))) = mpfr_get_decimal64(*op, (mp_rnd_t)SvUV(rnd));
-        }
-        else croak("1st arg (a %s object) supplied to Rmpfr_get_decimal64 needs to be a Math::Decimal64 object",
-                    HvNAME(SvSTASH(SvRV(rop))));
-      }
-      else croak("1st arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_get_decimal64 is not an object");
+/*
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h - this is done by
+ defining it at the 'Makefile.PL' step - see the Makefile.PL
+*/
+
+#ifdef MPFR_WANT_DECIMAL_FLOATS
+    if(sv_isobject(rop)) {
+      const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+      if(strEQ(h, "Math::Decimal64"))
+        *(INT2PTR(_Decimal64 *, SvIV(SvRV(rop)))) = mpfr_get_decimal64(*op, (mp_rnd_t)SvUV(rnd));
+     
+       else croak("1st arg (a %s object) supplied to Rmpfr_get_decimal64 needs to be a Math::Decimal64 object",
+                      HvNAME(SvSTASH(SvRV(rop))));
     }
-    else croak("The mpfr library needs to have been built using the '--with-gmp-build' configure option");
+    else croak("1st arg (which needs to be a Math::Decimal64 object) supplied to Rmpfr_get_decimal64 is not an object");
+
 #else
-    if(!mpfr_buildopt_gmpinternals_p()) croak("%s %s", "The mpfr library needs to have been built using the '--with-gmp-build' configure option and",
-      "MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
-    else croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
+    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
 #endif
 }
 
 int _MPFR_WANT_DECIMAL_FLOATS(void) {
 #ifdef MPFR_WANT_DECIMAL_FLOATS
+ return 1;
+#else
+ return 0;
+#endif
+}
+
+int _MPFR_WANT_FLOAT128(void) {
+#ifdef MPFR_WANT_FLOAT128
  return 1;
 #else
  return 0;
@@ -5389,6 +5659,198 @@ SV * _ivsize(void) {
 
 SV * _nvsize(void) {
      return newSVuv(sizeof(NV));
+}
+
+SV * _LDBL_DIG(void) {
+#ifdef LDBL_DIG
+     return newSViv(LDBL_DIG);
+#else 
+     return newSViv(0);
+#endif
+}
+
+SV * _DBL_DIG(void) {
+#ifdef DBL_DIG
+     return newSViv(DBL_DIG);
+#else 
+     return newSViv(0);
+#endif
+}
+
+SV * _LDBL_MANT_DIG(void) {
+#ifdef LDBL_MANT_DIG
+     return newSViv(LDBL_MANT_DIG);
+#else 
+     return newSViv(0);
+#endif
+}
+
+SV * _DBL_MANT_DIG(void) {
+#ifdef DBL_MANT_DIG
+     return newSViv(DBL_MANT_DIG);
+#else 
+     return newSViv(0);
+#endif
+}
+
+
+/*///////////////////////////////////////////
+////////////////////////////////////////////*/
+SV * Rgmp_randinit_default(void) {
+     gmp_randstate_t * state;
+     SV * obj_ref, * obj;
+
+     Newx(state, 1, gmp_randstate_t);
+     if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_default function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, NULL);
+     gmp_randinit_default(*state);
+
+     sv_setiv(obj, INT2PTR(IV,state));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+SV * Rgmp_randinit_mt(void) {
+     gmp_randstate_t * rand_obj;
+     SV * obj_ref, * obj;
+
+     Newx(rand_obj, 1, gmp_randstate_t);
+     if(rand_obj == NULL) croak("Failed to allocate memory in Math::GMPz::Random::Rgmp_randinit_mt function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, "Math::GMPz::Random");
+     gmp_randinit_mt(*rand_obj);
+
+     sv_setiv(obj, INT2PTR(IV, rand_obj));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+SV * Rgmp_randinit_lc_2exp(SV * a, SV * c, SV * m2exp ) {
+     gmp_randstate_t * state;
+     mpz_t aa;
+     SV * obj_ref, * obj;
+
+     Newx(state, 1, gmp_randstate_t);
+     if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, NULL);
+     if(sv_isobject(a)) {
+       const char* h = HvNAME(SvSTASH(SvRV(a)));
+
+       if(strEQ(h, "Math::GMP") ||
+          strEQ(h, "GMP::Mpz")  ||
+          strEQ(h, "Math::GMPz"))
+            gmp_randinit_lc_2exp(*state, *(INT2PTR(mpz_t *, SvIV(SvRV(a)))), (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
+       else croak("First arg to Rgmp_randinit_lc_2exp is of invalid type");
+     }
+
+     else {
+       if(!mpz_init_set_str(aa, SvPV_nolen(a), 0)) {
+         gmp_randinit_lc_2exp(*state, aa, (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
+         mpz_clear(aa);
+       }
+       else croak("Seedstring supplied to Rgmp_randinit_lc_2exp is not a valid number");
+     }
+
+     sv_setiv(obj, INT2PTR(IV,state));
+     SvREADONLY_on(obj);
+     return obj_ref;
+}
+
+SV * Rgmp_randinit_lc_2exp_size(SV * size) {
+     gmp_randstate_t * state;
+     SV * obj_ref, * obj;
+
+     if(SvUV(size) > 128) croak("The argument supplied to Rgmp_randinit_lc_2exp_size function (%u) needs to be in the range [1..128]", SvUV(size));
+
+     Newx(state, 1, gmp_randstate_t);
+     if(state == NULL) croak("Failed to allocate memory in Rgmp_randinit_lc_2exp_size function");
+     obj_ref = newSV(0);
+     obj = newSVrv(obj_ref, NULL);
+
+     if(gmp_randinit_lc_2exp_size(*state, (unsigned long)SvUV(size))) {
+       sv_setiv(obj, INT2PTR(IV,state));
+       SvREADONLY_on(obj);
+       return obj_ref;
+       }
+
+     croak("Rgmp_randinit_lc_2exp_size function failed");
+}
+
+/***********************************************
+************************************************/
+
+void Rmpfr_get_float128(SV * rop, mpfr_t * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,2,0)))
+     croak("Perl interface to Rmpfr_get_float128 not available for this version (%s) of the mpfr library. We need at least version 3.2.0",
+              MPFR_VERSION_STRING);
+#endif
+
+/*
+ MPFR_WANT_FLOAT128 needs to have been defined prior to inclusion of mpfr.h - this is done by
+ defining it at the 'Makefile.PL' step - see the Makefile.PL
+*/
+
+#ifdef MPFR_WANT_FLOAT128
+    if(sv_isobject(rop)) {
+      const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+      if(strEQ(h, "Math::Float128"))
+        *(INT2PTR(float128 *, SvIV(SvRV(rop)))) = mpfr_get_float128(*op, (mp_rnd_t)SvUV(rnd));
+     
+       else croak("1st arg (a %s object) supplied to Rmpfr_get_float128 needs to be a Math::Float128 object",
+                      HvNAME(SvSTASH(SvRV(rop))));
+    }
+    else croak("1st arg (which needs to be a Math::Float128 object) supplied to Rmpfr_get_float128 is not an object");
+
+#else
+
+    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
+#endif
+}
+
+SV * Rmpfr_set_float128(mpfr_t * rop, SV * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,2,0)))
+     croak("Perl interface to Rmpfr_set_float128 not available for this version (%s) of the mpfr library. We need at least version 3.2.0",
+            MPFR_VERSION_STRING);
+#endif
+
+/*
+ MPFR_WANT_FLOAT128 needs to have been defined prior to inclusion of mpfr.h - this is done by
+ defining it at the 'Makefile.PL' step - see the Makefile.PL
+*/
+
+#ifdef MPFR_WANT_FLOAT128
+    if(sv_isobject(op)) {
+      const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+      if(strEQ(h, "Math::Float128"))
+        return newSViv(mpfr_set_float128(*rop, *(INT2PTR(float128 *, SvIV(SvRV(op)))), (mp_rnd_t)SvUV(rnd)));
+       croak("2nd arg (a %s object) supplied to Rmpfr_set_float128 needs to be a Math::Float128 object",
+               HvNAME(SvSTASH(SvRV(op))));
+    }
+    else croak("2nd arg (which needs to be a Math::Float128 object) supplied to Rmpfr_set_float128 is not an object");
+
+#else
+
+    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - see the Makefile.PL");
+
+#endif
+}
+
+int _is_readonly(SV * sv) {
+  if SvREADONLY(sv) return 1;
+  return 0;
+}
+
+void _readonly_on(SV * sv) {
+  SvREADONLY_on(sv);
+}
+
+void _readonly_off(SV * sv) {
+  SvREADONLY_off(sv);
 }
 
 MODULE = Math::MPFR	PACKAGE = Math::MPFR	
@@ -7825,21 +8287,21 @@ overload_atan2 (a, b, third)
 	SV *	third
 
 SV *
-Rgmp_randinit_default ()
+Rgmp_randinit_default_nobless ()
 		
 
 SV *
-Rgmp_randinit_mt ()
+Rgmp_randinit_mt_nobless ()
 		
 
 SV *
-Rgmp_randinit_lc_2exp (a, c, m2exp)
+Rgmp_randinit_lc_2exp_nobless (a, c, m2exp)
 	SV *	a
 	SV *	c
 	SV *	m2exp
 
 SV *
-Rgmp_randinit_lc_2exp_size (size)
+Rgmp_randinit_lc_2exp_size_nobless (size)
 	SV *	size
 
 void
@@ -7954,17 +8416,32 @@ wrap_mpfr_fprintf (stream, a, b)
 	SV *	b
 
 SV *
-wrap_mpfr_sprintf (stream, a, b)
-	char *	stream
+wrap_mpfr_sprintf (s, a, b, buflen)
+	SV *	s
 	SV *	a
 	SV *	b
+	int	buflen
 
 SV *
-wrap_mpfr_snprintf (stream, bytes, a, b)
-	char *	stream
+wrap_mpfr_sprintf_ret (a, b, buflen)
+	SV *	a
+	SV *	b
+	int	buflen
+
+SV *
+wrap_mpfr_snprintf (s, bytes, a, b, buflen)
+	SV *	s
 	SV *	bytes
 	SV *	a
 	SV *	b
+	int	buflen
+
+SV *
+wrap_mpfr_snprintf_ret (bytes, a, b, buflen)
+	SV *	bytes
+	SV *	a
+	SV *	b
+	int	buflen
 
 SV *
 wrap_mpfr_printf_rnd (a, round, b)
@@ -7980,19 +8457,36 @@ wrap_mpfr_fprintf_rnd (stream, a, round, b)
 	SV *	b
 
 SV *
-wrap_mpfr_sprintf_rnd (stream, a, round, b)
-	char *	stream
+wrap_mpfr_sprintf_rnd (s, a, round, b, buflen)
+	SV *	s
 	SV *	a
 	SV *	round
 	SV *	b
+	int	buflen
 
 SV *
-wrap_mpfr_snprintf_rnd (stream, bytes, a, round, b)
-	char *	stream
+wrap_mpfr_sprintf_rnd_ret (a, round, b, buflen)
+	SV *	a
+	SV *	round
+	SV *	b
+	int	buflen
+
+SV *
+wrap_mpfr_snprintf_rnd (s, bytes, a, round, b, buflen)
+	SV *	s
 	SV *	bytes
 	SV *	a
 	SV *	round
 	SV *	b
+	int	buflen
+
+SV *
+wrap_mpfr_snprintf_rnd_ret (bytes, a, round, b, buflen)
+	SV *	bytes
+	SV *	a
+	SV *	round
+	SV *	b
+	int	buflen
 
 SV *
 Rmpfr_buildopt_tls_p ()
@@ -8125,7 +8619,7 @@ Rmpfr_buildopt_gmpinternals_p ()
 		
 
 SV *
-get_xs_version ()
+_get_xs_version ()
 		
 
 SV *
@@ -8196,6 +8690,10 @@ int
 _MPFR_WANT_DECIMAL_FLOATS ()
 		
 
+int
+_MPFR_WANT_FLOAT128 ()
+		
+
 SV *
 _max_base ()
 		
@@ -8227,4 +8725,98 @@ _ivsize ()
 SV *
 _nvsize ()
 		
+
+SV *
+_LDBL_DIG ()
+		
+
+SV *
+_DBL_DIG ()
+		
+
+SV *
+_LDBL_MANT_DIG ()
+		
+
+SV *
+_DBL_MANT_DIG ()
+		
+
+SV *
+Rgmp_randinit_default ()
+		
+
+SV *
+Rgmp_randinit_mt ()
+		
+
+SV *
+Rgmp_randinit_lc_2exp (a, c, m2exp)
+	SV *	a
+	SV *	c
+	SV *	m2exp
+
+SV *
+Rgmp_randinit_lc_2exp_size (size)
+	SV *	size
+
+void
+Rmpfr_get_float128 (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	Rmpfr_get_float128(rop, op, rnd);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+SV *
+Rmpfr_set_float128 (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+
+int
+_is_readonly (sv)
+	SV *	sv
+
+void
+_readonly_on (sv)
+	SV *	sv
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	_readonly_on(sv);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
+
+void
+_readonly_off (sv)
+	SV *	sv
+	PREINIT:
+	I32* temp;
+	PPCODE:
+	temp = PL_markstack_ptr++;
+	_readonly_off(sv);
+	if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+	  PL_markstack_ptr = temp;
+	  XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+	return; /* assume stack size is correct */
 

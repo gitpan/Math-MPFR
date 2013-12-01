@@ -26,14 +26,21 @@ unless($why) {
 
   my $round = 0;# MPFR_RNDN
 
+  my $mant_dig = Math::MPFR::_LDBL_MANT_DIG(); # expected to be either 64 or 106
+  Rmpfr_set_default_prec($mant_dig);
+
+  # If $mant_dig == 106, I assume the long double is "double-double" - which doesn't
+  # accommodate the full exponent range of the Decimal64 type.
+  my $rand_limit = $mant_dig == 106 ? 292 : 399;
+
   for my $it (1..100000) {
     my $digits = 1 + int(rand(16)); # Don't exceed max precision for this test.
-    Rmpfr_set_default_prec(53 + int(rand(100)));
+    #Rmpfr_set_default_prec(53 + int(rand(100)));
     my $man_sign = $it % 2 ? '-' : '';
     my $exp_sign = $it % 3 ? 1 : -1;
     my $man = $man_sign . get_man($digits);
-    my $exp = int(rand(399)) * $exp_sign;
-    next if $exp + $digits > 385;
+    my $exp = int(rand($rand_limit)) * $exp_sign;
+    #next if $exp + $digits > 385;
     my $fr_arg = $man . '@' . $exp;
 
     my $d64_check = Math::Decimal64->new($man, $exp);
@@ -46,13 +53,14 @@ unless($why) {
 
     unless($d64_2 == $d64_1) {
       if($keep_printing < 6) {
-        warn "$digits\n$fr_arg\n $fr\n";
+        warn "$digits $exp\n$fr_arg\n $fr\n";
         warn "\$d64_check: $d64_check\n\$d64_1: $d64_1\n\$d64_2: $d64_2\n\$ld: $ld\n\n";
         $ok = 0;
       }
-      $keep_printing++;
+    $keep_printing++;
     }
   }
+
 
   if($ok) {print "ok 1\n"}
   else {print "not ok 1\n"}
@@ -75,7 +83,7 @@ unless($why) {
   if($ok) {print "ok 2\n"}
   else {print "not ok 2\n"}
 
-  Rmpfr_set_default_prec(64);
+  Rmpfr_set_default_prec($mant_dig);
   my $root = Math::MPFR->new(2.0);
   Rmpfr_sqrt($root, $root, MPFR_RNDN);
   my $ld_root = sqrt(Math::LongDouble->new(2.0));

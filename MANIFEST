@@ -13,6 +13,7 @@ V/Makefile.PL
 t/_1aaa_v.t
 t/_1basic.t
 t/_2exp.t
+t/base_conversion.t
 t/bessel.t
 t/buildopt.t
 t/constants.t
@@ -21,9 +22,11 @@ t/decimal64_conv.t
 t/div_by_zero.t
 t/exceptions.t
 t/flags.t
+t/float128_conv.t
 t/grandom.t
 t/integer_string.t
 t/inits.t
+t/lngamma_bug.t
 t/LongDouble.t
 t/MPFR_RND.t
 t/nan_cmp.t
