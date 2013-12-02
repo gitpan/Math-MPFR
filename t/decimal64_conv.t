@@ -12,12 +12,13 @@ if($@) {
   $why = "Couldn't load Math::Decimal64\n";
   warn "\n Skipping all tests: $why: $@\n";
   print "ok $_\n" for 1..$t;
+  exit 0;
 }
 
 my $proceed = Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS();
 
 if($proceed) {
-  Rmpfr_set_default_prec(54); # Using complementary Rounding Modes needs prec of 54.
+  Rmpfr_set_default_prec(55); # Using complementary Rounding Modes needs prec of 55.
   my $ok = 1;
   my $it;
   for $it(1 .. 10000) {

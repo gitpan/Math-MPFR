@@ -1,4 +1,7 @@
-3.20
+3.21
+ - Fix errors in t/decimal64_conv.t
+
+3.19
  - Rewrite _wrap_mpfr_sprintf(), _wrap_mpfr_snprintf(), _wrap_mpfr_sprintf_rnd()
    and _wrap_mpfr_snprintf_rnd(). Their first arg has been changed from a char*
    to an SV*, and they take an additional argument that specifies the size of
