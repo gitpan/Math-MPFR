@@ -51,14 +51,14 @@ if($have_mpz) {
   }
   Rmpfr_trunc($mpfr1, $mpfr1);
   if(!Rmpfr_cmp_z($mpfr1, $z)) {$ok .= 'd'}
-  Rmpfr_set_d($mpfr1, $double, $rnd); 
+  Rmpfr_set_d($mpfr1, $double, $rnd);
   if($ok eq 'abcDd') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
 }
 else {
   warn "Skipping test 1 - no Math::GMPz\n";
   print "ok 1\n";
-} 
+}
 
 if($have_mpq) {
   my $ok = '';
@@ -75,7 +75,7 @@ if($have_mpq) {
 else {
   warn "Skipping test 2 - no Math::GMPq\n";
   print "ok 2\n";
-} 
+}
 
 if($have_mpf) {
   my $ok = '';
@@ -91,7 +91,7 @@ if($have_mpf) {
 else {
   warn "Skipping test 3 - no Math::GMPf\n";
   print "ok 3\n";
-} 
+}
 
 if($have_gmp) {
   my $ok = '';
@@ -104,14 +104,14 @@ if($have_gmp) {
   Rmpfr_get_z($z, $mpfr1, $rnd);
   Rmpfr_trunc($mpfr1, $mpfr1);
   if(!Rmpfr_cmp_z($mpfr1, $z)) {$ok .= 'd'}
-  Rmpfr_set_d($mpfr1, $double, $rnd); 
+  Rmpfr_set_d($mpfr1, $double, $rnd);
   if($ok eq 'abcd') {print "ok 4\n"}
   else {print "not ok 4 $ok\n"}
 }
 else {
   warn "Skipping test 4 - no Math::GMP\n";
   print "ok 4\n";
-} 
+}
 
 Rmpfr_set_ui_2exp($mpfr2, 5, 3, $rnd);
 if($mpfr2 == 40) {print "ok 5\n"}

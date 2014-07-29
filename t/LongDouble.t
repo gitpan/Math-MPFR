@@ -111,7 +111,7 @@ unless($@ || $Math::LongDouble::VERSION < 0.02) {
 
   ####################################################################
   # $mant_dig-bit mantissa of $fr_true should eq $m_actual           #
-  #################################################################### 
+  ####################################################################
   ($man, $exp) = Rmpfr_deref2($fr_true, 2, $mant_dig, MPFR_RNDN);
   if($man eq $m_actual) {print "ok 9\n"}
   else {
@@ -130,7 +130,7 @@ unless($@ || $Math::LongDouble::VERSION < 0.02) {
     warn "\n\$man: $man\n      $m_plus6_to_actual\n";
     print "not ok 10\n";
   }
- 
+
 
   Rmpfr_set_str($fr_true, $str_plus6, 2, MPFR_RNDN);
   #################################################################################

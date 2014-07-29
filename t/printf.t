@@ -43,12 +43,24 @@ else { warn "\n1k: \$\@: $@\n"}
 
 Math::MPFR::_readonly_off($buf);
 
-$ok .= 'm' if "For testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For testing: %.30Rf\n", $mpfr1, 200);
-$ok .= 'n' if "For testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For testing: %.30RNf\n", $mpfr1, 200);
-$ok .= 'o' if "For testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For testing: %.30R*f\n", GMP_RNDU, $mpfr1, 200);
-$ok .= 'p' if "For some more testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For some more testing: %.30Rf\n", $mpfr1, 200);
-$ok .= 'q' if "For some more testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For some more testing: %.30RNf\n", $mpfr1, 200);
-$ok .= 'r' if "For some more testing: 1234567.625000000000000000000000000000\n" eq Rmpfr_sprintf_ret("For some more testing: %.30R*f\n", GMP_RNDN, $mpfr1, 200);
+Rmpfr_sprintf($buf, "For testing: %.30Rf\n", $mpfr1, 200);
+$ok .= 'm' if "For testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
+Rmpfr_sprintf($buf, "For testing: %.30RNf\n", $mpfr1, 200);
+$ok .= 'n' if "For testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
+Rmpfr_sprintf($buf, "For testing: %.30R*f\n", GMP_RNDU, $mpfr1, 200);
+$ok .= 'o' if "For testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
+Rmpfr_sprintf($buf, "For some more testing: %.30Rf\n", $mpfr1, 200);
+$ok .= 'p' if "For some more testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
+Rmpfr_sprintf($buf, "For some more testing: %.30RNf\n", $mpfr1, 200);
+$ok .= 'q' if "For some more testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
+Rmpfr_sprintf($buf, "For some more testing: %.30R*f\n", GMP_RNDN, $mpfr1, 200);
+$ok .= 'r' if "For some more testing: 1234567.625000000000000000000000000000\n" eq $buf;
+
 Rmpfr_sprintf ($buf, "%Pu\n", prec_cast(Rmpfr_get_prec($mpfr1)), 200);
 
 if($buf == 80) {$ok .= 's'}
@@ -88,10 +100,10 @@ else {warn "1A: $ret\n"}
 if($buf eq 'hello world') {$ok .= 'B'}
 else {warn "1B: $buf\n"}
 
-$ret = Rmpfr_sprintf_ret("$ul", 0, 5);
-if($ret eq '123') {$ok .= 'C'}
-else {warn "\n1C: $ret\n"}
-if($buf eq "hello world") {$ok .= 'D'}
+$ret = Rmpfr_sprintf($buf, "$ul", 0, 5);
+if($ret == 3) {$ok .= 'C'}
+else {warn "\n1C: $ret $buf\n"}
+if($buf eq "123") {$ok .= 'D'}
 else {warn "\n1D: $buf\n"}
 
 if(!$copy) {$ok .= 'E'}
@@ -121,9 +133,12 @@ eval {Rmpfr_sprintf($buf, "%RNd", $mbi, 200);};
 if($@ =~ /Unrecognised object/) {$ok .= 'c'}
 else {warn "2c got: $@\n"}
 
-eval {Rmpfr_sprintf_ret("%RUd", $mbi, 200);};
-if($@ =~ /Unrecognised object/) {$ok .= 'd'}
-else {warn "2d got: $@\n"}
+# no longer have Rmpfr_sprintf_ret().
+#eval {Rmpfr_sprintf_ret("%RUd", $mbi, 200);};
+#if($@ =~ /Unrecognised object/) {$ok .= 'd'}
+#else {warn "2d got: $@\n"}
+
+$ok .= 'd';
 
 eval {Rmpfr_fprintf(\*STDOUT, "%R*d", GMP_RNDN, $mbi, $ul);};
 if($@ =~ /must take 3 or 4 arguments/) {$ok .= 'e'}
@@ -133,8 +148,8 @@ eval {Rmpfr_sprintf($buf, "%R*d", GMP_RNDN, $mbi, $ul, 50);};
 if($@ =~ /must take 4 or 5 arguments/) {$ok .= 'f'}
 else {warn "2f got: $@\n"}
 
-eval {Rmpfr_sprintf_ret("%RNd", $mbi);};
-if($@ =~ /must take 3 or 4 arguments/) {$ok .= 'g'}
+eval {Rmpfr_sprintf("%RNd", $mbi);};
+if($@ =~ /must take 4 or 5 arguments/) {$ok .= 'g'}
 else {warn "2g got: $@\n"}
 
 eval {Rmpfr_fprintf(\*STDOUT, "%R*d", 4, $mbi);};
@@ -176,10 +191,10 @@ else {print "not ok 2 $ok\n"}
 
 $ok = '';
 
-$ret = Rmpfr_snprintf_ret(5, "%.0Rf", $mpfr1, 10);
+$ret = Rmpfr_snprintf($buf, 5, "%.0Rf", $mpfr1, 10);
 
-if($ret eq '1234') {$ok .= 'a'}
-else {warn "3a: $ret\n"}
+if($buf eq '1234' && $ret == 7) {$ok .= 'a'}
+else {warn "3a: $buf $ret\n"}
 
 $ret = Rmpfr_snprintf($buf, 6, "%.0Rf", $mpfr1, 10);
 
@@ -194,12 +209,16 @@ else {print "not ok 3\n"}
 
 $ok = '';
 
-$ret = Rmpfr_snprintf_ret(7, "%.0R*f", GMP_RNDD, $mpfr1, 10);
+$ret = Rmpfr_snprintf($buf, 7, "%.0R*f", GMP_RNDD, $mpfr1, 10);
 
-if($ret eq '123456') {$ok .= 'a'}
+if($buf eq '123456' && $ret == 7) {$ok .= 'a'}
 else {warn "4a: $ret\n"}
 
+#Rmpfr_printf("%.0R*f", GMP_RNDD, $mpfr1);
+
 $ret = Rmpfr_snprintf($buf, 6, "%.0R*f", GMP_RNDD, $mpfr1 / 10, 10);
+
+#Rmpfr_printf("%.0R*f", GMP_RNDD, $mpfr1 / 10);
 
 if($ret == 6) {$ok .= 'b'}
 else {warn "4b: $ret\n"}

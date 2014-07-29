@@ -27,7 +27,7 @@ else {print "not ok 4 MPFR_VERSION_PATCHLEVEL is ", MPFR_VERSION_PATCHLEVEL, "\n
 my $v = Rmpfr_get_version();
 
 if($v eq MPFR_VERSION_STRING) {print "ok 5\n"}
-else {print "not ok 5 $v is not the same as ", MPFR_VERSION_STRING, "\n"} 
+else {print "not ok 5 $v is not the same as ", MPFR_VERSION_STRING, "\n"}
 
 eval{my $patches = Rmpfr_get_patches();};
 if(!$@) {print "ok 6\n"}

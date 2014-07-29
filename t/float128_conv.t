@@ -209,7 +209,7 @@ if($proceed) {
   else {
     warn "\n $f128_1: $f128_1\n \$f128_2: $f128_2\n";
     print "not ok 18\n";
-  }  
+  }
 
   $f128_1 = NVtoF128(1e-298);
   Rmpfr_set_float128($fr_F128, $f128_1, MPFR_RNDN);
@@ -218,7 +218,7 @@ if($proceed) {
   else {
     warn "\n $f128_1: $f128_1\n \$f128_2: $f128_2\n";
     print "not ok 19\n";
-  } 
+  }
 
   $f128_1 = STRtoF128('1e-360');
   Rmpfr_set_float128($fr_F128, $f128_1, MPFR_RNDN);
@@ -227,7 +227,7 @@ if($proceed) {
   else {
     warn "\n $f128_1: $f128_1\n \$f128_2: $f128_2\n";
     print "not ok 20\n";
-  } 
+  }
 
   $f128_1 = NVtoF128(1e-360);
   Rmpfr_set_float128($fr_F128, $f128_1, MPFR_RNDN);
@@ -236,7 +236,7 @@ if($proceed) {
   else {
     warn "\n $f128_1: $f128_1\n \$f128_2: $f128_2\n";
     print "not ok 21\n";
-  } 
+  }
 }
 else {
   warn "Skipping all tests - Math::MPFR not built for Float128 support";

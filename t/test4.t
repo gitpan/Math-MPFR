@@ -205,7 +205,7 @@ if($have_mpq) {
 else {
   warn "Skipping test 31 - no Math::GMPq\n";
   print "ok 31\n";
-} 
+}
 
 my ($u1, $cmp1) = Rmpfr_init_set_str('1.a', 16, GMP_RNDN);
 if(!$cmp1) {print "ok 32\n"}

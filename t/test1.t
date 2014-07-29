@@ -326,7 +326,7 @@ Rmpfr_agm($check, $check3, $check2, GMP_RNDN);
 $d2 = Rmpfr_get_d($check, GMP_RNDN);
 
 if($d2 > 12345.49999 && $d2 < 12345.50001) {print "ok 36\n"}
-else {print "not ok 36\n"} 
+else {print "not ok 36\n"}
 
 $ret = '';
 
@@ -385,7 +385,7 @@ if($have_mpz) {
   Rmpfr_urandomb(@r, $state);
 
   for(@r) {
-     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0} 
+     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0}
      if($_ <= 0 || $_ >= 1) {$ok = 0}
      }
 
@@ -393,7 +393,7 @@ if($have_mpz) {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r[$i] == $r[$j]) {$ok = 0}
         }
-     } 
+     }
 
   if($ok) {print "ok 41\n"}
   else {print "not ok 41\n"}
@@ -419,7 +419,7 @@ else {
   Rmpfr_urandomb(@r, $state);
 
   for(@r) {
-     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0} 
+     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0}
      if($_ <= 0 || $_ >= 1) {$ok = 0}
      }
 
@@ -427,7 +427,7 @@ else {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r[$i] == $r[$j]) {$ok = 0}
         }
-     } 
+     }
 
   if($ok) {print "ok 42\n"}
   else {print "not ok 42\n"}
@@ -442,7 +442,7 @@ my ($t1, $s1) = Rmpfr_init_set($o, GMP_RNDN);
 my ($t2, $s2) = Rmpfr_init_set_d($double, GMP_RNDN);
 
 if(Rmpfr_eq($t1, $t2, 50)) {print "ok 43\n"}
-else {print "not ok 43\n"} 
+else {print "not ok 43\n"}
 
 my ($t3, $s33) = Rmpfr_init_set_ui(int($double), GMP_RNDN);
 my ($t4, $s44) = Rmpfr_init_set_si(int($double) + 1, GMP_RNDN);
@@ -575,7 +575,7 @@ if(!(MPFR_VERSION_MAJOR > 2)) {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r3[$i] == $r3[$j]) {$dup_count ++}
         }
-     } 
+     }
 
   if($dup_count < 6) {print "ok 53\n"}
   else {print "not ok 53\n"}
@@ -671,7 +671,7 @@ if(1) {
   Rmpfr_urandomb(@r, $state);
 
   for(@r) {
-     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0} 
+     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0}
      if($_ <= 0 || $_ >= 1) {$ok = 0}
      }
 
@@ -679,7 +679,7 @@ if(1) {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r[$i] == $r[$j]) {$ok = 0}
         }
-     } 
+     }
 
   if($ok) {print "ok 61\n"}
   else {print "not ok 61\n"}
@@ -705,7 +705,7 @@ if($have_mpz) {
   Rmpfr_urandomb(@r, $state);
 
   for(@r) {
-     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0} 
+     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0}
      if($_ <= 0 || $_ >= 1) {$ok = 0}
      }
 
@@ -713,7 +713,7 @@ if($have_mpz) {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r[$i] == $r[$j]) {$ok = 0}
         }
-     } 
+     }
 
   if($ok) {print "ok 62\n"}
   else {print "not ok 62\n"}
@@ -740,7 +740,7 @@ if(1) {
   Rmpfr_urandomb(@r, $state);
 
   for(@r) {
-     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0} 
+     if(length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) > 80 || length(Rmpfr_get_str($_, 2, 0, GMP_RNDN)) < 40) {$ok = 0}
      if($_ <= 0 || $_ >= 1) {$ok = 0}
      }
 
@@ -748,7 +748,7 @@ if(1) {
      for(my $j = $i + 1; $j < 100; $j++) {
         if($r[$i] == $r[$j]) {$ok = 0}
         }
-     } 
+     }
 
   if($ok) {print "ok 63\n"}
   else {print "not ok 63\n"}
@@ -767,29 +767,32 @@ eval {Rmpfr_print_binary($c);
       print "\n";};
 
 if($@) {print "not ok 65\n"}
-else {print "ok 65\n"} 
+else {print "ok 65\n"}
 
 eval {Rmpfr_dump($c);};
 
 if($@) {print "not ok 66\n"}
-else {print "ok 66\n"} 
+else {print "ok 66\n"}
 
 eval{$ok = Math::MPFR::gmp_v();};
 
 if($@ || $ok =~ /[^0-9\.]/) {print "not ok 67\n"}
-else {print "ok 67\n"} 
+else {print "ok 67\n"}
 
 Rmpfr_const_catalan($c, GMP_RNDN);
 
 if($c - 0.915965594177 < 0.0000000001 &&
    $c - 0.915965594177 > - 0.0000000001) {print "ok 68\n"}
-else {print "not ok 68\n"} 
+else {print "not ok 68\n"}
 
 Rmpfr_set_si($c, -3, GMP_RNDN);
 Rmpfr_lngamma($c, $c, GMP_RNDN);
 
-if(Rmpfr_nan_p($c)) {print "ok 69\n"}
-else {print "not ok 69\n"} 
+if(Rmpfr_inf_p($c)) {print "ok 69\n"}
+else {
+  warn "lngamma(-3): $c\n";
+  print "not ok 69\n";
+}
 
 Rmpfr_erf($s, $log1, GMP_RNDN);
 Rmpfr_erfc($t, $log1, GMP_RNDN);
@@ -847,7 +850,7 @@ if($have_mpf) {
    Rmpfr_get_f($f1, $s, GMP_RNDN);
 
    if(Rmpfr_cmp_f($s, $f1)) {print "not ok 75\n"}
-   else {print "ok 75\n"}    
+   else {print "ok 75\n"}
    }
 else {
   warn "Skipping test 75 - no Math::GMPf\n";
@@ -887,7 +890,7 @@ else {
    warn "\n   Got (double): $double\n   Expected: 0.78125\n\n",
         "   Got (exp): $exp\n   Expected: 7\n";
    print "not ok 79\n";
-} 
+}
 
 my $posinf = Math::MPFR->new('inf');
 my $neginf = Math::MPFR->new('-inf');
@@ -900,12 +903,12 @@ else {warn "a: $posinf ", $neginf * -1, "\n"}
 $double = Rmpfr_get_d($nan, GMP_RNDN);
 Rmpfr_set_d($nan, $double, GMP_RNDN);
 if(Rmpfr_nan_p($nan)) {$ok .= 'b'}
-else {warn "b: $nan\n"} 
+else {warn "b: $nan\n"}
 
 $double = Rmpfr_get_d($posinf, GMP_RNDN);
 Rmpfr_set_d($posinf, $double, GMP_RNDN);
 if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'c'}
-else {warn "c: $posinf\n"} 
+else {warn "c: $posinf\n"}
 
 $double = Rmpfr_get_d($neginf, GMP_RNDN);
 Rmpfr_set_d($neginf, $double, GMP_RNDN);
@@ -915,12 +918,12 @@ else {warn "d: $neginf\n"}
 $double = Rmpfr_get_NV($nan, GMP_RNDN);
 Rmpfr_set_d($nan, $double, GMP_RNDN);
 if(Rmpfr_nan_p($nan)) {$ok .= 'e'}
-else {warn "e: $nan\n"} 
+else {warn "e: $nan\n"}
 
 $double = Rmpfr_get_NV($posinf, GMP_RNDN);
 Rmpfr_set_d($posinf, $double, GMP_RNDN);
 if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'f'}
-else {warn "f: $posinf\n"} 
+else {warn "f: $posinf\n"}
 
 $double = Rmpfr_get_NV($neginf, GMP_RNDN);
 Rmpfr_set_d($neginf, $double, GMP_RNDN);
@@ -996,17 +999,17 @@ else {warn "81 m: $ac2\n"}
 Rmpfr_set_ui($ac1, 0, GMP_RNDN);
 Rmpfr_li2($ac2, $ac1, GMP_RNDN);
 if(!$ac2) {$ok .= 'n'}
-else {warn "81 n: $ac2\n"} 
+else {warn "81 n: $ac2\n"}
 
 Rmpfr_set_ui($ac1, 1, GMP_RNDN);
 Rmpfr_li2($ac2, $ac1, GMP_RNDN);
 if($ac2 > 1.64493406 && $ac2 < 1.64493407) {$ok .= 'o'}
-else {warn "81 o: $ac2\n"} 
+else {warn "81 o: $ac2\n"}
 
 Rmpfr_set_ui($ac1, 2, GMP_RNDN);
 Rmpfr_li2($ac2, $ac1, GMP_RNDN);
 if($ac2 > 2.4674011002 && $ac2 < 2.4674011003) {$ok .= 'p'}
-else {warn "81 p: $ac2\n"} 
+else {warn "81 p: $ac2\n"}
 
 if($ok eq 'abcdefghijklmnop'){print "ok 81\n"}
 else {print "not ok 81 $ok\n"}
@@ -1072,7 +1075,7 @@ if($have_Math_GMP) {
     else {
       warn "84: \$fr: $fr\n";
       print "not ok 84\n";
-    }  
+    }
   }
   else {
     eval{Rmpfr_set_z_2exp($fr, $z, -2, MPFR_RNDN);};

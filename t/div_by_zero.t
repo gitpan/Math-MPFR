@@ -23,7 +23,7 @@ unless($@) {$have_gmp = 1}
 
 my($q_zero, $z_zero);
 
-# Rmpfr_div 
+# Rmpfr_div
 # Rmpfr_div_d Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z
 # Rmpfr_si_div Rmpfr_ui_div Rmpfr_d_div
 
@@ -90,7 +90,7 @@ if((MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 
   if(Rmpfr_divby0_p()) {$ok .= 'i'}
   Rmpfr_clear_divby0();
   unless(Rmpfr_divby0_p()) {$ok .= 'j'}
-  
+
   Rmpfr_div_d($rop, $unity, 0.0, GMP_RNDN);
   if(Rmpfr_divby0_p()) {$ok .= 'k'}
   Rmpfr_clear_divby0();
@@ -105,7 +105,7 @@ if((MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 
   if(Rmpfr_divby0_p()) {$ok .= 'o'}
   Rmpfr_clear_divby0();
   unless(Rmpfr_divby0_p()) {$ok .= 'p'}
-  
+
   Rmpfr_d_div($rop, 12.34, $fr_zero, GMP_RNDN);
   if(Rmpfr_divby0_p()) {$ok .= 'q'}
   Rmpfr_clear_divby0();

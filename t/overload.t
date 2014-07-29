@@ -60,7 +60,7 @@ if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '2.713594711213924e15'
 $z = $p * $negd;
 if(Rmpfr_get_str($z, 10, 0, GMP_RNDN) eq '-1.0854378789267698e16'
    && $z == -10854378789267698
-   && "$z" eq '-1.0854378789267698e16' 
+   && "$z" eq '-1.0854378789267698e16'
                                       ) {$ok .= 'e'}
 
 $z = $p * $frac;
@@ -628,7 +628,7 @@ Rmpfr_set_ui($s, 3, GMP_RNDN);
 $ok = '';
 
 my $y_atan2 = Rmpfr_init();
-Rmpfr_set_d($y_atan2, 2.07, GMP_RNDN); 
+Rmpfr_set_d($y_atan2, 2.07, GMP_RNDN);
 my $atan2 = Rmpfr_init();
 
 my $x_atan2 = 2 ** 31 + 2;

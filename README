@@ -5,7 +5,7 @@ computations with exact rounding (also called correct rounding). It
 is based on the GMP multiple-precision C library.
 
 The main goal of MPFR is to provide a library for multiple-precision
-floating-point computation which is both efficient and has a 
+floating-point computation which is both efficient and has a
 well-defined semantics. It copies the good ideas from the
 ANSI/IEEE-754 standard for double-precision floating-point
 arithmetic (53-bit mantissa).
@@ -46,8 +46,8 @@ Build in the usual way:
  make install
 
 When building this module, the GMP and MPFR libraries will need to be
-accessible. If those files are in a location where your compiler does 
-not find them by default, then instead of running 'perl Makefile.PL', 
+accessible. If those files are in a location where your compiler does
+not find them by default, then instead of running 'perl Makefile.PL',
 you'll need to run:
 
 perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
@@ -59,20 +59,20 @@ perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
 
 If your perl's Config reports that 'ivsize' is greater than or
 equal to 8, then Math::MPFR will, by default, be built with access
-to the mpfr_*_uj and mpfr_*_sj functions. Else, access to those 
-functions is, by default, denied. You can override the default by 
+to the mpfr_*_uj and mpfr_*_sj functions. Else, access to those
+functions is, by default, denied. You can override the default by
 opening up the Makefile.PL and uncommenting the appropriate line (just
 a few lines down from the top of the file ... the comments in that
 file should make it clear).
 
 Similarly, if your perl's Config reports that 'nvsize' is greater than
 8 then Math::MPFR will, by default, be built with access
-to the mpfr_*_ld functions. Else, access to those functions is, 
-by default, denied. Again, you can override the default by opening up the 
+to the mpfr_*_ld functions. Else, access to those functions is,
+by default, denied. Again, you can override the default by opening up the
 Makefile.PL and uncommenting the appropriate line.
 
-I believe it to be both unnecessary and inadvisable to override the 
-default - but if you do find that you need to override the default, 
+I believe it to be both unnecessary and inadvisable to override the
+default - but if you do find that you need to override the default,
 please let me know. That you have found it necessary to override the
 default is something I probably ought to know about.
 
@@ -129,9 +129,9 @@ Conversion between Math::LongDouble and Math::MPFR objects
 There are 2 functions provided for conversion between Math::LongDouble
 and Math::MPFR objects:
 
- Rmpfr_set_LD (assign the value of a Math::LongDouble object to a 
+ Rmpfr_set_LD (assign the value of a Math::LongDouble object to a
                Math::MPFR object)
- Rmpfr_get_LD (assign the value of a Math::MPFR object to a 
+ Rmpfr_get_LD (assign the value of a Math::MPFR object to a
                Math::Long Double object)
 
 If your perl's nvtype is long double, just use Rmpfr_set_ld and

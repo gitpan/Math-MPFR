@@ -168,7 +168,7 @@ if(MPFR_VERSION_MAJOR >= 3) {
 }
 else {
   if($@ =~ /3rd argument supplied to Rmpfr_strtofr/) {$ok .= 'i'}
-  else {warn "15i: \$\@: $@\n"} 
+  else {warn "15i: \$\@: $@\n"}
 }
 
 if($ok eq 'abcdefghi') {print "ok 15\n"}

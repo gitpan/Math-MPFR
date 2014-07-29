@@ -20,19 +20,19 @@ Rmpfr_set_inf($inf, 1);
 my $ok = '';
 
 Rmpfr_j0($ret, $val, GMP_RNDN);
-if($ret > 0.007545752435 && $ret < 0.007545752437) {$ok .= 'a'} 
+if($ret > 0.007545752435 && $ret < 0.007545752437) {$ok .= 'a'}
 
 Rmpfr_j1($ret, $val, GMP_RNDN);
-if($ret > -0.012649475954 && $ret < -0.012649475952) {$ok .= 'b'} 
+if($ret > -0.012649475954 && $ret < -0.012649475952) {$ok .= 'b'}
 
 Rmpfr_jn($ret, 200, $val, GMP_RNDN);
 if($ret > 0.012963999661 && $ret < 0.012963999663) {$ok .= 'c'}
 
 Rmpfr_y0($ret, $val, GMP_RNDN);
-if($ret > -0.012650761686 && $ret < -0.012650761684) {$ok .= 'd'} 
+if($ret > -0.012650761686 && $ret < -0.012650761684) {$ok .= 'd'}
 
 Rmpfr_y1($ret, $val, GMP_RNDN);
-if($ret > -0.007547908437 && $ret < -0.007547908435) {$ok .= 'e'} 
+if($ret > -0.007547908437 && $ret < -0.007547908435) {$ok .= 'e'}
 
 Rmpfr_yn($ret, 200, $val, GMP_RNDN);
 if($ret > -0.007029988802 && $ret < -0.0070299888) {$ok .= 'f'}

@@ -69,7 +69,7 @@ if(!($] < 5.007 && !Math::MPFR::_has_longdouble() && Math::MPFR::_has_longlong()
 
   $mpfr1 /= 2;
 
-  if($mpfr1 == ($n - 1) / 2) {$ok .= 'e'} 
+  if($mpfr1 == ($n - 1) / 2) {$ok .= 'e'}
   else {
     my $t = ($n - 1) / 2;
     warn "4e: ", $mpfr1 - 1, " != ", $t;
@@ -136,10 +136,7 @@ if($string == ~0) {$ok .= 'b'}
 else {print "$string != ", ~0, "\n"}
 
 if(Math::MPFR::_has_longdouble()) {
-  if(Math::MPFR::_has_inttypes()) {
-    Rmpfr_set_ld($mpfr1, (~0 - 1) / -2, GMP_RNDN);
-  }
-  else {Rmpfr_set_str($mpfr1, (~0 - 1) / -2, 10, GMP_RNDN)}
+  Rmpfr_set_ld($mpfr1, (~0 - 1) / -2, GMP_RNDN);
 }
 elsif(Math::MPFR::_has_longlong()){
   if(Math::MPFR::_has_inttypes()) {

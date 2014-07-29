@@ -134,27 +134,27 @@ $b_angle *= -1;
 my $ok = '';
 
 Rmpfr_sec($rop, $b_angle, GMP_RNDN);
-if($rop - sec($angle) < 0.000000001 
+if($rop - sec($angle) < 0.000000001
    && $rop - sec($angle) > -0.000000001) {$ok .= 'a'}
 
 Rmpfr_csc($rop, $b_angle, GMP_RNDN);
-if($rop - csc($angle) < 0.000000001 
+if($rop - csc($angle) < 0.000000001
    && $rop - csc($angle) > -0.000000001) {$ok .= 'b'}
 
 Rmpfr_cot($rop, $b_angle, GMP_RNDN);
-if($rop - cot($angle) < 0.000000001 
+if($rop - cot($angle) < 0.000000001
    && $rop - cot($angle) > -0.000000001) {$ok .= 'c'}
 
 Rmpfr_sech($rop, $b_angle, GMP_RNDN);
-if($rop - sech($angle) < 0.000000001 
+if($rop - sech($angle) < 0.000000001
    && $rop - sech($angle) > -0.000000001) {$ok .= 'd'}
 
 Rmpfr_csch($rop, $b_angle, GMP_RNDN);
-if($rop - csch($angle) < 0.000000001 
+if($rop - csch($angle) < 0.000000001
    && $rop - csch($angle) > -0.000000001) {$ok .= 'e'}
 
 Rmpfr_coth($rop, $b_angle, GMP_RNDN);
-if($rop - coth($angle) < 0.000000001 
+if($rop - coth($angle) < 0.000000001
    && $rop - coth($angle) > -0.000000001) {$ok .= 'f'}
 
 if($ok eq 'abcdef') {print "ok 16\n"}

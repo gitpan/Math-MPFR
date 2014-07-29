@@ -37,7 +37,7 @@ my $float128_message = $have_float128 ? "Attempting to build with __float128 sup
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
-if($use_64_bit_int == -1) {}                                
+if($use_64_bit_int == -1) {}
 elsif($use_64_bit_int == 1) {$defines .= " -DUSE_64_BIT_INT"}
 else {
   unless($Config::Config{ivsize} < 8) {
@@ -74,7 +74,7 @@ print "If this is wrong, see the \"Decimal64 conversion\" section in the README\
 print "\n$float128_message";
 print "If this is wrong, see the \"Float128 conversion\" section in the README\n\n";
 
-my %options = (       
+my %options = (
   NAME => 'Math::MPFR',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
   ABSTRACT => 'Perl interface to the MPFR (floating point) library',
@@ -82,11 +82,26 @@ my %options = (
   LIBS => [
     '-lmpfr -lgmp'
   ],
+  LICENSE  => 'perl',
   VERSION_FROM => 'MPFR.pm',
   clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt p_spec.txt' },
+  META_MERGE => {
+   'meta-spec' => { version => 2 },
+    resources => {
+      repository => {
+        type => 'git',
+        url => 'https://github.com/sisyphus/math-mpfr.git',
+        web => 'https://github.com/sisyphus/math-mpfr',
+      },
+    },
+  },
 );
 
-$options{PREREQ_PM} = {'Math::Decimal64' => '0.01'} if $have_decimal64;
+my %prereq = ();
+$prereq{'Math::Decimal64'} = '0.01' if $have_decimal64;
+$prereq{'Math::Float128'}  = '0.01' if $have_float128;
+
+$options{PREREQ_PM} = \%prereq;
 
 WriteMakefile(%options);
 

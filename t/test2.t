@@ -58,7 +58,7 @@ if($have_gmp || $have_mpz) {
   Rmpfr_set_ui($c, 237, GMP_RNDN);
   Rmpfr_div_z($check2, $c, $z, GMP_RNDN);
   Rmpfr_mul_z($check2, $check2, $z, GMP_RNDN);
-  if($check2 - $c > -0.000001 
+  if($check2 - $c > -0.000001
      && $check2 - $c < 0.000001
      && (Math::MPFR::get_package_name($z) eq "Math::GMP"
          || Math::MPFR::get_package_name($z) eq "Math::GMPz")) {print "ok 3\n"}
@@ -90,7 +90,7 @@ if($have_gmp || $have_mpz) {
 
   Rmpfr_add_z($c, $c, $z, GMP_RNDN);
   Rmpfr_sub_z($c, $c, $z, GMP_RNDN);
- 
+
   if($c == $check2) {print "ok 5\n"}
   else {print "not ok 5\n"}
 }
@@ -139,10 +139,13 @@ if($have_gmp || $have_mpz) {
     else {
       warn "\$\@: $@";
       print "not ok 8\n";
-    } 
+    }
   }
 }
 else {
   warn "Skipping test 8 - no Math::GMP or Math::GMPz\n";
   print "ok 8\n";
 }
+
+
+

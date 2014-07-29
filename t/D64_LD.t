@@ -94,7 +94,7 @@ unless($why) {
     warn "\n\$ld: $ld\n\$ld_root: $ld_root\n";
     print "not ok 3\n";
   }
-  
+
 }
 else {
  warn "\nSkipping all tests\n";

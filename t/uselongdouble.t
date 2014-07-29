@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
 
-print "1..8\n";
+print "1..9\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -23,7 +23,7 @@ if(Math::MPFR::_has_longdouble()) {
   Rmpfr_set_ld($ld3, $n, GMP_RNDN);
 
   if(
-     $ld1 == $ld2 && 
+     $ld1 == $ld2 &&
      $ld2 == $ld3 &&
      $ld2 <= $n  &&
      $ld2 >= $n  &&
@@ -36,7 +36,7 @@ if(Math::MPFR::_has_longdouble()) {
                    ) {$ok .= 'a'}
 
   my $d2 = Rmpfr_get_ld($ld1, GMP_RNDN);
-  
+
   if($d2 == $n) {$ok .= 'b'}
 
   if(!Rmpfr_cmp_ld($ld1, $n)) {$ok .= 'c'}
@@ -64,7 +64,7 @@ if(Math::MPFR::_has_longdouble()) {
 
   $ld1 /= 2;
 
-  if($ld1 == ($n - 1) / 2) {$ok .= 'e'} 
+  if($ld1 == ($n - 1) / 2) {$ok .= 'e'}
 
   $ld1 *= 2;
 
@@ -87,14 +87,14 @@ if(Math::MPFR::_has_longdouble()) {
   if($ok eq 'abcdefghij') {print "ok 2\n"}
   else {print "not ok 2 $ok\n"}
 
-  my $bits = $Config::Config{longdblsize} > $Config::Config{doublesize} ? $Config::Config{doublesize} * 7 : 50; 
+  my $bits = $Config::Config{longdblsize} > $Config::Config{doublesize} ? $Config::Config{doublesize} * 7 : 50;
 
   $n = (2 ** $bits) + 0.5;
 
   my $ld4 = Math::MPFR->new($n);
 
   if($ld4 == int($ld4)) { print "not ok 3 precision has been lost: $ld4\n"}
-  else {print "ok 3\n"} 
+  else {print "ok 3\n"}
 
 }
 else {
@@ -128,9 +128,9 @@ if(Math::MPFR::_has_longdouble()) {
   if ($mpfr >= 4611686018427387903) {$ok .= 'e'}
 
   my $ld = Rmpfr_get_ld($mpfr, GMP_RNDN);
-  
+
   if ($ld < 4611686018427387904 && $ld > 4611686018427387902) {$ok .= 'f'}
-  if ($ld == 4611686018427387903) {$ok .= 'g'} 
+  if ($ld == 4611686018427387903) {$ok .= 'g'}
 
   my $cmp = $mpfr <=> 4611686018427387902;
   if($cmp > 0) {$ok .= 'h'}
@@ -171,15 +171,15 @@ if(Math::MPFR::_has_longdouble()) {
       warn "\n   Got (double): $double\n   Expected: 0.78125\n\n",
            "   Got (exp): $exp\n   Expected: 7\n";
       print "not ok 5\n";
-   }    
+   }
 }
 else {
    eval{my $double = Rmpfr_get_ld_2exp($exp, $num1, GMP_RNDN);};
-   if($@ =~ /Rmpfr_get_ld_2exp\(\) not implemented/) {print "ok 5\n"}
+   if($@ =~ /Rmpfr_get_ld_2exp not implemented/) {print "ok 5\n"}
    else {
       warn "\n\$\@: $@\n";
       print "not ok 5\n";
-   }  
+   }
 }
 
 if(Math::MPFR::_has_longdouble()) {
@@ -209,12 +209,12 @@ if(Math::MPFR::_has_longdouble()) {
   my $double = Rmpfr_get_ld($nan, GMP_RNDN);
   Rmpfr_set_ld($nan, $double, GMP_RNDN);
   if(Rmpfr_nan_p($nan)) {$ok .= 'b'}
-  else {warn "b: $nan\n"} 
+  else {warn "b: $nan\n"}
 
   $double = Rmpfr_get_ld($posinf, GMP_RNDN);
   Rmpfr_set_ld($posinf, $double, GMP_RNDN);
   if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'c'}
-  else {warn "c: $posinf\n"} 
+  else {warn "c: $posinf\n"}
 
   $double = Rmpfr_get_ld($neginf, GMP_RNDN);
   Rmpfr_set_ld($neginf, $double, GMP_RNDN);
@@ -224,12 +224,12 @@ if(Math::MPFR::_has_longdouble()) {
   $double = Rmpfr_get_NV($nan, GMP_RNDN);
   Rmpfr_set_ld($nan, $double, GMP_RNDN);
   if(Rmpfr_nan_p($nan)) {$ok .= 'e'}
-  else {warn "e: $nan\n"} 
+  else {warn "e: $nan\n"}
 
   $double = Rmpfr_get_NV($posinf, GMP_RNDN);
   Rmpfr_set_ld($posinf, $double, GMP_RNDN);
   if(Rmpfr_inf_p($posinf) && $posinf > 0) {$ok .= 'f'}
-  else {warn "f: $posinf\n"} 
+  else {warn "f: $posinf\n"}
 
   $double = Rmpfr_get_NV($neginf, GMP_RNDN);
   Rmpfr_set_ld($neginf, $double, GMP_RNDN);
@@ -237,7 +237,7 @@ if(Math::MPFR::_has_longdouble()) {
   else {warn "g: $neginf\n"}
 
   if($ok eq 'abcdefg') {print "ok 7\n"}
-  else {print "not ok 7 $ok\n"} 
+  else {print "not ok 7 $ok\n"}
 }
 else {
   warn "Skipping test 7 - no long double support\n";
@@ -268,3 +268,39 @@ else {
   warn "Skipping test 8 - no long double support\n";
   print "ok 8\n";
 }
+
+# Test for a bug that affects Double-Double type only.
+if(Math::MPFR::_has_longdouble()) {
+  my $prob1 = Rmpfr_init2(2097);
+  my $prob2 = Rmpfr_init2(2098);
+  my $p_val = (2 ** 1023) + (2 ** -1074);
+
+  my $res = $p_val > 2 ** 1023 ? 1 : 0;
+
+  my $res1 = Rmpfr_set_ld($prob1, $p_val, MPFR_RNDN);
+  my $res2 = Rmpfr_set_ld($prob2, $p_val, MPFR_RNDN);
+
+  if($res) { # double-double
+    if($res1 == -1 && $res2 == 0) {
+      print "ok 9\n";
+    }
+    else {
+      warn "\nDouble-Double type: \$res1: $res1 \$res2: $res2\n";
+      print "not ok 9\n";
+    }
+  }
+  else {
+    if(!$res1 && !$res2) {
+      print "ok 9\n";
+    }
+    else {
+      warn "\nNOT Double-Double type: \$res1: $res1 \$res2: $res2\n";
+      print "not ok 9\n";
+    }
+  }
+}
+else {
+  warn "Skipping test 9 - no long double support\n";
+  print "ok 9\n";
+}
+

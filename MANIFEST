@@ -20,6 +20,7 @@ t/constants.t
 t/D64_LD.t
 t/decimal64_conv.t
 t/div_by_zero.t
+t/DoubleDouble.t
 t/exceptions.t
 t/flags.t
 t/float128_conv.t
@@ -40,6 +41,7 @@ t/P_specifier.t
 t/pod.t
 t/printf.t
 t/remainder.t
+t/set_NV.t
 t/set_str.t
 t/sign.t
 t/sizes.t
@@ -55,3 +57,5 @@ t/TRmpfr_out_str.t
 t/use64bitint.t
 t/uselongdouble.t
 typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -32,8 +32,8 @@ if($_64) {
     $pp1 = Rmpfr_integer_string($int1, 10, GMP_RNDN);
   }
   else {$pp1 = Rmpfr_get_sj($int1, GMP_RNDN)}
-  if($pp1 == -144115188075868217) {$ok .= 'b'} 
- 
+  if($pp1 == -144115188075868217) {$ok .= 'b'}
+
   $pp1 += 14;
 
   my $int2 = Rmpfr_init();
@@ -44,7 +44,7 @@ if($_64) {
   if($int2 == $pp1
      && $int2 - $int1 - 14 == 0
      && !($int2 - $int1 - 14)
-     ) {$ok .= 'c'}  
+     ) {$ok .= 'c'}
 
   if($Config::Config{cc} eq 'cl') {
     eval{Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);};
@@ -125,10 +125,10 @@ if($_64) {
   $int += 12345;
   $int /= $pint; # $int is no longer an integer value
 
-  if($int < 2 
+  if($int < 2
      && $int > 1.99
      && $int > "1.99"
-     && $int <= 2 
+     && $int <= 2
      && $int >= 1.99
      && ($int <=> 1.99) == 1
      && ($int <=> 2) == -1
@@ -170,7 +170,7 @@ if($_64) {
 
   if($temp < 2
      && $temp > 1.99
-     && $temp <= 2 
+     && $temp <= 2
      && $temp <= "2"
      && $temp >+ 1.99
     ) {$ok .= 'i'}
@@ -179,8 +179,8 @@ if($_64) {
 
   $temp = atan2(99999, $pint);
 
-  if($temp > 6.938824e-13 
-     && $temp < 6.938825e-13 
+  if($temp > 6.938824e-13
+     && $temp < 6.938825e-13
      && $temp >= 6.938824e-13
      && $temp <= 6.938825e-13
      && ($temp <=> 6.938825e-13) == -1
@@ -209,7 +209,7 @@ if($_64) {
     warn "Skipping test 3m as it fails on perl 5.6\nbuilt with -Duse64bitint but without -Duselongdouble\n";
     $ok .= 'm';
   }
-  
+
   my $temp3 = new Math::MPFR($pint);
 
   if($temp3 == $temp2) {$ok .= 'n'}

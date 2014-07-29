@@ -41,7 +41,7 @@ for my $r(@rnds) {
       else {
         if(!Rmpfr_fits_ushort_p($v, $r)) {$ok++}
         else { warn "$r : $v : ", Rmpfr_fits_ushort_p($v, $r), "\n"}
-      } 
+      }
     }
     elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
       if(Rmpfr_fits_ushort_p($v, $r)) {$ok++}
@@ -79,7 +79,7 @@ for my $r(@rnds) {
       else {
         if(!Rmpfr_fits_uint_p($v, $r)) {$ok++}
         else { warn "$r : $v : ", Rmpfr_fits_uint_p($v, $r), "\n"}
-      } 
+      }
     }
     elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
       if(Rmpfr_fits_uint_p($v, $r)) {$ok++}
@@ -117,7 +117,7 @@ for my $r(@rnds) {
       else {
         if(!Rmpfr_fits_ulong_p($v, $r)) {$ok++}
         else { warn "$r : $v : ", Rmpfr_fits_ulong_p($v, $r), "\n"}
-      } 
+      }
     }
     elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
       if(Rmpfr_fits_ulong_p($v, $r)) {$ok++}
@@ -155,7 +155,7 @@ for my $r(@rnds) {
       else {
         if(!Rmpfr_fits_uintmax_p($v, $r)) {$ok++}
         else { warn "$r : $v : ", Rmpfr_fits_uintmax_p($v, $r), "\n"}
-      } 
+      }
     }
     elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
       if(Rmpfr_fits_uintmax_p($v, $r)) {$ok++}
@@ -193,7 +193,7 @@ for my $r(@rnds) {
       else {
         if(!Rmpfr_fits_UV_p($v, $r)) {$ok++}
         else { warn "$r : $v : ", Rmpfr_fits_UV_p($v, $r), "\n"}
-      } 
+      }
     }
     elsif($r == MPFR_RNDZ || $r == MPFR_RNDU) {
       if(Rmpfr_fits_UV_p($v, $r)) {$ok++}

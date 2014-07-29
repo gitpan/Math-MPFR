@@ -190,7 +190,7 @@ else {
   print "ok 1\n";
   print "ok 2\n";
   print "ok 3\n";
-} 
+}
 
 
 sub _save {
@@ -213,7 +213,7 @@ sub _retrieve {
     if($ret =~ / /) {
       @ret = split / /, $ret;
       return @ret;
-    } 
+    }
     return $ret;
 }
 

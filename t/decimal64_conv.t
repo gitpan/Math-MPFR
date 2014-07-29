@@ -193,7 +193,7 @@ if($proceed) {
   else {
     warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
     print "not ok 18\n";
-  }  
+  }
 
   $d64_1 = NVtoD64(1e-298);
   Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
@@ -202,7 +202,7 @@ if($proceed) {
   else {
     warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
     print "not ok 19\n";
-  } 
+  }
 
   $d64_1 = MEtoD64('1', -360);
   Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
@@ -211,7 +211,7 @@ if($proceed) {
   else {
     warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
     print "not ok 20\n";
-  } 
+  }
 
   $d64_1 = NVtoD64(1e-360);
   Rmpfr_set_decimal64($fr_d64, $d64_1, MPFR_RNDN);
@@ -220,7 +220,7 @@ if($proceed) {
   else {
     warn "\n $d64_1: $d64_1\n \$d64_2: $d64_2\n";
     print "not ok 21\n";
-  } 
+  }
 }
 else {
   warn "Skipping all tests - Math::MPFR not built for Decimal64 support";

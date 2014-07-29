@@ -7,6 +7,7 @@ my %options = %{
   'VERSION_FROM' => 'V.pm'
 }
 };
+
 WriteMakefile(%options);
 
 # Remove the Makefile dependency. Causes problems on a few systems.
