@@ -3,7 +3,7 @@ use strict;
 use Config;
 use Math::MPFR qw(:mpfr);
 
-print "1..4\n";
+print "1..5\n";
 
 print STDERR "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print STDERR "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -14,10 +14,10 @@ elsif(pack("L", 305419897) eq pack("V", 305419897)) {warn "# Machine appears to 
 
 warn "# Byte Order: ", $Config{byteorder}, "\n";
 
-if($Math::MPFR::VERSION eq '3.22') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '3.23') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
-if(Math::MPFR::_get_xs_version() eq '3.22') {print "ok 2\n"}
+if(Math::MPFR::_get_xs_version() eq '3.23') {print "ok 2\n"}
 else {
   warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
   print "not ok 2\n";
@@ -47,4 +47,12 @@ elsif($max_base == 36) {
 else {
   warn "\n\$max_base: $max_base\n";
   print "not ok 4\n";
+}
+
+if(Math::MPFR::_has_longlong() && Math::MPFR::_ivsize_bits() == (8 * $Config{ivsize})) {print "ok 5\n"}
+elsif(!Math::MPFR::_has_longlong()) {print "ok 5\n"}
+else {
+  warn "\n _has_longlong(): ", Math::MPFR::_has_longlong(), "\n _ivsize_bits: ",
+        Math::MPFR::_ivsize_bits(), "\n";
+  print "not ok 5\n";
 }

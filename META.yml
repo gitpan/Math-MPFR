@@ -16,4 +16,4 @@ no_index:
     - inc
 resources:
   repository: https://github.com/sisyphus/math-mpfr.git
-version: 3.22
+version: 3.23

@@ -28,7 +28,7 @@
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
                 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
                 RMPFR_PREC_MIN RMPFR_PREC_MAX
-                MPFR_DBL_DIG MPFR_LDBL_DIG);
+                MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG);
 
     use overload
     '++'   => \&overload_inc,
@@ -130,7 +130,8 @@ Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
 Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_decimal64 Rmpfr_get_decimal64 Rmpfr_set_float128 Rmpfr_get_float128
+Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
+Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
 Rmpfr_sin_cos Rmpfr_sinh_cosh
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
@@ -150,11 +151,11 @@ Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 prec_cast
-MPFR_DBL_DIG MPFR_LDBL_DIG
+MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
 mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 );
 
-    our $VERSION = '3.22';
+    our $VERSION = '3.23';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -223,7 +224,8 @@ Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec
 Rmpfr_set_prec_raw Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj
 Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_str_binary Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
-Rmpfr_set_decimal64 Rmpfr_get_decimal64 Rmpfr_set_float128 Rmpfr_get_float128
+Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
+Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
 Rmpfr_sin_cos Rmpfr_sinh_cosh
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
@@ -243,7 +245,7 @@ Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
 Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 prec_cast
-MPFR_DBL_DIG MPFR_LDBL_DIG
+MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
 mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 )]);
 
@@ -517,6 +519,7 @@ sub MPFR_VERSION_PATCHLEVEL {return _MPFR_VERSION_PATCHLEVEL()}
 sub MPFR_VERSION_STRING {return _MPFR_VERSION_STRING()}
 sub MPFR_DBL_DIG {return _DBL_DIG()}
 sub MPFR_LDBL_DIG {return _LDBL_DIG()}
+sub MPFR_FLT128_DIG {return _FLT128_DIG()}
 
 sub mpfr_min_inter_prec {
     die "Wrong number of args to minimum_intermediate_prec()" if @_ != 3;
@@ -746,6 +749,45 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    that ships with the GMP sources. I get occasional
    segfaults when I try to do that, so I've stopped
    recommending it - and don't support the practice.
+
+=head1 PASSING __float128 VALUES
+
+   There are 3 ways to pass __float128 values to/from
+   Math::MPFR:
+
+    1) Install Math::Float128 and build Math::MPFR by providing the
+    "F128=1" arg to the Makefile.pl:
+
+      perl Makefile.PL F128=1
+
+    Then you can pass the values of the Math::Float128 objects to
+    and from Math::MPFR using:
+
+      Rmpfr_set_FLOAT128() and Rmpfr_get_FLOAT128()
+
+    2) Build perl (5.21.4 or later) with -Dusequadmath; build the
+    mpfr-3.2.0 (or later) library with the configure option
+    --enable-float128, and then build Math::MPFR by providing the
+    "F128=1" arg to the Makefile.pl:
+
+      perl Makefile.PL F128=1
+
+    Then you can pass your perl's __float128 NV values directly
+    to/from Math::MPFR using:
+
+      Rmpfr_set_float128() or Rmpfr_set_NV() and
+      Rmpfr_get_float128() or Rmpfr_get_NV()
+
+    This will also mean that overloaded operations that receive an
+    NV will evaluate that (__float128) NV to it's full precision.
+    And assigning the NV as Math::MPFR->new($nv) will also work as
+    intended.
+
+    3) Convert the __float128 values to a string and pass them to
+    and from Math::MPFR using:
+
+      Rmpfr_set_str() and Rmpfr_get_str()
+
 
 =head1 FUNCTIONS
 
@@ -1005,11 +1047,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
    $si = Rmpfr_set_f($rop, $f, $rnd); # $f is a mpf object.
    $si = Rmpfr_set_flt($rop, $float, $rnd); # mpfr-3.0.0 and later only
-   $si = Rmpfr_set_decimal64($rop, $d64, $rnd) # mpfr-3.1.1 and later
-                                               # only. $d64 is a
+   $si = Rmpfr_set_float128($rop, $f128, $rnd); # mpfr-3.2.0 and later
+   $si = Rmpfr_set_DECIMAL64($rop, $D64, $rnd) # mpfr-3.1.1 and later
+                                               # only. $D64 is a
                                                # Math::Decimal64 object
-   $si = Rmpfr_set_float128($rop, $f128, $rnd) # mpfr-3.2.0 and later
-                                               # only. $f128 is a
+   $si = Rmpfr_set_FLOAT128($rop, $F128, $rnd) # mpfr-3.2.0 and later
+                                               # only. $F128 is a
                                                # Math::Float128 object
     Set the value of $rop from 2nd arg, rounded to the precision of
     $rop towards the given direction $rnd.  Please note that even a
@@ -1026,8 +1069,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Rmpfr_set_NV(), but if your perl's nvtype is 'double' and you want
     to set a value whose precision is that of 'long double', then
     install Math::LongDouble and use Rmpfr_set_LD().
-    Rmpfr_set_NV simply calls either mpfr_set_ld or mpfr_set_ld,
-    as appropriate for your Math::MPFR and perl configuration.
+    Rmpfr_set_NV simply calls either mpfr_set_ld, mpfr_set_ld, or
+    mpfr_set_float128 as appropriate for your Math::MPFR and perl
+    configuration.
 
    $si = Rmpfr_set_ui_2exp($rop, $ui, $exp, $rnd);
    $si = Rmpfr_set_si_2exp($rop, $si, $exp, $rnd);
@@ -1265,18 +1309,20 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $double = Rmpfr_get_d($op, $rnd);
    $ld     = Rmpfr_get_ld($op, $rnd);
+   $f128   = Rmpfr_get_float128($op, $rnd); # nvtype must be __float128
+                                            # mpfr-3.2.0 or later
    $nv     = Rmpfr_get_NV($op, $rnd);
    $float  = Rmpfr_get_flt($op, $rnd);   # mpfr-3.0.0 and later.
    Rmpfr_get_LD($LD, $op, $rnd); # $LD is a Math::LongDouble object.
-   Rmpfr_get_decimal64($d64, $op, $rnd); # mpfr-3.1.1 and later.
+   Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.1 and later.
                                          # $d64 is a Math::Decimal64
                                          # object.
-   Rmpfr_get_float128($f128, $op, $rnd); # mpfr-3.2.0 and later.
-                                         # $f128 is a Math::Float128
+   Rmpfr_get_FLOAT128($F128, $op, $rnd); # mpfr-3.2.0 and later.
+                                         # $F128 is a Math::Float128
                                          # object.
     Convert $op to a 'double' a 'long double' an 'NV', a float, a
-    Math::LongDouble object, a Math::Decimal64 object, or a
-    Math::Float128 object using the rounding mode $rnd.
+    __float128, a Math::LongDouble object, a Math::Decimal64 object, or
+    a Math::Float128 object using the rounding mode $rnd.
 
     NOTE: If your perl's nvtype is 'long double' use Rmpfr_get_ld(), but
     if your perl's nvtype is 'double' and you want to get a value whose
@@ -2218,12 +2264,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      $M ** $G;
 
     In each of the above, a Math::MPFR object containing the result
-    of the operation is returned. It is also now permissible to do:
+    of the operation is returned.It is also now permissible to do:
 
      $M += $G;
      $M -= $G;
      $M *= $G;
      $M /= $G;
+     $M **= $G;
 
     If you have version 0.35 (or later) of Math::GMPz, Math::GMPq
     and Math::GMPf, it is also permissible to do:
@@ -2236,9 +2283,18 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     Again, each of those operations returns a Math::MPFR object
     containing the result of the operation.
-    Each operation is conducted using current default rounding mode
-    and, if there's a need for the operation to create a Math::MPFR
-    object, the created object will be given current default precision.
+    Each operation is conducted using current default rounding mode.
+
+    NOTE: If $G is a Math::GMPq object or a Math::GMPz object, then
+    the value of $G/$M is calculated by doing 1/($M/$G). This
+    involves *2* roundings of the value that is returned - once when
+    $M/$G is calculated, and again when the inverse is calculated.
+
+    NOTE: In overloading a ** (power) operation that involves a
+    Math::GMPq object, it is necessary to convert the Math::GMPq
+    object to an mpfr_t (the type of value encapsulated in the
+    Math::MPFR object). This conversion is done using current default
+    precision and current default rounding mode.
 
     The following is still NOT ALLOWED, and will cause a fatal error:
 
@@ -2255,23 +2311,18 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     using the first value it finds, or croaking if it gets
     to step 6:
 
-    1. If the variable is an unsigned long then that value is used.
-       The variable is considered to be an unsigned long if
+    1. If the variable is a UV (unsigned integer value) then that
+       value is used. The variable is considered to be a UV if
        (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV()
-       returns true.(In the case of perls built with
-       -Duse64bitint, the variable is treated as an unsigned long
-       long int if the UOK flag is set.)
+       returns true.
 
-    2. If the variable is a signed long int, then that value is used.
-       The variable is considered to be a signed long int if the
-       IOK flag is set. (In the case of perls built with
-       -Duse64bitint, the variable is treated as a signed long long
-       int if the IOK flag is set.)
+    2. If the variable is an IV (signed integer value) then that
+       value is used. The variable is considered to be an IV if the
+       IOK flag is set.
 
-    3. If the variable is a double, then that value is used. The
-       variable is considered to be a double if the NOK flag is set.
-       (In the case of perls built with -Duselongdouble, the variable
-       is treated as a long double if the NOK flag is set.)
+    3. If the variable is an NV (floating point value) then that
+       value is used. The variable is considered to be an NV if the
+       NOK flag is set.
 
     4. If the variable is a string (ie the POK flag is set) then the
        value of that string is used. If the POK flag is set, but the
@@ -2382,12 +2433,16 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    BASE CONVERSIONS
 
-   $DBL_DIG  = MPFR_DBL_DIG;  # Will be 0 if float.h doesn't define
+   $DBL_DIG  = MPFR_DBL_DIG;  # Will be undef if float.h doesn't define
                               # DBL_DIG.
 
-   $LDBL_DIG = MPFR_LDBL_DIG; # Will be 0 if float.h doesn't define
+   $LDBL_DIG = MPFR_LDBL_DIG; # Will be undef if float.h doesn't define
                               # LDBL_DIG.
 
+   $FLT128_DIG = MPFR_FLT128_DIG; # Will be undef if quadmath.h has not
+                                  # been loaded, or quadmath.h does not
+                                  # define FLT128_DIG
+.
    $min_prec = mpfr_min_inter_prec($orig_base, $orig_length, $to_base);
    $max_len  = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
    $min_base = mpfr_min_inter_base($orig_base, $orig_length, $to_prec);
@@ -2479,7 +2534,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2013 Sisyphus
+    Copyright 2006-2014 Sisyphus
 
 =head1 AUTHOR
 
